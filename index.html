@@ -2855,18 +2855,30 @@ let clasificacion = [
 ];
 
 /* hoja de Google Sheets publicada como CSV (pestaña de clasificación). La
-   tabla se copia y pega tal cual de la web de la federación, así que los
+   tabla se copia y pega tal cual de la web de la federación (columnas
+   "P.,Equipo,Punos,PJ,PG,PE,PP,GF,GC" en la primera fila), así que los
    nombres de equipo vienen en su formato oficial (mayúsculas, abreviados,
-   con comillas) y no coinciden con los que usa el resto de la web -- por
-   eso hace falta la tabla NOMBRES_EQUIPOS_FEDERACION de aquí abajo, para
-   que el escudo y la fila resaltada de "UE Castellbisbal" se reconozcan
-   igual. Si la federación cambia el texto de algún equipo, hay que
-   actualizar aquí su entrada (el resto de la tabla no le afecta).
+   con o sin comillas) y no coinciden con los que usa el resto de la web --
+   por eso hace falta la tabla NOMBRES_EQUIPOS_FEDERACION de aquí abajo,
+   para que el escudo y la fila resaltada de "UE Castellbisbal" se
+   reconozcan igual. Si la federación cambia el texto de algún equipo, hay
+   que actualizar aquí su entrada (el resto de la tabla no le afecta).
    Mientras URL_CLASIFICACION esté vacío, se usan los datos de ejemplo. */
 const URL_CLASIFICACION = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?gid=1405244159&single=true&output=csv";
 
+/* quita comillas, comas, puntos, espacios de más y la letra de división
+   final ("A"/"B") -- así da igual si el nombre viene "Torrelles, U.E. "A""
+   o "TORRELLES, U.E." (sin comillas ni letra): los dos quedan iguales.
+   Las comas/puntos se sustituyen por espacio (no se borran sin más) para
+   que "XXIII,C.S." y "XXIII, C.S." (con o sin espacio) también coincidan */
 function normalizarEquipoFederacion(nombre){
-  return nombre.toUpperCase().replace(/["“”]/g, "").replace(/\s+/g, " ").trim();
+  return nombre
+    .toUpperCase()
+    .replace(/["“”]/g, "")
+    .replace(/[.,]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\s+[AB]$/, "");
 }
 const NOMBRES_EQUIPOS_FEDERACION = {};
 [
@@ -2892,7 +2904,7 @@ const NOMBRES_EQUIPOS_FEDERACION = {};
 
 /* ---------- convierte una fila de la hoja (formato federación) en un equipo tal como lo espera el resto del código ---------- */
 function filaAEquipoClasificacion(fila){
-  const nombreCrudo = fila.EQUIPO || "";
+  const nombreCrudo = fila.Equipo || "";
   const nombreLimpio = NOMBRES_EQUIPOS_FEDERACION[normalizarEquipoFederacion(nombreCrudo)] || nombreCrudo;
   const numero = v => Number(v) || 0;
   return {
@@ -2914,7 +2926,12 @@ async function cargarClasificacionYPintar(){
     try{
       const resp = await fetchCSVSinCache(URL_CLASIFICACION);
       if(resp.ok){
-        const filas = parsearCSV(await resp.text());
+        // la federación a veces pega una segunda fila de cabecera (en catalán,
+        // "Equip,Punts,...") justo antes de los datos: se descarta cualquier
+        // fila cuyo equipo no sea uno de los 16 conocidos, para que no salga
+        // como un equipo fantasma en la tabla
+        const filas = parsearCSV(await resp.text())
+          .filter(f => normalizarEquipoFederacion(f.Equipo || "") in NOMBRES_EQUIPOS_FEDERACION);
         if(filas.length) clasificacion = filas.map(filaAEquipoClasificacion);
       }
     }catch(err){
@@ -3782,7 +3799,10 @@ function pintarCalendario(){
       const perdio = golesCastellbisbal < golesRival;
       row.classList.add(gano ? "gano" : perdio ? "perdio" : "empato");
       fechaHTML = `<span class="cal-fecha">Partido Jugado</span>`;
-      horaHTML = `<span class="cal-hora cal-resultado">${golesCastellbisbal}-${golesRival}</span>`;
+      // el resultado se muestra siempre "local-visitante" (como marca el
+      // marcador de verdad), no "nosotros-rival": si jugamos fuera, nuestro
+      // gol va segundo, igual que ya se hace en el banner y en "Último partido"
+      horaHTML = `<span class="cal-hora cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${p.fecha}</span>`;
