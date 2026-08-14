@@ -240,7 +240,7 @@ a:focus-visible, button:focus-visible{
 }
 .live-banner.is-directo .live-dot{
   background:#dc2626;
-  animation:live-pulse 1.6s infinite;
+  animation:live-pulse 1.6s infinite, live-blink 1.2s infinite;
 }
 .live-banner.is-final .live-dot{
   background:#94a3b8;
@@ -251,6 +251,10 @@ a:focus-visible, button:focus-visible{
   70%{ box-shadow:0 0 0 8px rgba(220,38,38,0); }
   100%{ box-shadow:0 0 0 0 rgba(220,38,38,0); }
 }
+@keyframes live-blink{
+  0%, 100%{ opacity:1; }
+  50%{ opacity:0.25; }
+}
 .live-label{
   font-size:11px;
   font-weight:800;
@@ -258,7 +262,7 @@ a:focus-visible, button:focus-visible{
   text-transform:uppercase;
   color:#4ade80;
 }
-.live-banner.is-directo .live-label{ color:#f87171; }
+.live-banner.is-directo .live-label{ color:#f87171; animation:live-blink 1.2s infinite; }
 .live-banner.is-final .live-label{ color:#94a3b8; }
 .live-label.is-recap{ color:var(--white-faint); }
 .live-minute{
@@ -269,6 +273,7 @@ a:focus-visible, button:focus-visible{
   padding-left:10px;
   border-left:1px solid var(--line);
 }
+#liveReloj.reloj-parpadea{ color:#dc2626; animation:live-blink 1s infinite; }
 .live-teams{
   display:flex;
   align-items:center;
@@ -332,6 +337,23 @@ a:focus-visible, button:focus-visible{
   transition:color .2s ease;
 }
 .live-venue[href]:hover{ color:var(--white); }
+.live-badge-wrap{ margin-top:16px; display:flex; justify-content:center; }
+.puntos-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px; height:44px;
+  border-radius:50%;
+  font-family:var(--display);
+  font-size:11px;
+  font-weight:800;
+  color:var(--black);
+  flex:none;
+}
+.puntos-badge.gano{ background:#4ade80; }
+.puntos-badge.empato{ background:#eab308; }
+.puntos-badge.perdio{ background:#f87171; }
+.puntos-badge.cal-badge{ grid-column:5; justify-self:center; width:36px; height:36px; font-size:9.5px; }
 .live-clima{
   margin-top:10px;
   font-size:12px;
@@ -344,36 +366,6 @@ a:focus-visible, button:focus-visible{
   letter-spacing:0.03em;
   color:var(--lilac-light);
 }
-.live-racha{
-  margin-top:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-.live-racha-label{
-  font-size:11px;
-  letter-spacing:0.06em;
-  text-transform:uppercase;
-  color:var(--white-faint);
-}
-.live-racha-dots{
-  display:flex;
-  gap:5px;
-}
-.racha-dot{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:20px; height:20px;
-  border-radius:50%;
-  font-size:10px;
-  font-weight:800;
-  color:var(--black);
-}
-.racha-dot.v{ background:#4ade80; }
-.racha-dot.e{ background:#9ca3af; }
-.racha-dot.d{ background:#f87171; }
 .live-actions{
   margin-top:18px;
   display:flex;
@@ -1341,40 +1333,6 @@ a:focus-visible, button:focus-visible{
 .calendar-header span:nth-child(3),
 .calendar-header span:nth-child(4){ text-align:right; }
 .calendar-header span:last-child{ justify-self:center; }
-.calendar-row-simple{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:11px 4px;
-  border-bottom:1px solid var(--line);
-  font-size:13px;
-}
-.calendar-row-simple:hover{ background:rgba(245,245,243,0.025); }
-.cals-jornada{
-  width:32px;
-  flex:none;
-  font-family:var(--display);
-  font-size:11px;
-  color:var(--white-faint);
-}
-.cals-rival{
-  flex:1;
-  color:var(--white-dim);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.cals-resultado{
-  flex:none;
-  font-family:var(--display);
-  font-size:13px;
-  font-weight:800;
-  color:var(--white-faint);
-  min-width:38px;
-  text-align:right;
-}
-.calendar-row-simple.gano .cals-resultado{ color:#4ade80; }
-.calendar-row-simple.perdio .cals-resultado{ color:#f87171; }
 .calendar-row{
   display:grid;
   grid-template-columns:52px 1fr 96px 118px 92px;
@@ -1438,7 +1396,12 @@ a:focus-visible, button:focus-visible{
   font-weight:800;
   font-family:var(--display);
   letter-spacing:0.04em;
+  font-size:16px;
+  text-align:center;
 }
+.calendar-row.jugado-resultado.gano .cal-resultado{ color:#4ade80; }
+.calendar-row.jugado-resultado.perdio .cal-resultado{ color:#f87171; }
+.calendar-row.jugado-resultado.empato .cal-resultado{ color:#eab308; }
 .cal-tag{
   grid-column:5;
   font-size:10px;
@@ -2150,6 +2113,7 @@ a:focus-visible, button:focus-visible{
       <span class="live-minute" id="liveJornada">J1</span>
       <span class="live-minute" id="liveFecha">20/09/2026</span>
       <span class="live-minute" id="liveHora">12:00 h</span>
+      <span class="live-minute" id="liveReloj" style="display:none;"></span>
     </div>
     <div class="live-teams">
       <div class="live-team">
@@ -2165,12 +2129,9 @@ a:focus-visible, button:focus-visible{
       </div>
     </div>
     <a class="live-venue" id="liveVenue" href="https://maps.app.goo.gl/7GEpgcETFou2osYU9" target="_blank" rel="noopener">📍 Campo Municipal</a>
+    <div class="live-badge-wrap" id="liveBadgeWrap" style="display:none;"></div>
     <p class="live-clima" id="liveClima" style="display:none;"></p>
     <p class="live-cuenta-atras" id="liveCuentaAtras" style="display:none;"></p>
-    <div class="live-racha" id="liveRacha" style="display:none;">
-      <span class="live-racha-label">Racha</span>
-      <span class="live-racha-dots" id="liveRachaDots"></span>
-    </div>
     <div class="live-actions">
       <a class="match-action match-action-primary" id="btnCompartirBanner" href="#" target="_blank" rel="noopener">Compartir</a>
       <a class="match-action" id="btnAnadirCalendario" href="#" target="_blank" rel="noopener" style="display:none;">📅 Añadir al calendario</a>
@@ -2846,7 +2807,7 @@ async function cargarRadarYPintar(calendarioListo){
   await calendarioListo;
   if(URL_RADAR){
     try{
-      const resp = await fetch(URL_RADAR);
+      const resp = await fetchCSVSinCache(URL_RADAR);
       if(resp.ok){
         const filas = parsearCSV(await resp.text());
         const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-");
@@ -2961,7 +2922,7 @@ function filaAEquipoClasificacion(fila){
 async function cargarClasificacionYPintar(){
   if(URL_CLASIFICACION){
     try{
-      const resp = await fetch(URL_CLASIFICACION);
+      const resp = await fetchCSVSinCache(URL_CLASIFICACION);
       if(resp.ok){
         const filas = parsearCSV(await resp.text());
         if(filas.length) clasificacion = filas.map(filaAEquipoClasificacion);
@@ -3228,6 +3189,17 @@ function formatearHora(hora){
   return hora === "Por confirmar" ? hora : hora + " h";
 }
 
+/* ---------- círculo de puntos según el resultado de UE Castellbisbal: se
+   usa en el banner al pasar a "final", en "Último partido" y en el
+   calendario de resultados, siempre con el mismo criterio de colores ---------- */
+function badgePuntosHTML(golesCastellbisbal, golesRival, claseExtra){
+  const gano = golesCastellbisbal > golesRival;
+  const perdio = golesCastellbisbal < golesRival;
+  const clase = gano ? "gano" : perdio ? "perdio" : "empato";
+  const texto = gano ? "+3P" : perdio ? "0P" : "+1P";
+  return `<span class="puntos-badge ${clase}${claseExtra ? " " + claseExtra : ""}">${texto}</span>`;
+}
+
 /* ---------- convierte "DD/MM/AAAA" en objeto Date ---------- */
 function parseFecha(fecha){
   const [d, m, y] = fecha.split("/").map(Number);
@@ -3283,7 +3255,6 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   document.getElementById("liveCrest2").src = esLocal ? (partidoActual.escudoRival || ESCUDO_GENERICO) : document.querySelector(".crest").src;
   document.getElementById("liveName1").textContent = esLocal ? "UE Castellbisbal" : partidoActual.rival;
   document.getElementById("liveName2").textContent = esLocal ? partidoActual.rival : "UE Castellbisbal";
-  pintarCampoBanner(esLocal, partidoActual.campo, partidoActual.direccion);
 
   const banner = document.getElementById("liveBanner");
   const label = document.getElementById("liveLabel");
@@ -3301,6 +3272,9 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   bannerInfo.golesCastellbisbal = golesCastellbisbal;
   bannerInfo.golesRival = golesRival;
 
+  const venueEl = document.getElementById("liveVenue");
+  const badgeWrap = document.getElementById("liveBadgeWrap");
+
   if(estado === "en_directo" || estado === "final"){
     banner.classList.add(estado === "en_directo" ? "is-directo" : "is-final");
     label.textContent = estado === "en_directo" ? "En directo" : "Final";
@@ -3312,12 +3286,26 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       `<span class="live-score-sep">–</span>` +
       `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
 
-    // en cuanto el partido termina, el mismo resultado se refleja también
-    // en la tarjeta de "Último partido", sin tener que escribirlo dos veces
     if(estado === "final"){
+      // partido acabado: no hace falta el campo, se ve mejor el resultado en puntos
+      venueEl.style.display = "none";
+      badgeWrap.style.display = "";
+      badgeWrap.innerHTML = badgePuntosHTML(golesCastellbisbal, golesRival);
+      detenerRelojPartido();
+      // y el mismo resultado se refleja también en la tarjeta de "Último
+      // partido", sin tener que escribirlo dos veces
       pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
+    }else{
+      badgeWrap.style.display = "none";
+      venueEl.style.display = "";
+      pintarCampoBanner(esLocal, partidoActual.campo, partidoActual.direccion);
+      iniciarRelojPartido(partidoActual);
     }
   }else{
+    badgeWrap.style.display = "none";
+    venueEl.style.display = "";
+    pintarCampoBanner(esLocal, partidoActual.campo, partidoActual.direccion);
+    detenerRelojPartido();
     label.textContent = "Próximo partido";
     fecha.textContent = partidoActual.fecha;
     hora.textContent = formatearHora(partidoActual.hora);
@@ -3352,8 +3340,6 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   }else{
     btnCalendario.style.display = "none";
   }
-
-  pintarRachaReciente();
 }
 
 /* ============================================================
@@ -3396,6 +3382,68 @@ function iniciarCuentaAtras(partido){
 }
 
 /* ============================================================
+   RELOJ DE TIEMPO ESTIMADO (solo mientras el partido está "en directo")
+   ------------------------------------------------------------
+   Es una estimación automática a partir de la hora de inicio de la
+   hoja: no sabe lo que pasa de verdad en el campo (retrasos, lesiones,
+   tiempo añadido real...), solo asume que el partido empieza puntual
+   y sigue un reparto fijo: 45'+2' / descanso de 17' / 45'+2' → pero
+   tope duro en "90'" (nunca se ve 90+2), y ahí se queda parpadeando
+   hasta que se cambie el estado a "final" en la hoja. ---------- */
+let intervaloReloj = null;
+
+function detenerRelojPartido(){
+  if(intervaloReloj){ clearInterval(intervaloReloj); intervaloReloj = null; }
+  const el = document.getElementById("liveReloj");
+  el.style.display = "none";
+  el.classList.remove("reloj-parpadea");
+}
+
+function calcularMinutoPartido(kickoff){
+  const DURACION_PARTE = 45, ANADIDO = 2, DESCANSO = 17;
+  const finPrimeraConAnadido = DURACION_PARTE + ANADIDO;      // 47'
+  const finDescanso = finPrimeraConAnadido + DESCANSO;        // 64'
+
+  let transcurridos = (new Date() - kickoff) / 60000;
+  if(transcurridos < 0) transcurridos = 0;
+
+  if(transcurridos <= DURACION_PARTE){
+    return { texto: Math.floor(transcurridos) + "'", parpadea: false };
+  }
+  if(transcurridos <= finPrimeraConAnadido){
+    return { texto: "45+" + Math.floor(transcurridos - DURACION_PARTE) + "'", parpadea: false };
+  }
+  if(transcurridos <= finDescanso){
+    return { texto: "45'", parpadea: true }; // descanso: parado y parpadeando
+  }
+  const transcurridosSegunda = transcurridos - finDescanso;
+  if(transcurridosSegunda < DURACION_PARTE){
+    return { texto: (DURACION_PARTE + Math.floor(transcurridosSegunda)) + "'", parpadea: false };
+  }
+  return { texto: "90'", parpadea: true }; // tope duro: parado y parpadeando hasta que se marque "final"
+}
+
+function iniciarRelojPartido(partido){
+  detenerRelojPartido();
+  const el = document.getElementById("liveReloj");
+
+  const [d, m, y] = partido.fecha.split("/");
+  let horas = 12, minutos = 0;
+  const horaMatch = /^(\d{1,2}):(\d{2})/.exec(partido.hora || "");
+  if(horaMatch){ horas = parseInt(horaMatch[1], 10); minutos = parseInt(horaMatch[2], 10); }
+  const kickoff = new Date(y, m - 1, d, horas, minutos);
+
+  function actualizar(){
+    const { texto, parpadea } = calcularMinutoPartido(kickoff);
+    el.textContent = texto;
+    el.classList.toggle("reloj-parpadea", parpadea);
+    el.style.display = "";
+  }
+  actualizar();
+  intervaloReloj = setInterval(actualizar, 15000); // se refresca cada 15s, de sobra para minutos
+}
+
+/* ============================================================
    AÑADIR AL CALENDARIO (Google Calendar)
    ============================================================ */
 function generarEnlaceCalendario(partido, esLocal){
@@ -3419,32 +3467,6 @@ function generarEnlaceCalendario(partido, esLocal){
   url.searchParams.set("location", lugar);
   url.searchParams.set("details", `Jornada ${partido.jornada} — UE Castellbisbal`);
   return url.toString();
-}
-
-/* ============================================================
-   RACHA RECIENTE (últimos 5 resultados)
-   ============================================================ */
-function pintarRachaReciente(){
-  const cont = document.getElementById("liveRacha");
-  const dotsEl = document.getElementById("liveRachaDots");
-
-  const jugados = partidos
-    .filter(p => p.golesLocal !== null && p.golesVisitante !== null)
-    .sort((a, b) => a.jornada - b.jornada)
-    .slice(-5);
-
-  if(!jugados.length){ cont.style.display = "none"; return; }
-
-  dotsEl.innerHTML = jugados.map(p => {
-    const esLocal = p.tipo === "LOCAL";
-    const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
-    const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
-    const resultado = golesCastellbisbal > golesRival ? "v" : golesCastellbisbal < golesRival ? "d" : "e";
-    const letra = resultado === "v" ? "V" : resultado === "d" ? "D" : "E";
-    return `<span class="racha-dot ${resultado}" title="J${p.jornada}: ${golesCastellbisbal}-${golesRival} vs ${p.rival}">${letra}</span>`;
-  }).join("");
-
-  cont.style.display = "";
 }
 
 /* ============================================================
@@ -3549,7 +3571,7 @@ function pintarUltimoPartidoDesdeSheet(partido, golesCastellbisbal, golesRival){
   const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
   const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
   const textoResultado = `${golesIzquierda} – ${golesDerecha}`;
-  document.getElementById("ultimoScore").innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>`;
+  document.getElementById("ultimoScore").innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>${badgePuntosHTML(golesCastellbisbal, golesRival)}`;
 
   const lugar = partido.campo || (esLocal ? "Campo Municipal" : "Campo del rival");
   info.textContent = `${partido.fecha} · ${lugar}`;
@@ -3600,7 +3622,7 @@ function pintarUltimoPartido(partidoAnterior){
     const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
     const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
     textoResultado = `${golesIzquierda} – ${golesDerecha}`;
-    score.innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>`;
+    score.innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>${badgePuntosHTML(golesCastellbisbal, golesRival)}`;
   }else{
     score.innerHTML = `<span class="live-vs">VS</span>`;
   }
@@ -3706,26 +3728,6 @@ function pintarCalendario(){
   partidosAMostrar.forEach(p => {
     const tieneResultado = p.golesLocal !== null && p.golesVisitante !== null;
     const esLocal = p.tipo === "LOCAL";
-
-    // partido ya jugado: fila simple, solo lo esencial (jornada, rival, resultado)
-    if(tieneResultado){
-      const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
-      const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
-      const gano = golesCastellbisbal > golesRival;
-      const perdio = golesCastellbisbal < golesRival;
-      const row = document.createElement("div");
-      row.className = "calendar-row-simple" + (gano ? " gano" : perdio ? " perdio" : " empato");
-      row.innerHTML = `
-        <span class="cals-jornada">J${p.jornada}</span>
-        <span class="cals-rival">${esLocal ? "vs " : "@ "}${p.rival}</span>
-        <span class="cals-resultado">${golesCastellbisbal}-${golesRival}</span>
-      `;
-      cont.appendChild(row);
-      return;
-    }
-
-    const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
-    const horaOResultado = formatearHora(p.hora);
     const escudoRival = p.escudoRival || ESCUDO_GENERICO;
     const rivalContenido = esLocal
       ? `<img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">
@@ -3737,6 +3739,32 @@ function pintarCalendario(){
          <span class="cal-vs">VS</span>
          <img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">`;
     const row = document.createElement("div");
+
+    // partido ya jugado: mismo formato que un partido por jugar (con escudos),
+    // pero con el resultado centrado donde iba la hora, y "Partido Jugado" en la fecha
+    if(tieneResultado){
+      const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
+      const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
+      const gano = golesCastellbisbal > golesRival;
+      const perdio = golesCastellbisbal < golesRival;
+      row.className = "calendar-row jugado-resultado" + (esLocal ? " local" : "") + (gano ? " gano" : perdio ? " perdio" : " empato");
+      row.innerHTML = `
+        <div class="cal-line-top">
+          <span class="cal-jornada">J${p.jornada}</span>
+          ${badgePuntosHTML(golesCastellbisbal, golesRival, "cal-badge")}
+        </div>
+        <span class="cal-rival">${rivalContenido}</span>
+        <div class="cal-line-bottom">
+          <span class="cal-fecha">Partido Jugado</span>
+          <span class="cal-hora cal-resultado">${golesCastellbisbal}-${golesRival}</span>
+        </div>
+      `;
+      cont.appendChild(row);
+      return;
+    }
+
+    const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
+    const horaOResultado = formatearHora(p.hora);
     row.className = "calendar-row" + (esLocal ? " local" : "") + (jugado ? " jugado" : "");
     row.innerHTML = `
       <div class="cal-line-top">
@@ -3805,6 +3833,16 @@ let partidos = [
    se usan los datos de ejemplo de arriba. */
 const URL_CALENDARIO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?output=csv";
 
+/* ---------- pide el CSV de una hoja sin que el navegador se quede con una
+   copia en caché (si no, un simple refresco de la página podía seguir
+   mostrando datos viejos aunque la hoja ya estuviera actualizada). El
+   caché de Google al publicar la hoja es aparte y no se puede evitar
+   desde aquí -- ese tarda unos minutos en refrescarse igualmente. ---------- */
+function fetchCSVSinCache(url){
+  const sinCache = url + (url.includes("?") ? "&" : "?") + "cb=" + Date.now();
+  return fetch(sinCache, { cache: "no-store" });
+}
+
 /* ---------- parser de CSV sencillo pero que respeta comas dentro de comillas
    (hace falta porque el enlace de Google Maps trae comas en la dirección) ---------- */
 function parsearCSV(texto){
@@ -3863,7 +3901,7 @@ function filaAPartido(fila){
 async function cargarCalendarioYArrancar(){
   if(URL_CALENDARIO){
     try{
-      const resp = await fetch(URL_CALENDARIO);
+      const resp = await fetchCSVSinCache(URL_CALENDARIO);
       if(resp.ok){
         const filas = parsearCSV(await resp.text());
         if(filas.length) partidos = filas.map(filaAPartido);
