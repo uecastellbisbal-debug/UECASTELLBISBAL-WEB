@@ -354,7 +354,6 @@ a:focus-visible, button:focus-visible{
 .puntos-badge.gano{ background:#4ade80; }
 .puntos-badge.empato{ background:#eab308; }
 .puntos-badge.perdio{ background:#f87171; }
-.puntos-badge.cal-badge{ grid-column:5; justify-self:center; width:36px; height:36px; font-size:9.5px; }
 .live-clima{
   margin-top:10px;
   font-size:12px;
@@ -1321,10 +1320,10 @@ a:focus-visible, button:focus-visible{
 }
 .calendar-header{
   display:grid;
-  grid-template-columns:52px 1fr 96px 118px 92px;
+  grid-template-columns:34px 1fr 78px 90px 20px;
   align-items:center;
-  gap:18px;
-  padding:0 4px 14px;
+  gap:12px;
+  padding:0 4px 12px;
   font-size:10.5px;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -1336,10 +1335,10 @@ a:focus-visible, button:focus-visible{
 .calendar-header span:last-child{ justify-self:center; }
 .calendar-row{
   display:grid;
-  grid-template-columns:52px 1fr 96px 118px 92px;
+  grid-template-columns:34px 1fr 78px 90px 20px;
   align-items:center;
-  gap:18px;
-  padding:20px 4px;
+  gap:12px;
+  padding:13px 4px;
   border-bottom:1px solid var(--line);
   border-left:2px solid transparent;
   transition:background .2s ease, border-color .2s ease;
@@ -1347,98 +1346,53 @@ a:focus-visible, button:focus-visible{
 .calendar-row:hover{ background:rgba(245,245,243,0.025); }
 .calendar-row.local{ border-left-color:var(--lilac); }
 .calendar-row.jugado{ opacity:0.45; }
-.cal-line-top,
-.cal-line-bottom{ display:contents; }
 .cal-jornada{
-  grid-column:1;
   font-family:var(--display);
-  font-size:13px;
+  font-size:11px;
   color:var(--white-faint);
 }
-.cal-rival{
-  grid-column:2;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:15px;
+.cal-rival-text{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:14px;
   font-weight:700;
-}
-.cal-crest{
-  width:18px; height:18px;
-  object-fit:contain;
-  flex:none;
-}
-.cal-vs{
-  font-family:var(--display);
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:0.02em;
-  color:var(--lilac-light);
-  border:1.5px solid var(--lilac);
-  border-radius:50%;
-  width:24px; height:24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:none;
+  color:var(--white-dim);
 }
 .cal-fecha,
 .cal-hora{
-  font-size:13px;
+  font-size:12.5px;
   color:var(--white-dim);
   text-align:right;
   font-variant-numeric:tabular-nums;
   white-space:nowrap;
 }
-.cal-fecha{ grid-column:3; }
-.cal-hora{ grid-column:4; color:var(--white-faint); }
+.cal-hora{ color:var(--white-faint); }
 .cal-resultado{
   color:var(--white);
   font-weight:800;
   font-family:var(--display);
   letter-spacing:0.04em;
-  font-size:16px;
-  text-align:center;
 }
-.calendar-row.jugado-resultado.gano .cal-resultado{ color:#4ade80; }
-.calendar-row.jugado-resultado.perdio .cal-resultado{ color:#f87171; }
-.calendar-row.jugado-resultado.empato .cal-resultado{ color:#eab308; }
-.cal-tag{
-  grid-column:5;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:0.08em;
-  padding:5px 10px;
-  border-radius:2px;
-  text-transform:uppercase;
+.calendar-row.gano .cal-resultado{ color:#4ade80; }
+.calendar-row.perdio .cal-resultado{ color:#f87171; }
+.calendar-row.empato .cal-resultado{ color:#eab308; }
+.cal-bola{
+  width:10px; height:10px;
+  border-radius:50%;
   justify-self:center;
+  background:var(--line);
+  flex:none;
 }
-.cal-tag.local{ background:var(--lilac-dark); color:var(--lilac-light); border:1px solid rgba(123,53,200,0.5); }
-.cal-tag.visitante{ background:transparent; color:var(--white-dim); border:1px solid var(--line); }
-.cal-tag.jugado{ background:transparent; color:var(--white-faint); border:1px solid var(--line); }
+.calendar-row.gano .cal-bola{ background:#4ade80; }
+.calendar-row.perdio .cal-bola{ background:#f87171; }
+.calendar-row.empato .cal-bola{ background:#eab308; }
 
 @media (max-width:640px){
-  .calendar-header{ display:none; }
-  .calendar-row{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:18px 4px;
-  }
-  .cal-line-top,
-  .cal-line-bottom{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    width:100%;
-  }
-  .cal-rival-text{
-    white-space:normal;
-    line-height:1.3;
-  }
-  .cal-fecha, .cal-hora{ text-align:left; white-space:nowrap; }
-  .cal-tag{ flex:none; }
+  .calendar-header{ grid-template-columns:24px 1fr 60px 56px 16px; gap:8px; }
+  .calendar-row{ grid-template-columns:24px 1fr 60px 56px 16px; gap:8px; padding:11px 2px; }
+  .cal-rival-text{ font-size:12.5px; }
+  .cal-fecha, .cal-hora{ font-size:11px; }
 }
 
 /* ============================================================
@@ -3722,7 +3676,6 @@ function pintarCalendario(){
   cont.innerHTML = "";
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
-  const escudoCastellbisbal = document.querySelector(".crest").src;
 
   const totalPartidos = partidos.length;
   const partidosAMostrar = calendarioMostrarTodo
@@ -3741,54 +3694,29 @@ function pintarCalendario(){
   partidosAMostrar.forEach(p => {
     const tieneResultado = p.golesLocal !== null && p.golesVisitante !== null;
     const esLocal = p.tipo === "LOCAL";
-    const escudoRival = p.escudoRival || ESCUDO_GENERICO;
-    const rivalContenido = esLocal
-      ? `<img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">
-         <span class="cal-vs">VS</span>
-         <img class="cal-crest" src="${escudoRival}" alt="Escudo ${p.rival}">
-         <span class="cal-rival-text">${p.rival}</span>`
-      : `<span class="cal-rival-text">${p.rival}</span>
-         <img class="cal-crest" src="${escudoRival}" alt="Escudo ${p.rival}">
-         <span class="cal-vs">VS</span>
-         <img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">`;
     const row = document.createElement("div");
+    row.className = "calendar-row" + (esLocal ? " local" : " visitante");
 
-    // partido ya jugado: mismo formato que un partido por jugar (con escudos),
-    // pero con el resultado centrado donde iba la hora, y "Partido Jugado" en la fecha
+    let horaOResultado;
     if(tieneResultado){
       const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
       const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
       const gano = golesCastellbisbal > golesRival;
       const perdio = golesCastellbisbal < golesRival;
-      row.className = "calendar-row jugado-resultado" + (esLocal ? " local" : "") + (gano ? " gano" : perdio ? " perdio" : " empato");
-      row.innerHTML = `
-        <div class="cal-line-top">
-          <span class="cal-jornada">J${p.jornada}</span>
-          ${badgePuntosHTML(golesCastellbisbal, golesRival, "cal-badge")}
-        </div>
-        <span class="cal-rival">${rivalContenido}</span>
-        <div class="cal-line-bottom">
-          <span class="cal-fecha">Partido Jugado</span>
-          <span class="cal-hora cal-resultado">${golesCastellbisbal}-${golesRival}</span>
-        </div>
-      `;
-      cont.appendChild(row);
-      return;
+      row.classList.add(gano ? "gano" : perdio ? "perdio" : "empato");
+      horaOResultado = `<span class="cal-resultado">${golesCastellbisbal}-${golesRival}</span>`;
+    }else{
+      const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
+      if(jugado) row.classList.add("jugado");
+      horaOResultado = formatearHora(p.hora);
     }
 
-    const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
-    const horaOResultado = formatearHora(p.hora);
-    row.className = "calendar-row" + (esLocal ? " local" : "") + (jugado ? " jugado" : "");
     row.innerHTML = `
-      <div class="cal-line-top">
-        <span class="cal-jornada">J${p.jornada}</span>
-        <div class="cal-tag ${jugado ? 'jugado' : (esLocal ? 'local' : 'visitante')}">${jugado ? 'Jugado' : p.tipo}</div>
-      </div>
-      <span class="cal-rival">${rivalContenido}</span>
-      <div class="cal-line-bottom">
-        <span class="cal-fecha">${p.fecha}</span>
-        <span class="cal-hora">${horaOResultado}</span>
-      </div>
+      <span class="cal-jornada">J${p.jornada}</span>
+      <span class="cal-rival-text">${esLocal ? "vs " : "@ "}${p.rival}</span>
+      <span class="cal-fecha">${p.fecha}</span>
+      <span class="cal-hora">${horaOResultado}</span>
+      <span class="cal-bola"></span>
     `;
     cont.appendChild(row);
   });
