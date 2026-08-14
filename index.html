@@ -3297,6 +3297,9 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
     }else{
       badgeWrap.style.display = "none";
       iniciarRelojPartido(partidoActual);
+      // mientras el partido destacado está en directo, "Último partido"
+      // sigue mostrando el resultado anterior (el suyo propio aún no existe)
+      pintarUltimoPartido(partidoAnterior);
     }
   }else{
     badgeWrap.style.display = "none";
