@@ -308,6 +308,9 @@ a:focus-visible, button:focus-visible{
   color:var(--white);
 }
 .live-score-sep{ color:var(--white-faint); font-size:0.6em; }
+/* en "Último partido" la bolita de puntos va encima del resultado,
+   centrada, con un pequeño hueco de cortesía entre las dos */
+#ultimoScore{ flex-direction:column; gap:8px; }
 .live-vs{
   font-family:var(--display);
   font-size:20px;
@@ -3626,7 +3629,7 @@ function pintarUltimoPartidoDesdeSheet(partido, golesCastellbisbal, golesRival){
   const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
   const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
   const textoResultado = `${golesIzquierda} – ${golesDerecha}`;
-  document.getElementById("ultimoScore").innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>${badgePuntosHTML(golesCastellbisbal, golesRival)}`;
+  document.getElementById("ultimoScore").innerHTML = `${badgePuntosHTML(golesCastellbisbal, golesRival)}<span class="live-vs has-resultado">${textoResultado}</span>`;
 
   const lugar = partido.campo || (esLocal ? "Campo Municipal" : "Campo del rival");
   info.textContent = `${partido.fecha} · ${lugar}`;
@@ -3677,7 +3680,7 @@ function pintarUltimoPartido(partidoAnterior){
     const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
     const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
     textoResultado = `${golesIzquierda} – ${golesDerecha}`;
-    score.innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>${badgePuntosHTML(golesCastellbisbal, golesRival)}`;
+    score.innerHTML = `${badgePuntosHTML(golesCastellbisbal, golesRival)}<span class="live-vs has-resultado">${textoResultado}</span>`;
   }else{
     score.innerHTML = `<span class="live-vs">VS</span>`;
   }
