@@ -936,7 +936,7 @@ a:focus-visible, button:focus-visible{
 .radar-resumen{ padding-top:24px; }
 .radar-grid{
   display:grid;
-  grid-template-columns:repeat(6, 1fr);
+  grid-template-columns:repeat(7, 1fr);
   border:1px solid var(--line);
   border-radius:4px;
   overflow:hidden;
@@ -967,7 +967,8 @@ a:focus-visible, button:focus-visible{
 .radar-item-value.es-gf{ color:#22c55e; }
 .radar-item-value.es-gc{ color:#dc2626; }
 .radar-item-value.es-jornada,
-.radar-item-value.es-posicion{
+.radar-item-value.es-posicion,
+.radar-item-value.es-puntos{
   color:var(--white);
   font-size:clamp(22px, 3.6vw, 34px);
   font-weight:800;
@@ -996,25 +997,8 @@ a:focus-visible, button:focus-visible{
 @media (max-width:768px){
   .radar-grid{ grid-template-columns:repeat(3, 1fr); }
   .radar-item{ border-bottom:1px solid var(--line); }
-  .radar-item:nth-child(3){ border-right:none; }
-  .radar-item:nth-child(n+4){ border-right:1px solid var(--line); }
-  .radar-item:last-child, .radar-item:nth-child(6){ border-right:none; }
-  .radar-item:nth-child(n+4){ border-bottom:none; }
-}
-
-.radar-tendencia-aviso{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-top:14px;
-  font-size:12px;
-  color:var(--white-faint);
-}
-.dot-tendencia{
-  display:inline-block;
-  width:14px; height:0;
-  border-top:1.5px dashed var(--lilac-light);
-  flex:none;
+  .radar-item:nth-child(3n){ border-right:none; }
+  .radar-item:nth-child(n+7){ border-bottom:none; }
 }
 
 .radar-charts{
@@ -1442,10 +1426,10 @@ a:focus-visible, button:focus-visible{
 .clasi-header,
 .clasi-row{
   display:grid;
-  grid-template-columns:40px 200px repeat(8, 46px) 50px;
+  grid-template-columns:40px 200px repeat(8, 46px);
   align-items:center;
   gap:0;
-  min-width:730px;
+  min-width:680px;
   padding:0;
 }
 .clasi-header > span,
@@ -1535,12 +1519,6 @@ a:focus-visible, button:focus-visible{
   font-family:var(--display);
   color:var(--white);
 }
-.clasi-est{
-  font-size:11.5px;
-  color:var(--white-faint);
-}
-.clasi-est.sube{ color:#4ade80; }
-.clasi-est.baja{ color:#f87171; }
 
 /* ============================================================
    COLABORADORES — 3 cuadros centrados
@@ -2231,9 +2209,6 @@ a:focus-visible, button:focus-visible{
       <div>
         <p class="section-eyebrow">Jornada a jornada</p>
         <h2 class="section-title">Evolución de la temporada</h2>
-        <p class="radar-tendencia-aviso" id="radarTendenciaAviso" style="display:none;">
-          <span class="dot-tendencia"></span> La línea discontinua es una estimación orientativa (proyección según el ritmo de las últimas jornadas), no un dato real.
-        </p>
       </div>
     </div>
     <div class="radar-charts">
@@ -2331,7 +2306,6 @@ a:focus-visible, button:focus-visible{
         <span>GC</span>
         <span>DG</span>
         <span>Pts</span>
-        <span tabindex="0" role="note" title="Posición estimada al final de la temporada, según el ritmo actual" aria-label="Est.: posición estimada al final de la temporada, según el ritmo actual">Est.</span>
       </div>
       <div class="clasi-list" id="clasiList">
         <!-- Se rellena automáticamente desde "clasificacion", al final de este archivo -->
@@ -2949,8 +2923,6 @@ function pintarClasificacion(){
   const cont = document.getElementById("clasiList");
   cont.innerHTML = "";
 
-  const TOTAL_JORNADAS = 30;
-
   const conCalculos = clasificacion.map(eq => ({
     ...eq,
     dg: eq.gf - eq.gc,
@@ -2959,35 +2931,10 @@ function pintarClasificacion(){
 
   conCalculos.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
 
-  // proyección "si esto sigue así": ritmo de puntos por partido de cada
-  // equipo, extrapolado a los partidos que le quedan por jugar. Solo tiene
-  // sentido a partir de la jornada 5 (con menos partidos, un resultado
-  // suelto desvía demasiado la estimación)
-  const jornadaActual = radarTemporada.length ? radarTemporada[radarTemporada.length - 1].jornada : 0;
-  const mostrarEstimacion = jornadaActual >= 5;
-
-  let posicionesEstimadas = {};
-  if(mostrarEstimacion){
-    const conProyeccion = conCalculos.map(eq => {
-      const ritmo = eq.pj > 0 ? eq.pts / eq.pj : 0;
-      const puntosFinales = eq.pts + ritmo * (TOTAL_JORNADAS - eq.pj);
-      return { equipo: eq.equipo, puntosFinales };
-    });
-    conProyeccion.sort((a, b) => b.puntosFinales - a.puntosFinales);
-    conProyeccion.forEach((eq, i) => { posicionesEstimadas[eq.equipo] = i + 1; });
-  }
-
   const escudoCastellbisbal = document.querySelector(".crest").src;
 
   conCalculos.forEach((eq, i) => {
     const escudo = eq.esNuestro ? escudoCastellbisbal : (ESCUDOS_RIVALES[eq.equipo] || ESCUDO_GENERICO);
-    const posEstimada = mostrarEstimacion ? posicionesEstimadas[eq.equipo] : null;
-    const diferencia = posEstimada !== null ? (i + 1) - posEstimada : 0; // positivo = va a subir
-    let textoEstimada = "—";
-    if(posEstimada !== null){
-      const flecha = diferencia > 0 ? "▲" : diferencia < 0 ? "▼" : "";
-      textoEstimada = `${posEstimada}º ${flecha}`;
-    }
     const row = document.createElement("div");
     row.className = "clasi-row" + (eq.esNuestro ? " es-nuestro" : "");
     row.innerHTML = `
@@ -3001,7 +2948,6 @@ function pintarClasificacion(){
       <span>${eq.gc}</span>
       <span>${eq.dg > 0 ? "+" + eq.dg : eq.dg}</span>
       <span class="clasi-pts">${eq.pts}</span>
-      <span class="clasi-est ${diferencia > 0 ? 'sube' : diferencia < 0 ? 'baja' : ''}">${textoEstimada}</span>
     `;
     cont.appendChild(row);
   });
@@ -3015,12 +2961,14 @@ function pintarRadarResumen(){
     return;
   }
   const ultimo = radarTemporada[radarTemporada.length - 1];
-  // amarillas/rojas de toda la temporada: se suman las de cada jornada
+  // puntos/amarillas/rojas de toda la temporada: se suman las de cada jornada
+  const totalPuntos = radarTemporada.reduce((suma, d) => suma + d.puntosJornada, 0);
   const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
   const totalRojas = radarTemporada.reduce((suma, d) => suma + d.rojasJornada, 0);
   const items = [
     { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
     { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
+    { label: "Puntos",           valor: totalPuntos, clase: "es-puntos" },
     { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
     { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
     { label: "Amarillas",        valor: totalAmarillas, clase: "es-amarilla" },
@@ -3114,31 +3062,6 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
         svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
       });
     }
-
-    // línea de tendencia (discontinua): solo con jornadas reales suficientes,
-    // proyecta con la media de ritmo hasta el final de la temporada
-    if(opciones.tendencia){
-      const jugadas = datos.filter(d => d.jornada > 0);
-      if(jugadas.length >= 5){
-        const n = jugadas.length;
-        const sumX = jugadas.reduce((a,d) => a + d.jornada, 0);
-        const sumY = jugadas.reduce((a,d) => a + d[s.key], 0);
-        const sumXY = jugadas.reduce((a,d) => a + d.jornada * d[s.key], 0);
-        const sumXX = jugadas.reduce((a,d) => a + d.jornada * d.jornada, 0);
-        const divisor = n * sumXX - sumX * sumX;
-        if(divisor !== 0){
-          const pendiente = (n * sumXY - sumX * sumY) / divisor;
-          const interseccion = (sumY - pendiente * sumX) / n;
-          const ultimoReal = jugadas[jugadas.length - 1];
-          let prediccion = interseccion + pendiente * maxX;
-          prediccion = Math.max(minY, Math.min(maxY, prediccion)); // no se sale del rango del eje
-          const x1 = pixelX(ultimoReal.jornada).toFixed(1), y1 = pixelY(ultimoReal[s.key]).toFixed(1);
-          const x2 = pixelX(maxX).toFixed(1), y2 = pixelY(prediccion).toFixed(1);
-          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${s.color}" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.55"/>`;
-          svg += `<circle cx="${x2}" cy="${y2}" r="2.5" fill="none" stroke="${s.color}" stroke-width="1.5" opacity="0.8"/>`;
-        }
-      }
-    }
   });
 
   // etiquetas del eje horizontal: todas las jornadas, sin girar, solo el número
@@ -3179,10 +3102,11 @@ function pintarTotalTarjetas(){
 }
 
 /* ---------- color de la línea de posición: verde si mejora respecto a la
-   jornada anterior, amarillo si se mantiene, rojo si empeora (menos = mejor) ---------- */
+   jornada anterior, amarillo si se mantiene, rojo si empeora (menos = mejor).
+   La primera jornada real se compara contra el 16 (última posición), que es
+   de donde parte siempre la línea antes de que exista ningún resultado ---------- */
 function colorEvolucionPosicion(datos, i){
   const anterior = datos[i - 1], actual = datos[i];
-  if(anterior.jornada === 0) return "#a868e8"; // sin jornada real anterior con la que comparar
   if(actual.posicion < anterior.posicion) return "#4ade80";
   if(actual.posicion > anterior.posicion) return "#f87171";
   return "#eab308";
@@ -3207,7 +3131,7 @@ function pintarRadarDesglose(){
   }));
   pintarGraficoLineal("chartPosicion", datosPosicion,
     [{ key: "posicion", colorFn: colorEvolucionPosicion }],
-    { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16, tendencia: true,
+    { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16,
       etiquetasY: Array.from({ length: 16 }, (_, i) => i + 1) }
   );
 
@@ -3217,15 +3141,17 @@ function pintarRadarDesglose(){
   );
 
   // "evolución de puntos" no viene directo de la hoja: es el sumatorio
-  // (acumulado) de los puntos de cada jornada, calculado aquí mismo
+  // (acumulado) de los puntos de cada jornada, calculado aquí mismo.
+  // Se colorea igual que "puntos por jornada" (por eso se lleva también
+  // el puntosJornada de cada punto, aunque el eje pinte el acumulado)
   let sumaPuntos = 0;
   const datosEvolucionPuntos = radarTemporada.map(d => {
     sumaPuntos += d.puntosJornada;
-    return { jornada: d.jornada, puntosAcumulados: sumaPuntos };
+    return { jornada: d.jornada, puntosAcumulados: sumaPuntos, puntosJornada: d.puntosJornada };
   });
   pintarGraficoLineal("chartEvolucionPuntos", datosEvolucionPuntos,
-    [{ key: "puntosAcumulados", color: "#a868e8" }],
-    { minX: 0, maxX: 30, minY: 0, tendencia: true }
+    [{ key: "puntosAcumulados", color: "#a868e8", colorFn: colorPuntosJornada }],
+    { minX: 0, maxX: 30, minY: 0 }
   );
 
   // "goles por jornada" tampoco viene directo de la hoja: se calcula
@@ -3244,20 +3170,12 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartEvolucionGoles", radarTemporada, [
     { key: "golesFavor", color: "#22c55e" },
     { key: "golesContra", color: "#dc2626" }
-  ], { minX: 0, maxX: 30, tendencia: true });
+  ], { minX: 0, maxX: 30 });
   pintarGraficoLineal("chartTarjetas", radarTemporada, [
     { key: "amarillasJornada", color: "#eab308" },
     { key: "rojasJornada", color: "#dc2626" }
   ], { minX: 0, maxX: 30 });
   pintarTotalTarjetas();
-
-  // aviso de la línea de tendencia: solo se ve el mensaje si ya hay
-  // suficientes jornadas jugadas como para que la proyección tenga sentido
-  const avisoTendencia = document.getElementById("radarTendenciaAviso");
-  if(avisoTendencia){
-    const jornadaActual = radarTemporada[radarTemporada.length - 1].jornada;
-    avisoTendencia.style.display = jornadaActual >= 5 ? "" : "none";
-  }
 }
 
 /* ---------- escudo genérico para equipos rivales (sin logo propio) ---------- */
