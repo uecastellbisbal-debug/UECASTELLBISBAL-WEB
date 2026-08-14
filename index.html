@@ -936,7 +936,7 @@ a:focus-visible, button:focus-visible{
 .radar-resumen{ padding-top:24px; }
 .radar-grid{
   display:grid;
-  grid-template-columns:repeat(7, 1fr);
+  grid-template-columns:repeat(8, 1fr);
   border:1px solid var(--line);
   border-radius:4px;
   overflow:hidden;
@@ -966,6 +966,7 @@ a:focus-visible, button:focus-visible{
 .radar-item-value.es-roja{ color:#dc2626; }
 .radar-item-value.es-gf{ color:#22c55e; }
 .radar-item-value.es-gc{ color:#dc2626; }
+.radar-item-value.es-ganados{ font-size:clamp(13px, 2.1vw, 18px); }
 .radar-item-value.es-jornada,
 .radar-item-value.es-posicion,
 .radar-item-value.es-puntos{
@@ -2953,7 +2954,20 @@ function pintarClasificacion(){
   });
 }
 
-/* ---------- pinta el resumen de 6 datos con el último dato disponible ---------- */
+/* ---------- cuenta los partidos ganados sobre los ya jugados (marcados
+   "final" en el calendario), para el cuadro "Partidos ganados" del radar ---------- */
+function calcularPartidosGanados(){
+  const finales = partidos.filter(p => p.estado === "final" && p.golesLocal !== null && p.golesVisitante !== null);
+  const ganados = finales.filter(p => {
+    const esLocal = p.tipo === "LOCAL";
+    const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
+    const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
+    return golesCastellbisbal > golesRival;
+  }).length;
+  return { ganados, jugados: finales.length };
+}
+
+/* ---------- pinta el resumen de 7 datos con el último dato disponible ---------- */
 function pintarRadarResumen(){
   const cont = document.getElementById("radarGrid");
   if(!radarTemporada.length){
@@ -2965,10 +2979,13 @@ function pintarRadarResumen(){
   const totalPuntos = radarTemporada.reduce((suma, d) => suma + d.puntosJornada, 0);
   const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
   const totalRojas = radarTemporada.reduce((suma, d) => suma + d.rojasJornada, 0);
+  const { ganados, jugados } = calcularPartidosGanados();
+  const porcentajeGanados = jugados > 0 ? Math.round((ganados / jugados) * 100) : 0;
   const items = [
     { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
     { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
     { label: "Puntos",           valor: totalPuntos, clase: "es-puntos" },
+    { label: "Partidos ganados", valor: `${ganados}/${jugados} (${porcentajeGanados}%)`, clase: "es-ganados" },
     { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
     { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
     { label: "Amarillas",        valor: totalAmarillas, clase: "es-amarilla" },
