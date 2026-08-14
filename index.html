@@ -1320,9 +1320,9 @@ a:focus-visible, button:focus-visible{
 }
 .calendar-header{
   display:grid;
-  grid-template-columns:34px 1fr 78px 90px 20px;
+  grid-template-columns:26px 22px 1fr 100px 60px 12px;
   align-items:center;
-  gap:12px;
+  gap:8px;
   padding:0 4px 12px;
   font-size:10.5px;
   letter-spacing:0.1em;
@@ -1330,15 +1330,15 @@ a:focus-visible, button:focus-visible{
   color:var(--white-faint);
   font-weight:700;
 }
-.calendar-header span:nth-child(3),
-.calendar-header span:nth-child(4){ text-align:right; }
+.calendar-header span:nth-child(4),
+.calendar-header span:nth-child(5){ text-align:right; }
 .calendar-header span:last-child{ justify-self:center; }
 .calendar-row{
   display:grid;
-  grid-template-columns:34px 1fr 78px 90px 20px;
+  grid-template-columns:26px 22px 1fr 100px 60px 12px;
   align-items:center;
-  gap:12px;
-  padding:13px 4px;
+  gap:8px;
+  padding:11px 4px;
   border-bottom:1px solid var(--line);
   border-left:2px solid transparent;
   transition:background .2s ease, border-color .2s ease;
@@ -1351,17 +1351,40 @@ a:focus-visible, button:focus-visible{
   font-size:11px;
   color:var(--white-faint);
 }
+.cal-tipo{
+  width:20px; height:20px;
+  border-radius:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--display);
+  font-size:9px;
+  font-weight:800;
+  justify-self:center;
+  flex:none;
+}
+.cal-tipo.local{ background:var(--lilac-dark); color:var(--lilac-light); }
+.cal-tipo.visitante{ background:rgba(245,245,243,0.08); color:var(--white-dim); }
+.cal-rival{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  overflow:hidden;
+}
+.cal-crest{ width:16px; height:16px; object-fit:contain; flex:none; }
 .cal-rival-text{
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:14px;
+  font-size:13px;
   font-weight:700;
   color:var(--white-dim);
+  min-width:0;
 }
 .cal-fecha,
 .cal-hora{
-  font-size:12.5px;
+  font-size:12px;
   color:var(--white-dim);
   text-align:right;
   font-variant-numeric:tabular-nums;
@@ -1369,14 +1392,16 @@ a:focus-visible, button:focus-visible{
 }
 .cal-hora{ color:var(--white-faint); }
 .cal-resultado{
-  color:var(--white);
   font-weight:800;
   font-family:var(--display);
   letter-spacing:0.04em;
 }
-.calendar-row.gano .cal-resultado{ color:#4ade80; }
-.calendar-row.perdio .cal-resultado{ color:#f87171; }
-.calendar-row.empato .cal-resultado{ color:#eab308; }
+.calendar-row.gano .cal-fecha,
+.calendar-row.gano .cal-hora{ color:#4ade80; }
+.calendar-row.perdio .cal-fecha,
+.calendar-row.perdio .cal-hora{ color:#f87171; }
+.calendar-row.empato .cal-fecha,
+.calendar-row.empato .cal-hora{ color:#eab308; }
 .cal-bola{
   width:10px; height:10px;
   border-radius:50%;
@@ -1389,10 +1414,12 @@ a:focus-visible, button:focus-visible{
 .calendar-row.empato .cal-bola{ background:#eab308; }
 
 @media (max-width:640px){
-  .calendar-header{ grid-template-columns:24px 1fr 60px 56px 16px; gap:8px; }
-  .calendar-row{ grid-template-columns:24px 1fr 60px 56px 16px; gap:8px; padding:11px 2px; }
-  .cal-rival-text{ font-size:12.5px; }
-  .cal-fecha, .cal-hora{ font-size:11px; }
+  .calendar-header{ grid-template-columns:18px 16px 1fr 78px 44px 8px; gap:5px; }
+  .calendar-row{ grid-template-columns:18px 16px 1fr 78px 44px 8px; gap:5px; padding:9px 2px; }
+  .cal-tipo{ width:16px; height:16px; font-size:7.5px; }
+  .cal-crest{ width:13px; height:13px; }
+  .cal-rival-text{ font-size:11.5px; }
+  .cal-fecha, .cal-hora{ font-size:9.5px; }
 }
 
 /* ============================================================
@@ -2247,6 +2274,7 @@ a:focus-visible, button:focus-visible{
     </div>
     <div class="calendar-header">
       <span>J</span>
+      <span>&nbsp;</span>
       <span>Rival</span>
       <span>Fecha</span>
       <span>Hora / resultado</span>
@@ -3694,28 +3722,31 @@ function pintarCalendario(){
   partidosAMostrar.forEach(p => {
     const tieneResultado = p.golesLocal !== null && p.golesVisitante !== null;
     const esLocal = p.tipo === "LOCAL";
+    const escudoRival = p.escudoRival || ESCUDO_GENERICO;
     const row = document.createElement("div");
     row.className = "calendar-row" + (esLocal ? " local" : " visitante");
 
-    let horaOResultado;
+    let fechaHTML, horaHTML;
     if(tieneResultado){
       const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
       const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
       const gano = golesCastellbisbal > golesRival;
       const perdio = golesCastellbisbal < golesRival;
       row.classList.add(gano ? "gano" : perdio ? "perdio" : "empato");
-      horaOResultado = `<span class="cal-resultado">${golesCastellbisbal}-${golesRival}</span>`;
+      fechaHTML = `<span class="cal-fecha">Partido Jugado</span>`;
+      horaHTML = `<span class="cal-hora cal-resultado">${golesCastellbisbal}-${golesRival}</span>`;
     }else{
-      const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
-      if(jugado) row.classList.add("jugado");
-      horaOResultado = formatearHora(p.hora);
+      if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
+      fechaHTML = `<span class="cal-fecha">${p.fecha}</span>`;
+      horaHTML = `<span class="cal-hora">${formatearHora(p.hora)}</span>`;
     }
 
     row.innerHTML = `
       <span class="cal-jornada">J${p.jornada}</span>
-      <span class="cal-rival-text">${esLocal ? "vs " : "@ "}${p.rival}</span>
-      <span class="cal-fecha">${p.fecha}</span>
-      <span class="cal-hora">${horaOResultado}</span>
+      <span class="cal-tipo ${esLocal ? "local" : "visitante"}">${esLocal ? "L" : "V"}</span>
+      <span class="cal-rival"><img class="cal-crest" src="${escudoRival}" alt=""><span class="cal-rival-text">${p.rival}</span></span>
+      ${fechaHTML}
+      ${horaHTML}
       <span class="cal-bola"></span>
     `;
     cont.appendChild(row);
