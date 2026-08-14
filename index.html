@@ -2747,14 +2747,21 @@ const ESCUDOS_RIVALES = {
    falta escribirlos aquí también.
 
    Columnas de la pestaña (una fila por jornada, en este orden):
-   Jornada, Posicion, Puntos, tar_amarilla, tar_roja
+   Jornada, Posicion, Puntos, tar_amarilla, tar_roja, fecha
 
      Jornada       -> número de jornada
-     Posicion      -> puesto en la clasificación (1 = primero); en
-                       blanco o con "-" mientras no se sepa esa jornada
-     Puntos        -> puntos ACUMULADOS en toda la temporada
-     tar_amarilla  -> tarjetas amarillas ACUMULADAS en toda la temporada
-     tar_roja      -> tarjetas rojas ACUMULADAS en toda la temporada
+     Posicion      -> puesto en la clasificación esa jornada (1 = primero);
+                       en blanco o con "-" mientras no se sepa
+     Puntos        -> puntos DE ESA JORNADA (3 ganado, 1 empatado, 0 perdido)
+     tar_amarilla  -> tarjetas amarillas DE ESA JORNADA
+     tar_roja      -> tarjetas rojas DE ESA JORNADA
+     fecha         -> solo hace falta rellenarla en la fila que se acaba de
+                       actualizar (DD/MM/AAAA); es lo que se ve en el cartel
+                       "Información actualizada tras jornada X en fecha Y"
+
+   El sumatorio de puntos y de tarjetas de toda la temporada se calcula
+   solo (ver pintarRadarDesglose / pintarTotalTarjetas) a partir de estos
+   valores de cada jornada -- no hace falta acumularlos a mano en la hoja.
 
    La fila de la jornada 0 (todo a cero) se añade sola como punto de
    partida antes de empezar la temporada -- no hace falta ponerla en
@@ -2763,7 +2770,7 @@ const ESCUDOS_RIVALES = {
    Mientras URL_RADAR esté vacío, se usan estos datos de ejemplo.
    ============================================================ */
 let radarTemporada = [
-  { jornada: 0, posicion: 0, puntos: 0, golesFavor: 0, golesContra: 0, amarillas: 0, rojas: 0, fecha: "06/08/2026" }
+  { jornada: 0, posicion: 0, puntosJornada: 0, golesFavor: 0, golesContra: 0, amarillasJornada: 0, rojasJornada: 0, fecha: "06/08/2026" }
 ];
 
 /* hoja de Google Sheets publicada como CSV (pestaña de radar). Necesita
@@ -2789,16 +2796,15 @@ function golesAcumuladosHastaJornada(jornada){
 function filaARadar(fila){
   const jornada = Number(fila.Jornada);
   const { favor, contra } = golesAcumuladosHastaJornada(jornada);
-  const partidoDeEsaJornada = partidos.find(p => p.jornada === jornada);
   return {
     jornada,
     posicion: Number(fila.Posicion) || 0,
-    puntos: Number(fila.Puntos) || 0,
+    puntosJornada: Number(fila.Puntos) || 0,
     golesFavor: favor,
     golesContra: contra,
-    amarillas: Number(fila.tar_amarilla) || 0,
-    rojas: Number(fila.tar_roja) || 0,
-    fecha: (partidoDeEsaJornada && partidoDeEsaJornada.fecha) || new Date().toLocaleDateString("es-ES")
+    amarillasJornada: Number(fila.tar_amarilla) || 0,
+    rojasJornada: Number(fila.tar_roja) || 0,
+    fecha: fila.fecha || "" // solo la trae la fila que se acaba de actualizar
   };
 }
 
@@ -3009,13 +3015,16 @@ function pintarRadarResumen(){
     return;
   }
   const ultimo = radarTemporada[radarTemporada.length - 1];
+  // amarillas/rojas de toda la temporada: se suman las de cada jornada
+  const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
+  const totalRojas = radarTemporada.reduce((suma, d) => suma + d.rojasJornada, 0);
   const items = [
     { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
     { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
     { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
     { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
-    { label: "Amarillas",        valor: ultimo.amarillas, clase: "es-amarilla" },
-    { label: "Rojas",            valor: ultimo.rojas, clase: "es-roja" }
+    { label: "Amarillas",        valor: totalAmarillas, clase: "es-amarilla" },
+    { label: "Rojas",            valor: totalRojas, clase: "es-roja" }
   ];
   cont.innerHTML = items.map(it => `
     <div class="radar-item">
@@ -3024,8 +3033,13 @@ function pintarRadarResumen(){
     </div>
   `).join("");
 
+  // el cartel de "actualizado el..." usa la última fila que tenga fecha
+  // marcada en la hoja (no tiene por qué ser la última jornada con datos:
+  // es la fecha en la que se consultó/actualizó la hoja por última vez)
+  const conFecha = radarTemporada.filter(d => d.fecha);
+  const referencia = conFecha.length ? conFecha[conFecha.length - 1] : ultimo;
   document.getElementById("radarActualizado").textContent =
-    `Información actualizada tras jornada ${ultimo.jornada} en fecha ${ultimo.fecha}`;
+    `Información actualizada tras jornada ${referencia.jornada} en fecha ${referencia.fecha}`;
 }
 
 /* ---------- dibuja una gráfica lineal sencilla en SVG (sin librerías) ----------
@@ -3078,12 +3092,28 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
   svg += `<line x1="${padZq}" y1="${padArr}" x2="${padZq}" y2="${padArr + areaAlto}" stroke="rgba(245,245,243,0.12)" stroke-width="1"/>`;
 
   series.forEach(s => {
-    const puntos = datos.map(d => pixelX(d.jornada).toFixed(1) + "," + pixelY(d[s.key]).toFixed(1));
-    svg += `<polyline points="${puntos.join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-    puntos.forEach(p => {
-      const [px, py] = p.split(",");
-      svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
-    });
+    if(s.colorFn){
+      // color por punto/segmento (por ejemplo: verde/amarillo/rojo según
+      // suba, se mantenga o baje) en vez de un color fijo para toda la línea
+      for(let i = 1; i < datos.length; i++){
+        const color = s.colorFn(datos, i);
+        const x1 = pixelX(datos[i - 1].jornada).toFixed(1), y1 = pixelY(datos[i - 1][s.key]).toFixed(1);
+        const x2 = pixelX(datos[i].jornada).toFixed(1), y2 = pixelY(datos[i][s.key]).toFixed(1);
+        svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="2" stroke-linecap="round"/>`;
+      }
+      datos.forEach((d, i) => {
+        const color = i === 0 ? (s.color || "#a868e8") : s.colorFn(datos, i);
+        const px = pixelX(d.jornada).toFixed(1), py = pixelY(d[s.key]).toFixed(1);
+        svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${color}"/>`;
+      });
+    }else{
+      const puntos = datos.map(d => pixelX(d.jornada).toFixed(1) + "," + pixelY(d[s.key]).toFixed(1));
+      svg += `<polyline points="${puntos.join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      puntos.forEach(p => {
+        const [px, py] = p.split(",");
+        svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
+      });
+    }
 
     // línea de tendencia (discontinua): solo con jornadas reales suficientes,
     // proyecta con la media de ritmo hasta el final de la temporada
@@ -3119,25 +3149,54 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
   // título del eje horizontal, debajo de los números
   svg += `<text x="${padZq + areaAncho / 2}" y="${alto - 2}" font-size="7" fill="rgba(245,245,243,0.6)" text-anchor="middle">Jornada</text>`;
 
-  // etiquetas del eje vertical: el mínimo y el máximo reales del eje
-  const yEtiquetaArriba = opciones.invertirY ? Math.round(minY) : Math.round(maxY);
-  const yEtiquetaAbajo = opciones.invertirY ? Math.round(maxY) : Math.round(minY);
-  svg += `<text x="${padZq - 5}" y="${padArr + 3}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaArriba}</text>`;
-  svg += `<text x="${padZq - 5}" y="${padArr + areaAlto}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaAbajo}</text>`;
+  // etiquetas del eje vertical: si se piden todas (por ejemplo, las 16
+  // posiciones de la clasificación), una por cada valor de opciones.etiquetasY;
+  // si no, solo el mínimo y el máximo reales del eje, como antes
+  if(opciones.etiquetasY){
+    opciones.etiquetasY.forEach(v => {
+      const py = pixelY(v).toFixed(1);
+      svg += `<text x="${padZq - 5}" y="${(+py + 2).toFixed(1)}" font-size="5" fill="rgba(245,245,243,0.45)" text-anchor="end">${v}</text>`;
+    });
+  }else{
+    const yEtiquetaArriba = opciones.invertirY ? Math.round(minY) : Math.round(maxY);
+    const yEtiquetaAbajo = opciones.invertirY ? Math.round(maxY) : Math.round(minY);
+    svg += `<text x="${padZq - 5}" y="${padArr + 3}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaArriba}</text>`;
+    svg += `<text x="${padZq - 5}" y="${padArr + areaAlto}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaAbajo}</text>`;
+  }
 
   svg += `</svg>`;
   cont.innerHTML = svg;
 }
 
-/* ---------- pinta el sumatorio de tarjetas (bolitas amarilla/roja) encima de esa gráfica ---------- */
+/* ---------- pinta el sumatorio de tarjetas (bolitas amarilla/roja) encima de esa gráfica:
+   se suman las tarjetas de cada jornada, no vienen ya acumuladas de la hoja ---------- */
 function pintarTotalTarjetas(){
-  const ultimo = radarTemporada[radarTemporada.length - 1];
+  const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
+  const totalRojas = radarTemporada.reduce((suma, d) => suma + d.rojasJornada, 0);
   document.getElementById("totalTarjetas").innerHTML =
-    `<span><i class="dot dot-amarilla"></i><span class="num-amarilla">${ultimo.amarillas}</span></span>` +
-    `<span><i class="dot dot-roja"></i><span class="num-roja">${ultimo.rojas}</span></span>`;
+    `<span><i class="dot dot-amarilla"></i><span class="num-amarilla">${totalAmarillas}</span></span>` +
+    `<span><i class="dot dot-roja"></i><span class="num-roja">${totalRojas}</span></span>`;
 }
 
-/* ---------- pinta las 3 gráficas del desglose, siempre de la J0 a la J30 ---------- */
+/* ---------- color de la línea de posición: verde si mejora respecto a la
+   jornada anterior, amarillo si se mantiene, rojo si empeora (menos = mejor) ---------- */
+function colorEvolucionPosicion(datos, i){
+  const anterior = datos[i - 1], actual = datos[i];
+  if(anterior.jornada === 0) return "#a868e8"; // sin jornada real anterior con la que comparar
+  if(actual.posicion < anterior.posicion) return "#4ade80";
+  if(actual.posicion > anterior.posicion) return "#f87171";
+  return "#eab308";
+}
+
+/* ---------- color de los puntos de cada jornada: victoria (3) verde, empate (1) amarillo, derrota (0) rojo ---------- */
+function colorPuntosJornada(datos, i){
+  const v = datos[i].puntosJornada;
+  if(v >= 3) return "#4ade80";
+  if(v === 1) return "#eab308";
+  return "#f87171";
+}
+
+/* ---------- pinta las gráficas del desglose, siempre de la J0 a la J30 ---------- */
 function pintarRadarDesglose(){
   // en la gráfica, un 0 significa "todavía sin clasificar": se trata como si
   // fuera el último puesto, para que la línea arranque abajo del todo en vez
@@ -3147,23 +3206,25 @@ function pintarRadarDesglose(){
     posicion: d.posicion === 0 ? 16 : d.posicion
   }));
   pintarGraficoLineal("chartPosicion", datosPosicion,
-    [{ key: "posicion", color: "#a868e8" }],
-    { invertirY: true, minX: 0, maxX: 30, minY: 0, maxY: 16, tendencia: true }
+    [{ key: "posicion", colorFn: colorEvolucionPosicion }],
+    { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16, tendencia: true,
+      etiquetasY: Array.from({ length: 16 }, (_, i) => i + 1) }
   );
 
-  // "puntos por jornada" no viene directo de la hoja: se calcula solo,
-  // restando los puntos acumulados de la jornada anterior a los de esta
-  const datosPuntosJornada = radarTemporada.map((d, i) => ({
-    jornada: d.jornada,
-    puntosJornada: i === 0 ? 0 : d.puntos - radarTemporada[i - 1].puntos
-  }));
-  pintarGraficoLineal("chartPuntosJornada", datosPuntosJornada,
-    [{ key: "puntosJornada", color: "#a868e8" }],
+  pintarGraficoLineal("chartPuntosJornada", radarTemporada,
+    [{ key: "puntosJornada", colorFn: colorPuntosJornada }],
     { minX: 0, maxX: 30, minY: 0, maxY: 3 }
   );
 
-  pintarGraficoLineal("chartEvolucionPuntos", radarTemporada,
-    [{ key: "puntos", color: "#a868e8" }],
+  // "evolución de puntos" no viene directo de la hoja: es el sumatorio
+  // (acumulado) de los puntos de cada jornada, calculado aquí mismo
+  let sumaPuntos = 0;
+  const datosEvolucionPuntos = radarTemporada.map(d => {
+    sumaPuntos += d.puntosJornada;
+    return { jornada: d.jornada, puntosAcumulados: sumaPuntos };
+  });
+  pintarGraficoLineal("chartEvolucionPuntos", datosEvolucionPuntos,
+    [{ key: "puntosAcumulados", color: "#a868e8" }],
     { minX: 0, maxX: 30, minY: 0, tendencia: true }
   );
 
@@ -3185,8 +3246,8 @@ function pintarRadarDesglose(){
     { key: "golesContra", color: "#dc2626" }
   ], { minX: 0, maxX: 30, tendencia: true });
   pintarGraficoLineal("chartTarjetas", radarTemporada, [
-    { key: "amarillas", color: "#eab308" },
-    { key: "rojas", color: "#dc2626" }
+    { key: "amarillasJornada", color: "#eab308" },
+    { key: "rojasJornada", color: "#dc2626" }
   ], { minX: 0, maxX: 30 });
   pintarTotalTarjetas();
 
