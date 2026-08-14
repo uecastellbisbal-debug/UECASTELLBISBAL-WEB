@@ -777,10 +777,16 @@ a:focus-visible, button:focus-visible{
 }
 .staff-grid{
   display:grid;
-  grid-template-columns:repeat(3, 1fr);
+  grid-template-columns:repeat(5, 1fr);
   border:1px solid var(--line);
   border-radius:4px;
   overflow:hidden;
+}
+@media (max-width:900px){
+  .staff-grid{ grid-template-columns:repeat(3, 1fr); }
+  .staff-box{ border-bottom:1px solid var(--line); }
+  .staff-box:nth-child(3n){ border-right:none; }
+  .staff-box:nth-child(n+4){ border-bottom:none; }
 }
 .staff-box{
   padding:32px 20px;
@@ -866,6 +872,11 @@ a:focus-visible, button:focus-visible{
 .badge-defensa{ background:var(--lilac); }
 .badge-mediocentro{ background:#d4af37; }
 .badge-delantera{ background:#2563eb; }
+.badge-capitan{ background:#f59e0b; }
+.roster-capitania{
+  max-width:360px;
+  margin:0 auto;
+}
 .roster-name{
   font-size:14px;
   font-weight:500;
@@ -2327,20 +2338,40 @@ a:focus-visible, button:focus-visible{
         <h2 class="section-title">Plantilla</h2>
       </div>
     </div>
+    <p class="staff-label" style="margin:0 0 14px;">Dirección deportiva</p>
     <div class="staff-grid">
       <div class="staff-box">
         <p class="staff-label">Entrenador</p>
-        <p class="staff-name">Nombre</p>
+        <p class="staff-name">Carlos Rodríguez</p>
+      </div>
+      <div class="staff-box">
+        <p class="staff-label">Segundo entrenador</p>
+        <p class="staff-name">Juanan Fernández</p>
       </div>
       <div class="staff-box">
         <p class="staff-label">Delegado</p>
-        <p class="staff-name">Nombre</p>
+        <p class="staff-name">Marc Jiménez</p>
       </div>
       <div class="staff-box">
-        <p class="staff-label">Capitanes</p>
-        <p class="staff-name">Nombre</p>
+        <p class="staff-label">Delegado de campo</p>
+        <p class="staff-name">Suñé</p>
+      </div>
+      <div class="staff-box">
+        <p class="staff-label">Entrenador de porteros</p>
+        <p class="staff-name">Aleix Ruiz</p>
       </div>
     </div>
+
+    <div class="roster-box">
+      <p class="staff-label">Capitanía</p>
+      <div class="roster-col-list roster-capitania">
+        <div class="roster-player"><span class="roster-badge badge-capitan">C</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Guillem Rivas</span><span class="roster-photo-popup"></span></span></div>
+        <div class="roster-player"><span class="roster-badge badge-capitan">C</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Víctor Vargas</span><span class="roster-photo-popup"></span></span></div>
+        <div class="roster-player"><span class="roster-badge badge-capitan">C</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Izan Molero</span><span class="roster-photo-popup"></span></span></div>
+        <div class="roster-player"><span class="roster-badge badge-capitan">C</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Aaron Blanco</span><span class="roster-photo-popup"></span></span></div>
+      </div>
+    </div>
+
     <div class="roster-box">
       <p class="staff-label">Jugadores</p>
       <!-- Para poner los nombres reales, sustituye cada "Nombre" por el del jugador correspondiente.
@@ -2349,42 +2380,44 @@ a:focus-visible, button:focus-visible{
         <div class="roster-col col-portero">
           <p class="roster-col-title">Portero</p>
           <div class="roster-col-list">
-            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Guillem Rivas</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Chema Gil</span><span class="roster-photo-popup"></span></span></div>
           </div>
         </div>
         <div class="roster-col col-defensa">
           <p class="roster-col-title">Defensa</p>
           <div class="roster-col-list">
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Pol Bonache</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Aaron Blanco</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Kais</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Eric Bonache</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Víctor Vargas</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Raúl Melendo</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Tomasso Buonocunto</span><span class="roster-photo-popup"></span></span></div>
           </div>
         </div>
         <div class="roster-col col-mediocentro">
           <p class="roster-col-title">Mediocentro</p>
           <div class="roster-col-list">
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Borja Ogayar</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Izan Molero</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Uri López</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Edu Quindos</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Alex Alcántara</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Alex Jordan</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Hugo Molero</span><span class="roster-photo-popup"></span></span></div>
           </div>
         </div>
         <div class="roster-col col-delantera">
           <p class="roster-col-title">Delantera</p>
           <div class="roster-col-list">
-            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
-            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Ibrahim Cámara</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Carlos Miranda</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Hugo Ruiz</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Manuel Linares</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Emilio Conde</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Ivan Soriano</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Fran Rodríguez</span><span class="roster-photo-popup"></span></span></div>
           </div>
         </div>
       </div>
