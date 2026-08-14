@@ -2302,6 +2302,7 @@ a:focus-visible, button:focus-visible{
       <div class="clasi-header">
         <span>P.</span>
         <span class="clasi-col-equipo">Equipo</span>
+        <span>Pts</span>
         <span>PJ</span>
         <span>PG</span>
         <span>PE</span>
@@ -2309,7 +2310,6 @@ a:focus-visible, button:focus-visible{
         <span>GF</span>
         <span>GC</span>
         <span>DG</span>
-        <span>Pts</span>
       </div>
       <div class="clasi-list" id="clasiList">
         <!-- Se rellena automáticamente desde "clasificacion", al final de este archivo -->
@@ -2961,6 +2961,7 @@ function pintarClasificacion(){
     row.innerHTML = `
       <span class="clasi-pos">${i + 1}</span>
       <span class="clasi-equipo"><img class="clasi-crest" src="${escudo}" alt="">${eq.equipo}</span>
+      <span class="clasi-pts">${eq.pts}</span>
       <span>${eq.pj}</span>
       <span>${eq.g}</span>
       <span>${eq.e}</span>
@@ -2968,7 +2969,6 @@ function pintarClasificacion(){
       <span>${eq.gf}</span>
       <span>${eq.gc}</span>
       <span>${eq.dg > 0 ? "+" + eq.dg : eq.dg}</span>
-      <span class="clasi-pts">${eq.pts}</span>
     `;
     cont.appendChild(row);
   });
