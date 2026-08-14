@@ -160,7 +160,7 @@ a:focus-visible, button:focus-visible{
 .masthead-logo{
   display:flex;
   justify-content:center;
-  padding:116px 24px 6px;
+  padding:140px 24px 6px; /* +24px mientras esté el enlace temporal de "Plantilla 26/27" en el header */
   position:relative;
 }
 .masthead-logo::before{
@@ -187,7 +187,7 @@ a:focus-visible, button:focus-visible{
   z-index:1;
 }
 @media (max-width:640px){
-  .masthead-logo{ padding:100px 16px 4px; }
+  .masthead-logo{ padding:120px 16px 4px; } /* +20px mientras esté el enlace temporal de "Plantilla 26/27" */
   .masthead-logo img{ height:92px; }
   .masthead-logo::before{ top:24px; width:150px; height:150px; }
 }
@@ -409,8 +409,9 @@ a:focus-visible, button:focus-visible{
 }
 .brand{
   display:flex;
-  align-items:center;
-  gap:12px;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:6px;
 }
 .brand-instagram{
   display:inline-flex;
@@ -426,9 +427,22 @@ a:focus-visible, button:focus-visible{
 }
 .brand-instagram:hover{ color:var(--lilac-light); }
 .brand-instagram svg{ width:20px; height:20px; flex:none; color:var(--lilac-light); }
+/* ENLACE TEMPORAL (ver aviso junto al <a> en el HTML): quitar entero
+   este bloque cuando se retire el enlace, junto con el <a> del HTML */
+.brand-plantilla-temp{
+  font-family:var(--display);
+  font-size:12.5px;
+  font-weight:800;
+  letter-spacing:0.02em;
+  color:var(--lilac-light);
+  text-decoration:none;
+  animation:live-blink 1.3s infinite;
+}
+.brand-plantilla-temp:hover{ color:var(--white); }
 @media (max-width:640px){
   .brand-instagram{ font-size:11.5px; gap:6px; }
   .brand-instagram svg{ width:17px; height:17px; }
+  .brand-plantilla-temp{ font-size:11px; }
 }
 .crest{
   width:52px; height:52px;
@@ -2067,6 +2081,11 @@ a:focus-visible, button:focus-visible{
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         <span>Sigue a la UE en Instagram</span>
       </a>
+      <!-- ENLACE TEMPORAL: solo para las primeras jornadas, luego se
+           quita este <a> (y se puede volver a poner .brand en fila con
+           flex-direction:row si ya no hace falta la segunda línea) --
+           la plantilla ya está siempre disponible en el menú de arriba -->
+      <a class="brand-plantilla-temp" href="#plantilla">📋 Plantilla 26/27</a>
     </div>
     <nav class="header-nav" id="headerNav">
       <a href="#ultimo-partido">Último partido</a>
