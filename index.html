@@ -1,0 +1,4133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UE Castellbisbal</title>
+<meta name="description" content="Web de aficionados de la UE Castellbisbal. Próximo partido, calendario, resultados y clasificación del primer equipo, Grupo 12 de Tercera Catalana.">
+
+<!-- Open Graph: la miniatura que se ve al compartir el enlace en WhatsApp, Instagram, Facebook, etc.
+     IMPORTANTE: og:url y og:image usan aquí un dominio de ejemplo (uecastellbisbal.cat).
+     En cuanto tengas el dominio y hosting definitivos, cambia esas dos líneas por la
+     dirección real donde subas la web (y sube también el archivo assets/og-image.png
+     a esa misma ruta, junto al index.html). -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.uecastellbisbal.cat/">
+<meta property="og:title" content="UE Castellbisbal">
+<meta property="og:description" content="Próximo partido, calendario, resultados y clasificación del primer equipo, Grupo 12 de Tercera Catalana.">
+<meta property="og:image" content="https://www.uecastellbisbal.cat/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_ES">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UE Castellbisbal">
+<meta name="twitter:description" content="Próximo partido, calendario, resultados y clasificación del primer equipo, Grupo 12 de Tercera Catalana.">
+<meta name="twitter:image" content="https://www.uecastellbisbal.cat/assets/og-image.png">
+
+<link rel="icon" type="image/png" id="favicon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   UE CASTELLBISBAL — v1
+   ------------------------------------------------------------
+   COLOR:  90% negro / 8% blanco / 2% lila de club
+   TIPO:   Archivo Black (títulos) + Inter (todo lo demás)
+   ============================================================ */
+
+:root{
+  --black:        #050505;
+  --black-soft:   #0e0e10;
+  --black-card:   #131315;
+  --line:         rgba(245,245,243,0.10);
+  --white:        #f5f5f3;
+  --white-dim:    rgba(245,245,243,0.62);
+  --white-faint:  rgba(245,245,243,0.38);
+  --lilac:        #7b35c8;
+  --lilac-light:  #a868e8;
+  --lilac-dark:   #2e1150;
+
+  --display: "Archivo Black", "Arial Black", sans-serif;
+  --body: "Inter", -apple-system, sans-serif;
+  --signature: "Dancing Script", cursive;
+
+  --wrap: 1180px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* caja normal (no fija) con fondo negro opaco: al ser una caja de flujo
+   normal se pinta por encima de la foto fija de fondo (z-index negativo),
+   así que la tapa de forma estable durante el scroll en todo lo que va
+   después del hero -- ver comentario junto a su apertura en el HTML */
+.page-body{
+  position:relative;
+  background:var(--black);
+}
+
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+img{ max-width:100%; display:block; }
+
+.wrap{
+  max-width:var(--wrap);
+  margin:0 auto;
+  padding:0 32px;
+}
+
+@media (max-width:640px){
+  .wrap{ padding:0 22px; }
+}
+
+::selection{ background:var(--lilac); color:var(--white); }
+
+/* focus visibility (accesibilidad) */
+a:focus-visible, button:focus-visible{
+  outline:2px solid var(--lilac-light);
+  outline-offset:3px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+}
+
+/* ---------- secuencia de entrada del hero ---------- */
+@keyframes rise-in{
+  from{ opacity:0; transform:translateY(22px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+.hero-links-col{
+  opacity:0;
+  animation:rise-in .9s cubic-bezier(.16,.8,.3,1) forwards;
+  animation-delay:.2s;
+}
+
+/* ---------- reveal on scroll ---------- */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.reveal.is-visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ============================================================
+   BARRA SUPERIOR
+   ============================================================ */
+.top-bar{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:101;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--lilac-dark);
+  border-bottom:1px solid rgba(123,53,200,0.4);
+}
+.top-bar p{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+}
+.top-bar p strong{ color:var(--white); font-weight:800; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+/* ============================================================
+   PARTIDO: PRÓXIMO / EN DIRECTO / FINAL
+   ============================================================ */
+.masthead-logo{
+  display:flex;
+  justify-content:center;
+  padding:116px 24px 6px;
+  position:relative;
+}
+.masthead-logo::before{
+  content:"";
+  position:absolute;
+  top:38px; left:50%;
+  width:260px; height:260px;
+  transform:translateX(-50%);
+  background:radial-gradient(circle, rgba(168,104,232,0.35) 0%, rgba(168,104,232,0) 70%);
+  filter:blur(6px);
+  animation:masthead-glow-pulse 5s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes masthead-glow-pulse{
+  0%, 100%{ opacity:0.7; transform:translateX(-50%) scale(1); }
+  50%{ opacity:1; transform:translateX(-50%) scale(1.08); }
+}
+.masthead-logo img{
+  height:190px;
+  width:auto;
+  max-width:100%;
+  filter:drop-shadow(0 4px 18px rgba(0,0,0,0.55));
+  position:relative;
+  z-index:1;
+}
+@media (max-width:640px){
+  .masthead-logo{ padding:100px 16px 4px; }
+  .masthead-logo img{ height:92px; }
+  .masthead-logo::before{ top:24px; width:150px; height:150px; }
+}
+.live-banner{
+  margin-top:0;
+  padding:0 0 2px;
+}
+@media (max-width:640px){
+  .live-banner{ margin-top:0; }
+}
+.live-card{
+  max-width:640px;
+  margin:0 auto;
+  border-radius:4px;
+  padding:22px 28px;
+  text-align:center;
+  transition:background .3s ease, border-color .3s ease;
+  /* por defecto (próximo partido): acento verde */
+  background:linear-gradient(135deg, rgba(22,163,74,0.14), var(--black-soft) 55%);
+  border:1px solid rgba(22,163,74,0.4);
+}
+.live-banner.is-directo .live-card{
+  background:linear-gradient(135deg, rgba(220,38,38,0.12), var(--black-soft) 55%);
+  border-color:rgba(220,38,38,0.4);
+}
+.live-banner.is-final .live-card{
+  background:linear-gradient(135deg, rgba(55,65,81,0.35), var(--black-soft) 55%);
+  border-color:rgba(148,163,184,0.35);
+}
+.recap-card{
+  background:var(--black-soft) !important;
+  border:1px solid var(--line) !important;
+}
+.recap-card .live-vs{
+  color:var(--white-faint);
+  border-color:var(--line);
+}
+.live-status{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:8px 10px;
+  margin-bottom:18px;
+}
+.live-dot{
+  width:9px; height:9px;
+  border-radius:50%;
+  background:#22c55e;
+}
+.live-banner.is-directo .live-dot{
+  background:#dc2626;
+  animation:live-pulse 1.6s infinite;
+}
+.live-banner.is-final .live-dot{
+  background:#94a3b8;
+}
+.live-dot.is-recap{ background:var(--white-faint); }
+@keyframes live-pulse{
+  0%{ box-shadow:0 0 0 0 rgba(220,38,38,0.55); }
+  70%{ box-shadow:0 0 0 8px rgba(220,38,38,0); }
+  100%{ box-shadow:0 0 0 0 rgba(220,38,38,0); }
+}
+.live-label{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:#4ade80;
+}
+.live-banner.is-directo .live-label{ color:#f87171; }
+.live-banner.is-final .live-label{ color:#94a3b8; }
+.live-label.is-recap{ color:var(--white-faint); }
+.live-minute{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:var(--white-faint);
+  padding-left:10px;
+  border-left:1px solid var(--line);
+}
+.live-teams{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:28px;
+}
+.live-team{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  width:140px;
+}
+.live-crest{
+  width:44px; height:44px;
+  object-fit:contain;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+.live-team-name{
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--white-dim);
+  line-height:1.25;
+}
+.live-score{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-family:var(--display);
+  font-size:clamp(34px, 6vw, 48px);
+  color:var(--white);
+}
+.live-score-sep{ color:var(--white-faint); font-size:0.6em; }
+.live-vs{
+  font-family:var(--display);
+  font-size:20px;
+  color:#4ade80;
+  border:1.5px solid rgba(22,163,74,0.6);
+  border-radius:50%;
+  width:48px; height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.live-vs.has-resultado{
+  width:auto; height:auto;
+  min-width:48px;
+  padding:8px 14px;
+  border-radius:8px;
+  font-size:26px;
+  color:var(--white);
+  border-color:var(--line);
+  background:rgba(255,255,255,0.04);
+}
+.live-venue{
+  display:inline-block;
+  margin-top:16px;
+  font-size:11.5px;
+  letter-spacing:0.06em;
+  color:var(--white-faint);
+  transition:color .2s ease;
+}
+.live-venue[href]:hover{ color:var(--white); }
+.live-clima{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--white-dim);
+}
+.live-cuenta-atras{
+  margin-top:12px;
+  font-family:var(--display);
+  font-size:13px;
+  letter-spacing:0.03em;
+  color:var(--lilac-light);
+}
+.live-racha{
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.live-racha-label{
+  font-size:11px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--white-faint);
+}
+.live-racha-dots{
+  display:flex;
+  gap:5px;
+}
+.racha-dot{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:20px; height:20px;
+  border-radius:50%;
+  font-size:10px;
+  font-weight:800;
+  color:var(--black);
+}
+.racha-dot.v{ background:#4ade80; }
+.racha-dot.e{ background:#9ca3af; }
+.racha-dot.d{ background:#f87171; }
+.live-actions{
+  margin-top:18px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:nowrap;
+  gap:10px;
+}
+@media (max-width:640px){
+  .live-card{ padding:20px 16px; }
+  .live-teams{ gap:14px; }
+  .live-team{ width:auto; flex:1; }
+  .live-team-name{ font-size:11px; }
+  .live-actions{ gap:6px; }
+  .live-actions .match-action{ padding:10px 12px; font-size:10px; gap:5px; }
+}
+
+.site-header{
+  position:fixed;
+  top:34px; left:0; right:0;
+  z-index:100;
+  padding:22px 0;
+  transition:background .4s ease, padding .4s ease, border-color .4s ease;
+  border-bottom:1px solid transparent;
+}
+.site-header.is-scrolled{
+  background:rgba(5,5,5,0.86);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+.site-header .wrap{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:24px;
+  max-width:1500px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.brand-instagram{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--display);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:0.01em;
+  color:var(--white);
+  text-decoration:none;
+  transition:color .2s ease;
+}
+.brand-instagram:hover{ color:var(--lilac-light); }
+.brand-instagram svg{ width:20px; height:20px; flex:none; color:var(--lilac-light); }
+@media (max-width:640px){
+  .brand-instagram{ font-size:11.5px; gap:6px; }
+  .brand-instagram svg{ width:17px; height:17px; }
+}
+.crest{
+  width:52px; height:52px;
+  object-fit:contain;
+  flex:none;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+}
+.header-nav{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:center;
+  gap:9px 18px;
+  font-size:10.5px;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--white-dim);
+  white-space:nowrap;
+}
+.header-nav a{ transition:color .25s ease; }
+.nav-colaboradores{
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--lilac-light);
+  animation:nav-parpadeo 1.6s ease-in-out infinite;
+}
+@keyframes nav-parpadeo{
+  0%, 100%{ opacity:1; }
+  50%{ opacity:0.35; }
+}
+.header-nav a:hover{ color:var(--white); }
+
+.menu-toggle{
+  display:none;
+  grid-column:3;
+  flex-direction:column;
+  gap:5px;
+  background:none;
+  border:none;
+  padding:6px;
+}
+.menu-toggle span{
+  width:22px; height:2px;
+  background:var(--white);
+  display:block;
+  transition:transform .25s ease, opacity .25s ease;
+}
+.menu-toggle.is-open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.menu-toggle.is-open span:nth-child(2){ opacity:0; }
+.menu-toggle.is-open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+@media (max-width:1320px){
+  .header-nav{
+    display:flex;
+    position:fixed;
+    top:34px; right:0;
+    height:calc(100svh - 34px);
+    width:min(78vw, 320px);
+    flex-direction:column;
+    justify-content:center;
+    gap:32px;
+    background:rgba(5,5,5,0.98);
+    border-left:1px solid var(--line);
+    padding:32px;
+    transform:translateX(100%);
+    transition:transform .35s ease;
+    font-size:15px;
+    letter-spacing:0.02em;
+    z-index:99;
+  }
+  .header-nav.is-open{ transform:translateX(0); }
+  .menu-toggle{ display:flex; z-index:101; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero-menu-simple{
+  position:relative;
+  padding:18px 0 32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border-bottom:1px solid var(--line);
+  overflow:hidden;
+  isolation:isolate;
+}
+.hero-scroll-hint{
+  position:absolute;
+  left:50%;
+  bottom:6px;
+  transform:translateX(-50%);
+  width:26px;
+  height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--white-faint);
+  opacity:0.55;
+  animation:hero-scroll-bounce 2.2s ease-in-out infinite;
+  transition:opacity .2s ease, color .2s ease;
+}
+.hero-scroll-hint:hover{ opacity:1; color:var(--white); }
+.hero-scroll-hint svg{ width:20px; height:20px; }
+@keyframes hero-scroll-bounce{
+  0%, 100%{ transform:translateX(-50%) translateY(0); }
+  50%{ transform:translateX(-50%) translateY(5px); }
+}
+@media (max-width:640px){
+  .hero-menu-simple{ padding:14px 0 24px; }
+  .hero-scroll-hint{ display:none; }
+}
+
+/* --------------------------------------------------------------
+   FOTO DEL CAMPO DE FONDO — FIJA A TODA LA WEB
+   Ya no vive dentro del hero: es un div fijo (position:fixed) al
+   nivel de <body>, cubre siempre el viewport entero y no se
+   desplaza al hacer scroll. El contenido normal de cada sección
+   (que lleva su propio fondo negro sólido) pasa por encima y la
+   va tapando a medida que se baja — así el contenido manda
+   siempre, y la foto queda como una atmósfera fija de fondo,
+   visible sobre todo en la cabecera y el hero.
+   -------------------------------------------------------------- */
+.hero-photo{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+  background-size:cover;
+  background-position:center 62%;
+  background-color:#101a10;
+  animation:hero-kenburns 26s cubic-bezier(.25,.1,.25,1) infinite alternate;
+  will-change:transform;
+  background-image:url('assets/hero-bg.jpg');
+}
+/* ---------- haces de luz de estadio, parpadeando muy despacio detrás de la viñeta ---------- */
+.hero-photo::before{
+  content:"";
+  position:absolute; inset:0;
+  z-index:1;
+  background:
+    conic-gradient(from 205deg at 18% -12%, rgba(245,245,243,0.14) 0deg, rgba(245,245,243,0) 22deg, rgba(245,245,243,0) 338deg, rgba(245,245,243,0.08) 360deg),
+    conic-gradient(from 15deg at 84% -10%, rgba(245,245,243,0.11) 0deg, rgba(245,245,243,0) 26deg, rgba(245,245,243,0) 334deg, rgba(245,245,243,0.07) 360deg);
+  opacity:0.6;
+  animation:hero-rays-flicker 7s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes hero-rays-flicker{
+  0%, 100%{ opacity:0.46; }
+  50%{ opacity:0.74; }
+}
+/* ---------- viñeta dramática: oscurece bordes y funde el pie con el fondo, con un leve tinte lila de marca ---------- */
+.hero-photo::after{
+  content:"";
+  position:absolute; inset:0;
+  z-index:2;
+  background:
+    radial-gradient(125% 95% at 50% 10%, rgba(0,0,0,0) 28%, rgba(0,0,0,0.66) 100%),
+    linear-gradient(0deg, rgba(5,5,5,0.96) 0%, rgba(5,5,5,0.78) 30%, rgba(20,20,20,0.46) 58%, rgba(20,20,20,0.22) 100%),
+    linear-gradient(90deg, rgba(5,5,5,0.66) 0%, rgba(5,5,5,0.2) 40%, rgba(5,5,5,0.2) 60%, rgba(5,5,5,0.66) 100%),
+    linear-gradient(0deg, rgba(123,53,200,0.22) 0%, rgba(123,53,200,0) 16%),
+    linear-gradient(160deg, rgba(58,38,10,0.12) 0%, rgba(58,38,10,0) 40%);
+}
+@keyframes hero-kenburns{
+  0%{ transform:scale(1) translate3d(0,0,0) rotate(0deg); }
+  50%{ transform:scale(1.08) translate3d(-1.2%,-1%,0) rotate(0.35deg); }
+  100%{ transform:scale(1.15) translate3d(1%,0.6%,0) rotate(-0.3deg); }
+}
+
+.hero-links-topleft{
+  z-index:1;
+  width:100%;
+}
+.hero-menu-card{
+  max-width:640px;
+  margin:0 auto;
+  border-radius:4px;
+  padding:22px 28px;
+  background:linear-gradient(135deg, rgba(123,53,200,0.18), var(--black-soft) 55%);
+  border:1px solid rgba(123,53,200,0.45);
+}
+@media (max-width:640px){
+  .hero-menu-card{ padding:20px 16px; }
+}
+.hero-links-col{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  align-items:stretch;
+  gap:12px;
+}
+@media (min-width:900px){
+  .hero-links-col{ grid-template-columns:repeat(5, 1fr); }
+  .hero-zero-insults{ grid-column:auto; }
+}
+.hero-zero-insults{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  text-align:center;
+  color:var(--white);
+  background:rgba(220,38,38,0.16);
+  border:1px solid #dc2626;
+  border-radius:2px;
+  padding:8px 12px;
+  transition:background .25s ease;
+  white-space:normal;
+  box-sizing:border-box;
+  width:100%;
+  animation:zero-insults-blink 1.6s ease-in-out infinite;
+}
+.hero-zero-insults:hover{ background:rgba(220,38,38,0.3); }
+@keyframes zero-insults-blink{
+  0%, 100%{ border-color:#dc2626; box-shadow:0 0 0 0 rgba(220,38,38,0.5); }
+  50%{ border-color:#f87171; box-shadow:0 0 0 4px rgba(220,38,38,0); }
+}
+.hero-zero-insults img{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  flex:none;
+}
+.hero-zero-insults span{
+  font-family:var(--body);
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  text-shadow:none;
+  flex:1;
+  min-width:0;
+  animation:zero-insults-text-blink 1.6s ease-in-out infinite;
+}
+@keyframes zero-insults-text-blink{
+  0%, 100%{ color:#ffffff; }
+  50%{ color:#dc2626; }
+}
+@media (max-width:640px){
+  .hero-zero-insults img{ width:26px; height:26px; }
+}
+@media (max-width:420px){
+  .hero-zero-insults{ gap:6px; padding:8px; }
+  .hero-zero-insults img{ width:22px; height:22px; }
+  .hero-zero-insults span{ font-size:11px; letter-spacing:0.015em; }
+}
+
+.hero-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  line-height:0.92;
+  font-size:clamp(24px, 8.5vw, 128px);
+  letter-spacing:-0.01em;
+  overflow-wrap:anywhere;
+}
+.hero-title .line-lilac{ color:var(--lilac-light); }
+
+.hero-link{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  text-transform:uppercase;
+  text-align:center;
+  color:var(--white);
+  background:var(--lilac-dark);
+  border:1px solid var(--lilac);
+  border-radius:2px;
+  padding:12px 12px;
+  transition:border-color .25s ease, color .25s ease, background .25s ease;
+  white-space:normal;
+  box-sizing:border-box;
+  width:100%;
+}
+.hero-link:hover{ border-color:var(--lilac-light); background:var(--lilac); }
+.hero-link-icon{
+  width:16px; height:16px;
+  flex:none;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+}
+@media (max-width:640px){
+  .hero-link{ font-size:14px; }
+}
+@media (max-width:400px){
+  .hero-link{ font-size:12px; letter-spacing:0.02em; }
+}
+
+/* ============================================================
+   INDICADORES
+   ============================================================ */
+.stats{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+}
+.stat{
+  padding:56px 24px;
+  text-align:center;
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.stat:last-child{ border-right:none; }
+.stat-label{
+  font-size:12px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--white-dim);
+  font-weight:600;
+  min-height:2.6em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.stat-number{
+  font-family:var(--display);
+  font-size:clamp(15px, 4.4vw, 42px);
+  color:var(--white);
+  line-height:1;
+  margin-top:16px;
+  white-space:nowrap;
+  letter-spacing:-0.01em;
+}
+.stat-number .accent{ color:var(--lilac-light); }
+@media (max-width:640px){
+  .stat{ padding:40px 6px; }
+  .stat-label{ font-size:10px; }
+}
+
+/* ============================================================
+   CUERPO TÉCNICO — entrenador / delegado / capitanes
+   ============================================================ */
+.staff{
+  padding:24px 0 64px;
+}
+.staff-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+}
+.staff-box{
+  padding:32px 20px;
+  text-align:center;
+  border-right:1px solid var(--line);
+  background:var(--black-soft);
+}
+.staff-box:last-child{ border-right:none; }
+.staff-label{
+  font-size:11px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:10px;
+}
+.staff-name{
+  font-size:15px;
+  font-weight:600;
+  color:var(--white-dim);
+}
+.roster-box{
+  margin-top:16px;
+  padding:28px 32px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--black-soft);
+}
+.roster-box .staff-label{ margin-bottom:20px; }
+.roster-columns{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:28px;
+}
+.roster-col-title{
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:16px;
+}
+.col-portero .roster-col-title{
+  color:#f87171;
+  text-shadow:0 0 10px rgba(220,38,38,0.85), 0 0 22px rgba(220,38,38,0.45);
+}
+.col-defensa .roster-col-title{
+  color:var(--lilac-light);
+  text-shadow:0 0 10px rgba(123,53,200,0.85), 0 0 22px rgba(123,53,200,0.45);
+}
+.col-mediocentro .roster-col-title{
+  color:#d4af37;
+  text-shadow:0 0 10px rgba(212,175,55,0.85), 0 0 22px rgba(212,175,55,0.45);
+}
+.col-delantera .roster-col-title{
+  color:#60a5fa;
+  text-shadow:0 0 10px rgba(37,99,235,0.85), 0 0 22px rgba(37,99,235,0.45);
+}
+.roster-col-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.roster-player{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.roster-badge{
+  width:22px; height:22px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--display);
+  font-size:10px;
+  color:var(--white);
+  flex:none;
+}
+.badge-portero{ background:#dc2626; }
+.badge-defensa{ background:var(--lilac); }
+.badge-mediocentro{ background:#d4af37; }
+.badge-delantera{ background:#2563eb; }
+.roster-name{
+  font-size:14px;
+  font-weight:500;
+  color:var(--white-dim);
+}
+
+/* ---------- foto del jugador al pasar el ratón por encima del nombre ----------
+   Para poner la foto real de un jugador: busca su fila (el bloque
+   <div class="roster-player">...</div> correspondiente) y añade, en el
+   <span class="roster-photo-popup">, este atributo:
+   style="background-image:url('ruta-o-foto-en-base64'); background-size:cover;"
+   Mientras no la pongas, se ve una silueta genérica, igual para todos. ---------- */
+.roster-name-wrap{
+  position:relative;
+  display:inline-block;
+  cursor:pointer;
+  outline:none;
+}
+.roster-photo-popup{
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 12px);
+  transform:translateX(-50%) translateY(6px) scale(0.92);
+  width:104px;
+  height:104px;
+  border-radius:8px;
+  background-color:var(--black-soft);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23555964'%3E%3Cpath d='M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:42%;
+  border:2px solid var(--lilac);
+  box-shadow:0 12px 32px rgba(0,0,0,0.6);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+  z-index:30;
+}
+.roster-photo-popup::after{
+  content:"";
+  position:absolute;
+  top:100%; left:50%;
+  transform:translateX(-50%);
+  border:6px solid transparent;
+  border-top-color:var(--lilac);
+}
+.roster-name-wrap:hover .roster-photo-popup,
+.roster-name-wrap:focus-visible .roster-photo-popup{
+  opacity:1;
+  transform:translateX(-50%) translateY(0) scale(1);
+}
+
+@media (max-width:900px){
+  .roster-columns{ grid-template-columns:repeat(2, 1fr); row-gap:32px; }
+}
+@media (max-width:640px){
+  .staff{ padding-bottom:40px; }
+  .staff-grid{ grid-template-columns:1fr; }
+  .staff-box{
+    border-right:none;
+    border-bottom:1px solid var(--line);
+  }
+  .staff-box:last-child{ border-bottom:none; }
+  .roster-box{ padding:24px 18px; }
+  .roster-columns{ grid-template-columns:1fr; row-gap:24px; }
+}
+
+/* ============================================================
+   RADAR DE TEMPORADA — resumen (6 datos) y desglose (gráficas)
+   ============================================================ */
+.radar-resumen{ padding-top:24px; }
+.radar-grid{
+  display:grid;
+  grid-template-columns:repeat(6, 1fr);
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+}
+.radar-item{
+  padding:26px 12px;
+  text-align:center;
+  border-right:1px solid var(--line);
+  background:var(--black-soft);
+}
+.radar-item:last-child{ border-right:none; }
+.radar-item-label{
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:10px;
+}
+.radar-item-value{
+  font-family:var(--display);
+  font-size:clamp(18px, 3vw, 28px);
+  color:var(--white);
+  white-space:nowrap;
+}
+.radar-item-value.es-amarilla{ color:#eab308; }
+.radar-item-value.es-roja{ color:#dc2626; }
+.radar-item-value.es-gf{ color:#22c55e; }
+.radar-item-value.es-gc{ color:#dc2626; }
+.radar-item-value.es-jornada,
+.radar-item-value.es-posicion{
+  color:var(--white);
+  font-size:clamp(22px, 3.6vw, 34px);
+  font-weight:800;
+  text-shadow:0 0 12px rgba(123,53,200,0.7);
+}
+.radar-actualizado{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  padding:8px 16px;
+  border-radius:20px;
+  background:rgba(123,53,200,0.15);
+  border:1px solid rgba(123,53,200,0.5);
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--lilac-light);
+}
+.radar-actualizado::before{
+  content:"";
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--lilac-light);
+  flex:none;
+}
+@media (max-width:768px){
+  .radar-grid{ grid-template-columns:repeat(3, 1fr); }
+  .radar-item{ border-bottom:1px solid var(--line); }
+  .radar-item:nth-child(3){ border-right:none; }
+  .radar-item:nth-child(n+4){ border-right:1px solid var(--line); }
+  .radar-item:last-child, .radar-item:nth-child(6){ border-right:none; }
+  .radar-item:nth-child(n+4){ border-bottom:none; }
+}
+
+.radar-tendencia-aviso{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:14px;
+  font-size:12px;
+  color:var(--white-faint);
+}
+.dot-tendencia{
+  display:inline-block;
+  width:14px; height:0;
+  border-top:1.5px dashed var(--lilac-light);
+  flex:none;
+}
+
+.radar-charts{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:24px;
+}
+.radar-chart-box{
+  padding:22px 22px 20px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--black-soft);
+}
+.radar-chart-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.radar-chart-header .radar-chart-title{ margin-bottom:0; }
+.radar-chart-total{
+  display:flex;
+  gap:12px;
+  font-family:var(--display);
+  font-size:14px;
+  color:var(--white);
+}
+.radar-chart-total span{ display:flex; align-items:center; gap:5px; }
+.num-amarilla{ color:#eab308; }
+.num-roja{ color:#dc2626; }
+.radar-chart-title{
+  font-size:12px;
+  font-weight:700;
+  color:var(--white-dim);
+  margin-bottom:14px;
+}
+.radar-chart{ width:100%; height:142px; }
+.radar-chart svg{ width:100%; height:100%; overflow:visible; }
+.radar-legend{
+  display:flex;
+  gap:16px;
+  margin-top:12px;
+  font-size:11px;
+  color:var(--white-faint);
+}
+.radar-legend .dot{
+  display:inline-block;
+  width:8px; height:8px;
+  border-radius:50%;
+  margin-right:5px;
+}
+.dot-a{ background:#22c55e; }
+.dot-b{ background:#dc2626; }
+.dot-amarilla{ background:#eab308; }
+.dot-roja{ background:#dc2626; }
+@media (max-width:768px){
+  .radar-charts{ grid-template-columns:1fr; }
+}
+
+/* ============================================================
+   SECCIÓN — genérico
+   ============================================================ */
+.section{
+  padding:120px 0;
+}
+@media (max-width:640px){
+  .section{ padding:80px 0; }
+}
+#ultimo-partido{ padding-top:64px; padding-bottom:56px; }
+#calendario{ padding-top:0; padding-bottom:56px; }
+#clasificacion{ padding-top:0; }
+#radar-resumen{ padding-top:24px; padding-bottom:40px; }
+#radar-desglose{ padding-top:0; padding-bottom:56px; }
+/* estas dos secciones dejan ver la foto de fondo por debajo del texto normal
+   (no llevan fondo negro sólido propio). Aquí se les da un fondo oscuro tipo
+   tarjeta, más una sombra de texto marcada, para que la foto quede claramente
+   detrás y el contenido (fechas, rivales, tabla) se lea con total nitidez */
+#calendario, #clasificacion{
+  text-shadow:0 1px 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.7);
+}
+#calendario .wrap, #clasificacion .wrap{
+  background:rgba(5,5,5,0.88);
+  border-radius:14px;
+  padding-top:32px;
+  padding-bottom:32px;
+  box-shadow:0 0 0 1px var(--line);
+}
+@media (max-width:640px){
+  #calendario .wrap, #clasificacion .wrap{ padding-top:24px; padding-bottom:24px; border-radius:10px; }
+}
+@media (max-width:640px){
+  #ultimo-partido{ padding-top:48px; padding-bottom:40px; }
+  #calendario{ padding-bottom:40px; }
+}
+.section-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:56px;
+  flex-wrap:wrap;
+}
+.section-eyebrow{
+  font-size:12px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+}
+.section-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(28px, 4vw, 42px);
+  margin-top:10px;
+}
+
+/* ============================================================
+   PRÓXIMO PARTIDO — pieza central, tipo cartel de evento
+   ============================================================ */
+.match{
+  position:relative;
+  background:
+    radial-gradient(ellipse 90% 140% at 15% 0%, rgba(123,53,200,0.20), transparent 55%),
+    var(--black-soft);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:64px 40px;
+  overflow:hidden;
+}
+.match-kicker{
+  text-align:center;
+  font-size:12px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--white-dim);
+  font-weight:700;
+  margin-bottom:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+}
+.match-kicker span{ color:var(--lilac-light); }
+.match-soon{
+  display:none;
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:0.1em;
+  padding:5px 12px;
+  border-radius:20px;
+  background:var(--lilac);
+  color:var(--white);
+}
+.match-soon.is-visible{ display:inline-block; }
+
+.match-teams{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:28px;
+  text-align:center;
+}
+.team-crest{
+  width:clamp(88px, 16vw, 136px);
+  height:clamp(88px, 16vw, 136px);
+  object-fit:contain;
+  margin:0 auto 20px;
+  display:block;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.5));
+}
+.team-name{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(22px, 3.6vw, 40px);
+  line-height:1.05;
+}
+.team-tag{
+  display:block;
+  margin-top:10px;
+  font-size:11px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--white-faint);
+  font-weight:600;
+}
+.match-vs{
+  font-family:var(--display);
+  font-size:clamp(18px, 3vw, 26px);
+  color:var(--lilac-light);
+  border:1.5px solid var(--lilac);
+  border-radius:50%;
+  width:64px; height:64px;
+  display:flex; align-items:center; justify-content:center;
+}
+.match-vs.has-resultado{
+  width:auto; height:auto;
+  min-width:64px;
+  padding:10px 18px;
+  border-radius:8px;
+  font-size:clamp(24px, 4vw, 34px);
+  color:var(--white);
+  border-color:rgba(123,53,200,0.5);
+  background:rgba(123,53,200,0.12);
+}
+
+.match-meta{
+  margin-top:52px;
+  display:flex;
+  justify-content:center;
+  gap:48px;
+  flex-wrap:wrap;
+  text-align:center;
+}
+.match-meta-item{ min-width:120px; }
+.match-meta-label{
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--white-faint);
+  font-weight:600;
+  margin-bottom:8px;
+}
+.match-meta-value{
+  font-size:16px;
+  font-weight:700;
+  color:var(--white);
+}
+
+.match-actions{
+  margin-top:40px;
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.match-action{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 20px;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  border-radius:2px;
+  border:1px solid rgba(245,245,243,0.22);
+  color:var(--white-dim);
+  background:transparent;
+  cursor:pointer;
+  transition:border-color .25s ease, color .25s ease;
+  font-family:var(--body);
+}
+.match-action:hover{ border-color:var(--lilac); color:var(--white); }
+.match-action-primary{
+  border-color:var(--lilac);
+  background:var(--lilac-dark);
+  color:var(--white);
+}
+.match-action-primary:hover{ background:var(--lilac); }
+
+@media (max-width:640px){
+  .match{ padding:44px 20px; }
+  .match-teams{ grid-template-columns:1fr; gap:18px; }
+  .match-vs{ margin:0 auto; }
+  .match-meta{ gap:28px; margin-top:36px; }
+}
+
+/* ============================================================
+   CALENDARIO — compacto, discreto (no debe dominar la página)
+   ============================================================ */
+.calendar-list{
+  border-top:1px solid var(--line);
+}
+.calendar-aviso{
+  padding:32px 4px;
+  text-align:center;
+  font-size:13px;
+  color:var(--white-faint);
+}
+.calendar-ver-mas{
+  display:block;
+  width:100%;
+  margin-top:14px;
+  padding:14px;
+  background:transparent;
+  border:1px solid rgba(123,53,200,0.45);
+  border-radius:4px;
+  color:var(--white);
+  font-family:var(--body);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  cursor:pointer;
+  transition:background .2s ease, border-color .2s ease;
+}
+.calendar-ver-mas:hover{
+  background:rgba(123,53,200,0.12);
+  border-color:var(--lilac);
+}
+.calendar-ver-mas span{
+  color:var(--white-faint);
+  font-weight:400;
+}
+.calendar-header{
+  display:grid;
+  grid-template-columns:52px 1fr 96px 118px 92px;
+  align-items:center;
+  gap:18px;
+  padding:0 4px 14px;
+  font-size:10.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--white-faint);
+  font-weight:700;
+}
+.calendar-header span:nth-child(3),
+.calendar-header span:nth-child(4){ text-align:right; }
+.calendar-header span:last-child{ justify-self:center; }
+.calendar-row-simple{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:11px 4px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.calendar-row-simple:hover{ background:rgba(245,245,243,0.025); }
+.cals-jornada{
+  width:32px;
+  flex:none;
+  font-family:var(--display);
+  font-size:11px;
+  color:var(--white-faint);
+}
+.cals-rival{
+  flex:1;
+  color:var(--white-dim);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.cals-resultado{
+  flex:none;
+  font-family:var(--display);
+  font-size:13px;
+  font-weight:800;
+  color:var(--white-faint);
+  min-width:38px;
+  text-align:right;
+}
+.calendar-row-simple.gano .cals-resultado{ color:#4ade80; }
+.calendar-row-simple.perdio .cals-resultado{ color:#f87171; }
+.calendar-row{
+  display:grid;
+  grid-template-columns:52px 1fr 96px 118px 92px;
+  align-items:center;
+  gap:18px;
+  padding:20px 4px;
+  border-bottom:1px solid var(--line);
+  border-left:2px solid transparent;
+  transition:background .2s ease, border-color .2s ease;
+}
+.calendar-row:hover{ background:rgba(245,245,243,0.025); }
+.calendar-row.local{ border-left-color:var(--lilac); }
+.calendar-row.jugado{ opacity:0.45; }
+.cal-line-top,
+.cal-line-bottom{ display:contents; }
+.cal-jornada{
+  grid-column:1;
+  font-family:var(--display);
+  font-size:13px;
+  color:var(--white-faint);
+}
+.cal-rival{
+  grid-column:2;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:15px;
+  font-weight:700;
+}
+.cal-crest{
+  width:18px; height:18px;
+  object-fit:contain;
+  flex:none;
+}
+.cal-vs{
+  font-family:var(--display);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  color:var(--lilac-light);
+  border:1.5px solid var(--lilac);
+  border-radius:50%;
+  width:24px; height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:none;
+}
+.cal-fecha,
+.cal-hora{
+  font-size:13px;
+  color:var(--white-dim);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.cal-fecha{ grid-column:3; }
+.cal-hora{ grid-column:4; color:var(--white-faint); }
+.cal-resultado{
+  color:var(--white);
+  font-weight:800;
+  font-family:var(--display);
+  letter-spacing:0.04em;
+}
+.cal-tag{
+  grid-column:5;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:0.08em;
+  padding:5px 10px;
+  border-radius:2px;
+  text-transform:uppercase;
+  justify-self:center;
+}
+.cal-tag.local{ background:var(--lilac-dark); color:var(--lilac-light); border:1px solid rgba(123,53,200,0.5); }
+.cal-tag.visitante{ background:transparent; color:var(--white-dim); border:1px solid var(--line); }
+.cal-tag.jugado{ background:transparent; color:var(--white-faint); border:1px solid var(--line); }
+
+@media (max-width:640px){
+  .calendar-header{ display:none; }
+  .calendar-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:18px 4px;
+  }
+  .cal-line-top,
+  .cal-line-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    width:100%;
+  }
+  .cal-rival-text{
+    white-space:normal;
+    line-height:1.3;
+  }
+  .cal-fecha, .cal-hora{ text-align:left; white-space:nowrap; }
+  .cal-tag{ flex:none; }
+}
+
+/* ============================================================
+   CLASIFICACIÓN — tabla con scroll horizontal en móvil
+   ============================================================ */
+.clasi-scroll{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  border-top:1px solid var(--line);
+}
+.clasi-header,
+.clasi-row{
+  display:grid;
+  grid-template-columns:40px 200px repeat(8, 46px) 50px;
+  align-items:center;
+  gap:0;
+  min-width:730px;
+  padding:0;
+}
+.clasi-header > span,
+.clasi-row > span{
+  padding:14px 6px;
+  border-right:1px solid var(--line);
+  font-variant-numeric:tabular-nums;
+}
+.clasi-header > span:last-child,
+.clasi-row > span:last-child{
+  border-right:none;
+}
+.clasi-header{
+  border-bottom:1px solid var(--line);
+  border-left:2px solid transparent;
+  font-size:10.5px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--white-faint);
+  font-weight:700;
+}
+.clasi-header span,
+.clasi-row span{
+  text-align:center;
+}
+.clasi-col-equipo,
+.clasi-row .clasi-equipo{
+  text-align:left;
+}
+.clasi-row{
+  border-bottom:1px solid var(--line);
+  border-left:2px solid transparent;
+  font-size:13px;
+  color:var(--white-dim);
+  animation:clasi-row-in 0.45s ease both;
+  animation-play-state:paused;
+}
+.reveal.is-visible .clasi-row{ animation-play-state:running; }
+@keyframes clasi-row-in{
+  from{ opacity:0; transform:translateY(6px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+.clasi-row:nth-child(1){ animation-delay:0.02s; }
+.clasi-row:nth-child(2){ animation-delay:0.05s; }
+.clasi-row:nth-child(3){ animation-delay:0.08s; }
+.clasi-row:nth-child(4){ animation-delay:0.11s; }
+.clasi-row:nth-child(5){ animation-delay:0.14s; }
+.clasi-row:nth-child(6){ animation-delay:0.17s; }
+.clasi-row:nth-child(7){ animation-delay:0.20s; }
+.clasi-row:nth-child(8){ animation-delay:0.23s; }
+.clasi-row:nth-child(9){ animation-delay:0.26s; }
+.clasi-row:nth-child(10){ animation-delay:0.29s; }
+.clasi-row:nth-child(11){ animation-delay:0.32s; }
+.clasi-row:nth-child(12){ animation-delay:0.35s; }
+.clasi-row:nth-child(13){ animation-delay:0.38s; }
+.clasi-row:nth-child(14){ animation-delay:0.41s; }
+.clasi-row:nth-child(15){ animation-delay:0.44s; }
+.clasi-row:nth-child(16){ animation-delay:0.47s; }
+.clasi-row:nth-child(n+17){ animation-delay:0.50s; }
+.clasi-row.es-nuestro{
+  background:rgba(123,53,200,0.1);
+  border-left-color:var(--lilac);
+  color:var(--white);
+  font-weight:700;
+}
+.clasi-pos{
+  font-family:var(--display);
+  font-size:13px;
+  color:var(--white-faint);
+}
+.clasi-row.es-nuestro .clasi-pos{ color:var(--lilac-light); }
+.clasi-equipo{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.clasi-crest{
+  width:18px; height:18px;
+  object-fit:contain;
+  flex:none;
+}
+.clasi-pts{
+  font-family:var(--display);
+  color:var(--white);
+}
+.clasi-est{
+  font-size:11.5px;
+  color:var(--white-faint);
+}
+.clasi-est.sube{ color:#4ade80; }
+.clasi-est.baja{ color:#f87171; }
+
+/* ============================================================
+   COLABORADORES — 3 cuadros centrados
+   ============================================================ */
+.sponsors{
+  background:var(--black-soft);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.sponsors-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+}
+.sponsors-cta{
+  margin-top:56px;
+  padding-top:32px;
+  border-top:1px solid var(--line);
+  text-align:center;
+}
+.sponsors-cta-titulo{
+  font-family:var(--display);
+  font-size:clamp(28px, 4.2vw, 44px);
+  font-weight:800;
+  letter-spacing:0.01em;
+  color:var(--lilac-light);
+  animation:sponsors-cta-titulo-blink 1.8s ease-in-out infinite;
+}
+@keyframes sponsors-cta-titulo-blink{
+  0%, 100%{ color:var(--lilac-light); }
+  50%{ color:var(--white); }
+}
+.sponsors-cta-bloque{
+  max-width:600px;
+  margin:0 auto;
+  text-align:center;
+}
+.sponsors-cta-bloque + .sponsors-cta-bloque{
+  margin-top:40px;
+}
+.sponsors-cta-divisor{
+  width:100%;
+  height:0;
+  border-top:3px dashed currentColor;
+  color:var(--lilac-light);
+  margin:22px 0 18px;
+  animation:sponsors-cta-titulo-blink 1.8s ease-in-out infinite;
+}
+.sponsors-cta-label{
+  font-family:var(--display);
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  margin-bottom:18px;
+}
+@media (max-width:640px){
+  .sponsors-cta-label{ font-size:17px; }
+}
+.sponsors-cta-texto{
+  max-width:600px;
+  margin:12px auto 0;
+  font-size:13.5px;
+  line-height:1.6;
+  color:var(--white-faint);
+}
+.sponsors-cta-acciones{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:24px;
+}
+.sponsors-cta-btn{
+  display:inline-flex;
+  align-items:center;
+  padding:13px 22px;
+  border-radius:2px;
+  font-size:12.5px;
+  font-weight:700;
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+  background:var(--lilac);
+  color:var(--white);
+  transition:background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.sponsors-cta-btn:hover{ background:var(--lilac-light); transform:translateY(-2px); }
+.sponsors-cta-btn-ghost{
+  background:transparent;
+  border:1px solid rgba(245,245,243,0.28);
+}
+.sponsors-cta-btn-ghost:hover{ background:rgba(245,245,243,0.06); border-color:var(--white); }
+.sponsor-col{
+  padding:0 28px;
+  text-align:center;
+  border-right:1px solid var(--line);
+}
+.sponsor-col:last-child{ border-right:none; }
+.sponsor-col-label{
+  font-size:11px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:22px;
+}
+.sponsor-names{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  min-height:64px;
+}
+.amigos-logos{ gap:22px; }
+.amigo-logo{
+  width:96px;
+  height:52px;
+  object-fit:contain;
+  filter:grayscale(1);
+  opacity:0.75;
+  position:relative;
+  transition:opacity .2s ease, transform .25s ease;
+}
+.amigo-logo:hover{
+  opacity:1;
+  transform:scale(2.3);
+  z-index:5;
+  filter:grayscale(0);
+  background:rgba(5,5,5,0.92);
+  border-radius:4px;
+  box-shadow:0 14px 34px rgba(0,0,0,0.5);
+}
+.patrocinador-logo{
+  width:180px;
+  height:90px;
+  object-fit:contain;
+  filter:grayscale(1);
+  position:relative;
+  transition:filter .25s ease, transform .25s ease;
+}
+.patrocinador-logo:hover{
+  transform:scale(2.1);
+  z-index:5;
+  filter:grayscale(0);
+  background:rgba(5,5,5,0.92);
+  border-radius:4px;
+  box-shadow:0 14px 34px rgba(0,0,0,0.5);
+}
+.sponsor-name{
+  font-family:var(--display);
+  text-transform:uppercase;
+  letter-spacing:0.02em;
+  color:var(--white);
+  line-height:1.3;
+}
+/* patrocinadores: el nivel más grande e importante, con la etiqueta destacada */
+.tier-patrocinadores .sponsor-col-label{
+  display:inline-block;
+  font-size:15px;
+  color:var(--white);
+  padding:6px 16px;
+  border:1.5px solid var(--lilac);
+  border-radius:20px;
+  text-shadow:0 0 14px rgba(123,53,200,0.9), 0 0 28px rgba(123,53,200,0.55);
+}
+.tier-patrocinadores .sponsor-name{ font-size:22px; }
+/* colaboradores: tamaño medio */
+.tier-colaboradores .sponsor-name{ font-size:15px; color:var(--white-dim); font-weight:600; text-transform:none; font-family:var(--body); }
+/* amigos del club: discreto */
+.tier-amigos .sponsor-name{ font-size:13px; color:var(--white-faint); font-weight:500; text-transform:none; font-family:var(--body); }
+
+@media (max-width:768px){
+  .sponsors-grid{ grid-template-columns:1fr; }
+  .sponsor-col{
+    padding:36px 12px;
+    border-right:none;
+    border-bottom:1px solid var(--line);
+  }
+  .sponsor-col:last-child{ border-bottom:none; }
+}
+
+/* ============================================================
+   HISTORIA Y ESTADIO (sección propia, justo después del hero)
+   ============================================================ */
+.hero-about-section{
+  background:var(--black);
+  padding:72px 0;
+}
+.hero-about{
+  max-width:1180px;
+}
+.about-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:32px;
+}
+.about-block{
+  position:relative;
+}
+.about-number{
+  position:absolute;
+  top:-6px;
+  right:0;
+  font-family:var(--display);
+  font-size:56px;
+  line-height:1;
+  color:rgba(245,245,243,0.05);
+  z-index:0;
+  pointer-events:none;
+  user-select:none;
+}
+.about-icon{
+  display:block;
+  width:26px;
+  height:26px;
+  color:var(--lilac-light);
+  margin-bottom:16px;
+  position:relative;
+  z-index:1;
+}
+.about-block-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(16px, 1.8vw, 19px);
+  letter-spacing:0.03em;
+  margin-bottom:12px;
+  color:var(--lilac-light);
+  position:relative;
+  z-index:1;
+}
+.about-block-text{
+  font-size:14px;
+  line-height:1.65;
+  color:var(--white-dim);
+}
+.about-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:14px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--lilac-light);
+  transition:color .2s ease;
+}
+.about-link:hover{ color:var(--white); }
+@media (max-width:900px){
+  .about-grid{ grid-template-columns:repeat(2, 1fr); gap:28px; }
+}
+@media (max-width:768px){
+  .hero-about-section{ padding:48px 0; }
+  .about-grid{ grid-template-columns:1fr; gap:28px; }
+}
+
+/* ============================================================
+   BOTÓN "VOLVER ARRIBA"
+   ============================================================ */
+.back-to-top{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:90;
+  width:44px; height:44px;
+  border-radius:50%;
+  background:rgba(5,5,5,0.75);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(123,53,200,0.5);
+  color:var(--white);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;
+}
+.back-to-top.is-visible{
+  opacity:1;
+  transform:translateY(0);
+  pointer-events:auto;
+}
+.back-to-top:hover{
+  background:var(--lilac);
+  border-color:var(--lilac-light);
+}
+@media (max-width:640px){
+  .back-to-top{ right:16px; bottom:16px; width:40px; height:40px; }
+}
+/* ============================================================
+   MODAL "QUIERO HABLAR CON EL CLUB"
+   ============================================================ */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:rgba(5,5,5,0.8);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease;
+}
+.modal-overlay.is-open{
+  opacity:1;
+  pointer-events:auto;
+}
+.modal-box{
+  position:relative;
+  width:100%;
+  max-width:400px;
+  background:var(--black-soft);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:36px 28px 28px;
+  transform:translateY(14px);
+  transition:transform .25s ease;
+}
+.modal-overlay.is-open .modal-box{ transform:translateY(0); }
+.modal-cerrar{
+  position:absolute;
+  top:14px; right:14px;
+  width:28px; height:28px;
+  border-radius:50%;
+  background:transparent;
+  border:1px solid var(--line);
+  color:var(--white-faint);
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  transition:background .2s ease, color .2s ease;
+}
+.modal-cerrar:hover{ background:rgba(245,245,243,0.08); color:var(--white); }
+.modal-titulo{
+  font-family:var(--display);
+  font-size:19px;
+  color:var(--white);
+  margin-bottom:8px;
+}
+.modal-subtitulo{
+  font-size:13px;
+  line-height:1.5;
+  color:var(--white-faint);
+  margin-bottom:24px;
+}
+.modal-campo{
+  margin-bottom:16px;
+}
+.modal-campo label{
+  display:block;
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:6px;
+}
+.modal-campo input,
+.modal-campo select,
+.modal-campo textarea{
+  width:100%;
+  padding:11px 12px;
+  background:var(--black);
+  border:1px solid var(--line);
+  border-radius:3px;
+  color:var(--white);
+  font-size:14px;
+  font-family:var(--body);
+}
+.modal-campo select{
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0d6f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:16px;
+  padding-right:34px;
+}
+.modal-campo select option{ background:var(--black); color:var(--white); }
+.modal-campo textarea{
+  resize:vertical;
+  min-height:80px;
+  font-family:var(--body);
+}
+.modal-campo input:focus,
+.modal-campo select:focus,
+.modal-campo textarea:focus{
+  outline:none;
+  border-color:var(--lilac);
+}
+.modal-enviar{
+  width:100%;
+  justify-content:center;
+  margin-top:8px;
+  border:none;
+  cursor:pointer;
+}
+.modal-oauth-botones{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:20px;
+}
+.modal-oauth-google{
+  display:flex;
+  justify-content:center;
+}
+.modal-oauth-google:empty{ display:none; } /* si no hay Client ID de Google, no deja hueco vacío */
+.modal-oauth-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:10px 14px;
+  background:var(--white);
+  color:#1a1a1a;
+  border:1px solid var(--line);
+  border-radius:3px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background .2s ease, transform .2s ease;
+}
+.modal-oauth-btn:hover{ background:#f2f2f2; transform:translateY(-1px); }
+.modal-oauth-btn[hidden]{ display:none; }
+.modal-separador{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
+  font-size:11px;
+  color:var(--white-faint);
+}
+.modal-separador::before,
+.modal-separador::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+.modal-box-legal{
+  max-width:640px;
+  max-height:80vh;
+  overflow-y:auto;
+}
+.modal-legal-texto{
+  font-size:13px;
+  line-height:1.7;
+  color:var(--white-dim);
+}
+.modal-legal-texto p{ margin-bottom:16px; }
+.modal-legal-texto p:last-child{ margin-bottom:0; }
+.modal-legal-texto strong{ color:var(--white); }
+
+.back-to-top-crest{
+  position:fixed;
+  right:26px;
+  bottom:76px;
+  z-index:90;
+  width:34px;
+  height:auto;
+  filter:grayscale(1) contrast(0.95);
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.back-to-top-crest.is-visible{
+  opacity:0.85;
+  transform:translateY(0);
+}
+@media (max-width:640px){
+  .back-to-top-crest{ right:18px; bottom:64px; width:28px; }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{
+  padding:56px 0 40px;
+  border-top:1px solid var(--line);
+}
+.footer-disclaimer{
+  max-width:560px;
+  margin:0 auto 24px;
+  text-align:center;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--white-faint);
+}
+.footer-bottom{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  font-size:12px;
+  color:var(--white-faint);
+}
+.footer-bottom a:hover{ color:var(--white); }
+.footer-legal{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.footer-legal a{ color:var(--white-faint); transition:color .2s ease; }
+.footer-legal a:hover{ color:var(--lilac-light); }
+
+</style>
+<!-- Librerías de inicio de sesión con Google y Microsoft, para la membresía de aficionado -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://alcdn.msauth.net/browser/3.14.0/js/msal-browser.min.js" defer></script>
+</head>
+<body>
+<div class="hero-photo" role="img" aria-label="Campo municipal de la UE Castellbisbal"></div>
+
+<div class="top-bar">
+  <p>Web de aficionados · <strong>Primer equipo</strong></p>
+</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <div class="brand">
+      <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
+      <a class="brand-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span>Sigue a la UE en Instagram</span>
+      </a>
+    </div>
+    <nav class="header-nav" id="headerNav">
+      <a href="#ultimo-partido">Último partido</a>
+      <a href="#radar-resumen">Radar de temporada</a>
+      <a href="#calendario">Calendario y resultados</a>
+      <a href="#clasificacion">Clasificación</a>
+      <a href="#plantilla">Plantilla</a>
+      <a href="#sobre-nosotros">Sobre nosotros</a>
+      <a href="#colaboradores" class="nav-colaboradores">Colaboradores</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="masthead-logo">
+  <img src="assets/logo-uecastellbisbal.png" alt="UE Castellbisbal — uecastellbisbal.cat">
+</div>
+
+<!-- ============ PARTIDO: PRÓXIMO / EN DIRECTO / FINAL ============ -->
+<section class="live-banner" id="liveBanner">
+  <div class="wrap live-card">
+    <div class="live-status">
+      <span class="live-dot" id="liveDot"></span>
+      <span class="live-label" id="liveLabel">Próximo partido</span>
+      <span class="live-minute" id="liveJornada">J1</span>
+      <span class="live-minute" id="liveFecha">20/09/2026</span>
+      <span class="live-minute" id="liveHora">12:00 h</span>
+    </div>
+    <div class="live-teams">
+      <div class="live-team">
+        <img class="live-crest" id="liveCrest1" src="" alt="">
+        <span class="live-team-name" id="liveName1">UE Castellbisbal</span>
+      </div>
+      <div class="live-score" id="liveScore">
+        <span class="live-vs">VS</span>
+      </div>
+      <div class="live-team">
+        <img class="live-crest" id="liveCrest2" src="" alt="">
+        <span class="live-team-name" id="liveName2">Vallirana C.F.</span>
+      </div>
+    </div>
+    <a class="live-venue" id="liveVenue" href="https://maps.app.goo.gl/7GEpgcETFou2osYU9" target="_blank" rel="noopener">📍 Campo Municipal</a>
+    <p class="live-clima" id="liveClima" style="display:none;"></p>
+    <p class="live-cuenta-atras" id="liveCuentaAtras" style="display:none;"></p>
+    <div class="live-racha" id="liveRacha" style="display:none;">
+      <span class="live-racha-label">Racha</span>
+      <span class="live-racha-dots" id="liveRachaDots"></span>
+    </div>
+    <div class="live-actions">
+      <a class="match-action match-action-primary" id="btnCompartirBanner" href="#" target="_blank" rel="noopener">Compartir</a>
+      <a class="match-action" id="btnAnadirCalendario" href="#" target="_blank" rel="noopener" style="display:none;">📅 Añadir al calendario</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HERO ============ -->
+<!-- ============ HERO (solo menú, sin foto) ============ -->
+<section class="hero-menu-simple">
+  <div class="wrap hero-menu-card">
+    <nav class="hero-links-col">
+      <a href="#ultimo-partido" class="hero-link">
+        <svg class="hero-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        Último partido
+      </a>
+      <a href="#radar-resumen" class="hero-link">
+        <svg class="hero-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Radar de temporada
+      </a>
+      <a href="#calendario" class="hero-link">
+        <svg class="hero-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendario y resultados
+      </a>
+      <a href="#clasificacion" class="hero-link">
+        <svg class="hero-link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        Clasificación
+      </a>
+      <a href="https://www.fcf.cat/es/zero-insults" target="_blank" rel="noopener" class="hero-zero-insults" id="linkZeroInsults">
+        <img src="assets/icono-zero-insults.png" alt="Zero Insults a la Grada">
+        <span>Cero insultos en la grada</span>
+      </a>
+    </nav>
+  </div>
+  <a href="#ultimo-partido" class="hero-scroll-hint" aria-label="Ir al contenido">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </a>
+</section>
+
+<!-- ============ A PARTIR DE AQUÍ: fondo negro sólido normal ============
+     La foto fija solo debe verse en la cabecera y el hero de arriba. Todo
+     lo que viene después va dentro de este contenedor, que es una caja
+     normal (no ligada al hero) con su propio fondo negro opaco: al pintarse
+     por encima de la foto (que tiene z-index negativo) la tapa del todo,
+     de forma estable durante el scroll -- no depende de sombras de texto
+     ni de que cada tarjeta individual sea opaca, evitando destellos de la
+     imagen al hacer scroll rápido. -->
+<div class="page-body">
+
+<!-- ============ ÚLTIMO PARTIDO ============ -->
+<section class="section reveal" id="ultimo-partido">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">Resultado más reciente</p>
+        <h2 class="section-title">Último partido</h2>
+      </div>
+    </div>
+    <div class="live-card recap-card">
+      <div class="live-status">
+        <span class="live-dot is-recap"></span>
+        <span class="live-label is-recap" id="ultimoLabel">Último partido</span>
+        <span class="live-minute" id="ultimoJornada" style="display:none;">J1</span>
+      </div>
+      <div class="live-teams" id="ultimoTeams">
+        <div class="live-team">
+          <img class="live-crest" id="ultimoCrest1" src="" alt="">
+          <span class="live-team-name" id="ultimoName1">UE Castellbisbal</span>
+        </div>
+        <div class="live-score" id="ultimoScore">
+          <span class="live-vs">VS</span>
+        </div>
+        <div class="live-team">
+          <img class="live-crest" id="ultimoCrest2" src="" alt="">
+          <span class="live-team-name" id="ultimoName2">Rival</span>
+        </div>
+      </div>
+      <p class="live-venue" id="ultimoInfo">Aún no se ha jugado ningún partido esta temporada</p>
+      <div class="match-actions" id="ultimoActions" style="display:none;">
+        <a class="match-action match-action-primary" id="btnWhatsapp" href="#" target="_blank" rel="noopener">Compartir resultado</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADAR DE TEMPORADA — RESUMEN ============ -->
+<section class="section radar-resumen reveal" id="radar-resumen">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">Cómo va la temporada</p>
+        <h2 class="section-title">Radar de temporada</h2>
+        <p class="radar-actualizado" id="radarActualizado"></p>
+      </div>
+    </div>
+    <div class="radar-grid" id="radarGrid">
+      <!-- Se rellena automáticamente con el último dato de "radarTemporada", al final del archivo -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADAR DE TEMPORADA — DESGLOSE ============ -->
+<section class="section radar-desglose reveal" id="radar-desglose">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">Jornada a jornada</p>
+        <h2 class="section-title">Evolución de la temporada</h2>
+        <p class="radar-tendencia-aviso" id="radarTendenciaAviso" style="display:none;">
+          <span class="dot-tendencia"></span> La línea discontinua es una estimación orientativa (proyección según el ritmo de las últimas jornadas), no un dato real.
+        </p>
+      </div>
+    </div>
+    <div class="radar-charts">
+      <div class="radar-chart-box">
+        <p class="radar-chart-title">Posición en la clasificación</p>
+        <div class="radar-chart" id="chartPosicion"></div>
+      </div>
+      <div class="radar-chart-box">
+        <p class="radar-chart-title">Puntos por jornada</p>
+        <div class="radar-chart" id="chartPuntosJornada"></div>
+      </div>
+      <div class="radar-chart-box">
+        <p class="radar-chart-title">Evolución de puntos</p>
+        <div class="radar-chart" id="chartEvolucionPuntos"></div>
+      </div>
+      <div class="radar-chart-box">
+        <p class="radar-chart-title">Goles a favor / en contra</p>
+        <div class="radar-chart" id="chartGoles"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-a"></i> A favor</span>
+          <span><i class="dot dot-b"></i> En contra</span>
+        </div>
+      </div>
+      <div class="radar-chart-box">
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Tarjetas</p>
+          <div class="radar-chart-total" id="totalTarjetas"></div>
+        </div>
+        <div class="radar-chart" id="chartTarjetas"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-amarilla"></i> Amarillas</span>
+          <span><i class="dot dot-roja"></i> Rojas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CALENDARIO ============ -->
+<section class="section reveal" id="calendario">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">Temporada 2026/27</p>
+        <h2 class="section-title">Calendario y resultados</h2>
+      </div>
+    </div>
+    <div class="calendar-header">
+      <span>J</span>
+      <span>Rival</span>
+      <span>Fecha</span>
+      <span>Hora / resultado</span>
+      <span>&nbsp;</span>
+    </div>
+    <div class="calendar-list" id="calendarList">
+      <p class="calendar-aviso" id="calendarAviso">Cargando calendario…</p>
+    </div>
+    <button type="button" class="calendar-ver-mas" id="btnVerMasCalendario" style="display:none;">
+      Ver todos los partidos <span id="calendarVerMasCount"></span>
+    </button>
+  </div>
+</section>
+
+<!-- ============ CLASIFICACIÓN ============ -->
+<section class="section reveal" id="clasificacion">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">3ª Catalana · Grupo 12</p>
+        <h2 class="section-title">Clasificación</h2>
+      </div>
+    </div>
+    <div class="clasi-scroll">
+      <div class="clasi-header">
+        <span>Pos</span>
+        <span class="clasi-col-equipo">Equipo</span>
+        <span>PJ</span>
+        <span>G</span>
+        <span>E</span>
+        <span>P</span>
+        <span>GF</span>
+        <span>GC</span>
+        <span>DG</span>
+        <span>Pts</span>
+        <span tabindex="0" role="note" title="Posición estimada al final de la temporada, según el ritmo actual" aria-label="Est.: posición estimada al final de la temporada, según el ritmo actual">Est.</span>
+      </div>
+      <div class="clasi-list" id="clasiList">
+        <!-- Se rellena automáticamente desde "clasificacion", al final de este archivo -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUERPO TÉCNICO ============ -->
+<section class="staff reveal" id="plantilla">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">La temporada 2026/27</p>
+        <h2 class="section-title">Plantilla</h2>
+      </div>
+    </div>
+    <div class="staff-grid">
+      <div class="staff-box">
+        <p class="staff-label">Entrenador</p>
+        <p class="staff-name">Nombre</p>
+      </div>
+      <div class="staff-box">
+        <p class="staff-label">Delegado</p>
+        <p class="staff-name">Nombre</p>
+      </div>
+      <div class="staff-box">
+        <p class="staff-label">Capitanes</p>
+        <p class="staff-name">Nombre</p>
+      </div>
+    </div>
+    <div class="roster-box">
+      <p class="staff-label">Jugadores</p>
+      <!-- Para poner los nombres reales, sustituye cada "Nombre" por el del jugador correspondiente.
+           Para añadir o quitar una fila, copia o borra una línea completa <div class="roster-player">...</div> -->
+      <div class="roster-columns">
+        <div class="roster-col col-portero">
+          <p class="roster-col-title">Portero</p>
+          <div class="roster-col-list">
+            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-portero">P</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+          </div>
+        </div>
+        <div class="roster-col col-defensa">
+          <p class="roster-col-title">Defensa</p>
+          <div class="roster-col-list">
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-defensa">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+          </div>
+        </div>
+        <div class="roster-col col-mediocentro">
+          <p class="roster-col-title">Mediocentro</p>
+          <div class="roster-col-list">
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-mediocentro">M</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+          </div>
+        </div>
+        <div class="roster-col col-delantera">
+          <p class="roster-col-title">Delantera</p>
+          <div class="roster-col-list">
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+            <div class="roster-player"><span class="roster-badge badge-delantera">D</span><span class="roster-name-wrap" tabindex="0"><span class="roster-name">Nombre</span><span class="roster-photo-popup"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HISTORIA / ESTADIO / REDES / EQUIPO ============ -->
+<section class="hero-about-section reveal" id="sobre-nosotros">
+  <div class="wrap hero-about about-grid">
+    <div class="about-block">
+      <span class="about-number">01</span>
+      <svg class="about-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5z"/></svg>
+      <h2 class="about-block-title">Nuestra historia</h2>
+      <p class="about-block-text">Fundada en 1913, la UE Castellbisbal forma parte de la historia deportiva de Castellbisbal. Un club abierto a todos, construido gracias al esfuerzo de muchas generaciones de jugadores, socios, familias, voluntarios y colaboradores.</p>
+    </div>
+    <div class="about-block">
+      <span class="about-number">02</span>
+      <svg class="about-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <h2 class="about-block-title">Nuestro estadio</h2>
+      <p class="about-block-text">Jugamos como locales en el Camp de Futbol Municipal de Castellbisbal, en Carrer Major 78, 08755, Castellbisbal, Barcelona.</p>
+      <a class="about-link" href="https://maps.app.goo.gl/7GEpgcETFou2osYU9" target="_blank" rel="noopener">📍 Ver ubicación en Google Maps</a>
+    </div>
+    <div class="about-block">
+      <span class="about-number">03</span>
+      <svg class="about-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
+      <h2 class="about-block-title">Nuestras redes sociales</h2>
+      <p class="about-block-text">Síguenos para no perderte nada del club.</p>
+      <a class="about-link" href="https://www.instagram.com/uecastellbisbal/" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg>
+        Instagram
+      </a>
+    </div>
+    <div class="about-block">
+      <span class="about-number">04</span>
+      <svg class="about-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v3a5 5 0 0 1-10 0V4z"/><path d="M7 5H4.5a1.5 1.5 0 0 0 0 3H7M17 5h2.5a1.5 1.5 0 0 1 0 3H17"/></svg>
+      <h2 class="about-block-title">Nuestro equipo</h2>
+      <p class="about-block-text">Nuestro primer equipo compite esta temporada 2026/27 en el Grupo 12 de Tercera Catalana, la categoría organizada por la Federació Catalana de Futbol.</p>
+      <a class="about-link" href="https://www.fcf.cat/ca/competicio?temporadaId=22&disciplinaId=19308233&competicioId=58161869&grupId=58161883" target="_blank" rel="noopener">Acceso FCF grupo 12 de tercera catalana</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLABORADORES ============ -->
+<section class="section sponsors reveal" id="colaboradores">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="section-eyebrow">Gracias por vuestro apoyo</p>
+        <h2 class="section-title">Colaboradores</h2>
+      </div>
+    </div>
+
+    <div class="sponsors-grid">
+      <div class="sponsor-col tier-patrocinadores">
+        <p class="sponsor-col-label">Patrocinadores</p>
+        <div class="sponsor-names">
+          <img class="patrocinador-logo" src="assets/patrocinador-logo.svg" alt="Patrocinador">
+        </div>
+      </div>
+
+      <div class="sponsor-col tier-colaboradores">
+        <p class="sponsor-col-label">Colaboradores</p>
+        <div class="sponsor-names"></div>
+      </div>
+
+      <div class="sponsor-col tier-amigos">
+        <p class="sponsor-col-label">Amigos del club</p>
+        <div class="sponsor-names amigos-logos">
+          <img class="amigo-logo" src="assets/amigo-cb-cup.png" alt="CB Cup Castellbisbal">
+          <img class="amigo-logo" src="assets/amigo-futgen-academy.png" alt="FutGen Academy">
+          <img class="amigo-logo" src="assets/amigo-supporters-castellbisbal.png" alt="Supporters Castellbisbal">
+          <img class="amigo-logo" src="assets/amigo-uecastellbisbal.png" alt="uecastellbisbal.cat">
+        </div>
+      </div>
+    </div>
+
+    <div class="sponsors-cta">
+      <p class="sponsors-cta-titulo">¿Quieres que colaboremos?</p>
+
+      <div class="sponsors-cta-bloque">
+        <div class="sponsors-cta-divisor"></div>
+        <p class="sponsors-cta-label">Espacio para empresas, comercios y entidades</p>
+        <div class="sponsors-cta-columna">
+
+          <p class="sponsors-cta-texto">Disponemos de un programa de colaboración pensado para sumar patrocinadores, colaboradores y amigos del club a nuestro proyecto. Queremos construir relaciones duraderas con entidades que compartan nuestros valores y quieran formar parte de nuestro camino.</p>
+          <p class="sponsors-cta-texto">Además de las propuestas recogidas en el programa, estamos abiertos y somos flexibles ante cualquier otro tipo de colaboración que pueda surgir. Creemos que cada entidad puede aportar de una manera diferente y estamos dispuestos a encontrar juntos la fórmula que mejor encaje.</p>
+          <div class="sponsors-cta-acciones">
+        <a class="sponsors-cta-btn" href="assets/programa-colaboradores.pdf" download="UE-Castellbisbal-Programa-Colaboradores.pdf">Ver programa completo (PDF)</a>
+            <a class="sponsors-cta-btn sponsors-cta-btn-ghost" id="btnHablemos" href="#" target="_blank" rel="noopener">Quiero hablar con el club</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sponsors-cta-bloque">
+        <div class="sponsors-cta-divisor"></div>
+        <p class="sponsors-cta-label">Espacio para personas</p>
+        <div class="sponsors-cta-columna">
+
+          <p class="sponsors-cta-texto">Necesitamos personas con ganas de participar, aportar y sentirse parte de nuestro proyecto. Una entidad no puede crecer y funcionar como queremos sin contar con su gente, su comunidad y su afición.</p>
+          <p class="sponsors-cta-texto">Porque, al final, las entidades están formadas por personas. Por eso queremos que quienes forman parte del club no sean solo espectadores, sino protagonistas de todo lo que construimos juntos.</p>
+          <div class="sponsors-cta-acciones">
+            <a class="sponsors-cta-btn sponsors-cta-btn-ghost" id="btnParticipar" href="#">Quiero participar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- fin sponsors-cta -->
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="footer-disclaimer">Página web comunitaria no oficial — Sin afiliación con UE Castellbisbal. Creada por aficionados para los aficionados. Todos los derechos de marca y contenido pertenecen a sus respectivos propietarios.</p>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> UE Castellbisbal</span>
+      <nav class="footer-legal">
+        <a href="#" id="btnAvisoLegal">Aviso legal</a>
+        <a href="#" id="btnPrivacidad">Privacidad</a>
+        <a href="#" id="btnCookies">Cookies</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /.page-body -->
+
+<!-- ============ MODAL "QUIERO HABLAR CON EL CLUB" ============ -->
+<div class="modal-overlay" id="modalHablemos">
+  <div class="modal-box">
+    <button class="modal-cerrar" id="modalCerrar" aria-label="Cerrar">&times;</button>
+    <h3 class="modal-titulo">Quiero hablar con el club</h3>
+    <p class="modal-subtitulo">Déjanos tus datos y te contactamos para hablar de colaboración.</p>
+    <form id="formHablemos">
+      <div class="modal-campo">
+        <label for="campoNombre">Nombre</label>
+        <input type="text" id="campoNombre" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoApellidos">Apellidos</label>
+        <input type="text" id="campoApellidos" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoEntidad">Entidad, negocio o comercio</label>
+        <input type="text" id="campoEntidad" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoContacto">Correo o teléfono</label>
+        <input type="text" id="campoContacto" required>
+      </div>
+      <button type="submit" class="sponsors-cta-btn modal-enviar">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalMembresia">
+  <div class="modal-box">
+    <button class="modal-cerrar" id="modalCerrarMembresia" aria-label="Cerrar">&times;</button>
+    <h3 class="modal-titulo">Quiero colaborar</h3>
+    <p class="modal-subtitulo">Regístrate con tu cuenta, o rellena tus datos a mano.</p>
+
+    <div class="modal-oauth-botones">
+      <div id="googleBtnDiv" class="modal-oauth-google"></div>
+      <button type="button" class="modal-oauth-btn" id="btnMicrosoftLogin">
+        <svg width="16" height="16" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+        Continuar con Microsoft
+      </button>
+    </div>
+    <p class="modal-separador"><span>o rellena tus datos</span></p>
+
+    <form id="formMembresia">
+      <div class="modal-campo">
+        <label for="campoNombreMembresia">Nombre</label>
+        <input type="text" id="campoNombreMembresia" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoApellidoMembresia">Apellido</label>
+        <input type="text" id="campoApellidoMembresia" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoCorreoMembresia">Correo</label>
+        <input type="email" id="campoCorreoMembresia" required>
+      </div>
+      <div class="modal-campo">
+        <label for="campoFormaMembresia">¿Cómo quieres colaborar?</label>
+        <select id="campoFormaMembresia" required>
+          <option value="" disabled selected>Elige una opción</option>
+          <option value="Entrenador">Entrenador</option>
+          <option value="Aprendiz entrenador">Aprendiz entrenador</option>
+          <option value="Colaborador continuo">Colaborador continuo</option>
+          <option value="Colaborador puntual">Colaborador puntual</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
+      <div class="modal-campo">
+        <label for="campoMensajeMembresia">Cuéntanos lo que quieras (opcional)</label>
+        <textarea id="campoMensajeMembresia" placeholder="Por ejemplo: disponibilidad, alguna idea o duda..."></textarea>
+      </div>
+      <button type="submit" class="sponsors-cta-btn modal-enviar">Enviar</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODALES LEGALES ============ -->
+<div class="modal-overlay" id="modalAvisoLegal">
+  <div class="modal-box modal-box-legal">
+    <button class="modal-cerrar modal-cerrar-legal" aria-label="Cerrar">&times;</button>
+    <h3 class="modal-titulo">Aviso legal</h3>
+    <div class="modal-legal-texto">
+      <p>Somos aficionados de la UE Castellbisbal. Esta web es una colaboración desinteresada, sin ánimo de lucro, hecha por aficionados y para aficionados — no es la web oficial del club, ni actuamos en su representación.</p>
+
+      <p>El único objetivo es que los seguidores del club dispongan de la información del primer equipo (calendario, resultados, clasificación, plantilla) de forma fácil y accesible.</p>
+
+      <p>El escudo, el nombre y demás elementos de marca de la UE Castellbisbal pertenecen al club. Los escudos de los equipos rivales que aparecen en el calendario pertenecen a sus respectivos clubes, y solo se usan para identificar los partidos.</p>
+
+      <p>Al ser una iniciativa voluntaria, no podemos garantizar que la web esté siempre disponible ni que algún dato (fecha, hora, resultado) esté siempre actualizado al momento — para cualquier información importante, contrasta con los canales oficiales del club.</p>
+
+      <p>Cualquier duda, puedes escribirnos a <strong>sperezp@gmail.com</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalPrivacidad">
+  <div class="modal-box modal-box-legal">
+    <button class="modal-cerrar modal-cerrar-legal" aria-label="Cerrar">&times;</button>
+    <h3 class="modal-titulo">Política de privacidad</h3>
+    <div class="modal-legal-texto">
+      <p>Cuando rellenas el formulario "Quiero hablar con el club", nos das tu nombre, apellidos, entidad/negocio y correo o teléfono. Solo los usamos para eso: para que el club pueda ponerse en contacto contigo sobre tu propuesta de colaboración.</p>
+
+      <p>No los usamos para nada más, ni se los damos a nadie salvo al propio club, y solo cuando tu solicitud es de su interés.</p>
+
+      <p>Puedes pedirnos en cualquier momento que veamos, corrijamos o borremos tus datos, escribiendo a <strong>sperezp@gmail.com</strong>. Si en algún momento crees que no hemos tratado bien tus datos, también puedes reclamar ante la Agencia Española de Protección de Datos (AEPD).</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalCookies">
+  <div class="modal-box modal-box-legal">
+    <button class="modal-cerrar modal-cerrar-legal" aria-label="Cerrar">&times;</button>
+    <h3 class="modal-titulo">Política de cookies</h3>
+    <div class="modal-legal-texto">
+      <p>Esta web no usa ninguna cookie. Si algún día lo hiciera (por ejemplo, para saber cuánta gente la visita), lo contaríamos aquí con todo detalle.</p>
+    </div>
+  </div>
+</div>
+
+<img class="back-to-top-crest" id="backToTopCrest" src="" alt="">
+<button class="back-to-top" id="btnBackToTop" aria-label="Volver arriba">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<script>
+/* ============================================================
+   CALENDARIO — se lee entero desde una hoja de Google Sheets
+   ------------------------------------------------------------
+   La hoja tiene una fila por jornada, con estas columnas:
+   jornada, estado, rival, fecha, hora, tipo, goles_local, goles_visitante, campo, dirección
+
+     jornada          -> número de jornada
+     estado           -> "proximo" / "en_directo" / "final" (solo importa en
+                          la jornada que toca jugar; el resto se puede dejar
+                          en blanco)
+     rival            -> nombre del equipo contrario
+     fecha            -> formato DD/MM/AAAA
+     hora             -> formato HH:MM (o "Por confirmar")
+     tipo             -> "LOCAL" o "VISITANTE"
+     goles_local      -> goles del equipo que juega en casa esa jornada
+                          (dejar en blanco o con un "-" si aún no se ha jugado)
+     goles_visitante  -> goles del equipo que juega fuera esa jornada
+     campo            -> nombre del campo donde se juega esa jornada
+     dirección        -> enlace de Google Maps de ese campo
+
+   Todo se actualiza desde el móvil, editando la hoja — no hace
+   falta tocar el código nunca para el día a día. ============================================================ */
+
+/* true si la UE Castellbisbal juega en casa en el partido destacado; la usan
+   tanto el bloque de "Próximo partido" como el banner de arriba */
+let esLocalDestacado = true;
+// guarda el estado actual del banner de arriba, para poder compartirlo tal cual se ve
+let bannerInfo = { rival: "", fecha: "", hora: "", estado: "proximo", golesCastellbisbal: 0, golesRival: 0 };
+
+/* PARA PONER EL ESCUDO REAL DE UN RIVAL (opcional):
+   1. Consigue la imagen del escudo (fondo blanco o transparente).
+   2. Pide que te la conviertan a "base64" y crea una constante
+      arriba, junto a ESCUDO_GENERICO, por ejemplo:
+      const ESCUDO_NOMBREEQUIPO = "data:image/png;base64,....";
+   3. Añade una línea aquí abajo con el nombre EXACTO tal como
+      aparece en la columna "rival" de la hoja:
+      "Nombre Exacto Del Equipo": ESCUDO_NOMBREEQUIPO, */
+const ESCUDO_GENERICO = "assets/escudo-generico.png";
+const ESCUDO_VISTA_ALEGRE = "assets/escudo-vista-alegre.png";
+const ESCUDO_ABRERA = "assets/escudo-abrera.png";
+const ESCUDO_CASTELLDEFELS = "assets/escudo-castelldefels.png";
+const ESCUDO_JUAN_XXIII = "assets/escudo-juan-xxiii.png";
+const ESCUDO_JUVENTUD_25 = "assets/escudo-juventud-25.png";
+const ESCUDO_MARTORELL = "assets/escudo-martorell.png";
+const ESCUDO_MIRASOL_BACO = "assets/escudo-mirasol-baco.png";
+const ESCUDO_PENYA_BARCELONISTA = "assets/escudo-penya-barcelonista.png";
+const ESCUDO_PENYA_MALAGA = "assets/escudo-penya-malaga.png";
+const ESCUDO_RUBI = "assets/escudo-rubi.png";
+const ESCUDO_SABADELL_NORD = "assets/escudo-sabadell-nord.png";
+const ESCUDO_SANT_ANDREU = "assets/escudo-sant-andreu.png";
+const ESCUDO_SANT_VICENC_HORTS = "assets/escudo-sant-vicenc-horts.png";
+const ESCUDO_TORRELLES = "assets/escudo-torrelles.png";
+const ESCUDO_VALLIRANA = "assets/escudo-vallirana.png";
+
+const ESCUDOS_RIVALES = {
+  "Vista Alegre U.D. B": ESCUDO_VISTA_ALEGRE,
+  "Abrera A.E.": ESCUDO_ABRERA,
+  "Castelldefels U.E. B": ESCUDO_CASTELLDEFELS,
+  "Juan XXIII C.S.": ESCUDO_JUAN_XXIII,
+  "Juventud 25 de Septiembre B": ESCUDO_JUVENTUD_25,
+  "Martorell C.F. B": ESCUDO_MARTORELL,
+  "Mirasol-Baco Unión C.F.": ESCUDO_MIRASOL_BACO,
+  "Penya Barcelonista Sant Vicenç": ESCUDO_PENYA_BARCELONISTA,
+  "Penya Unión D. Málaga": ESCUDO_PENYA_MALAGA,
+  "Rubí U.E. B": ESCUDO_RUBI,
+  "Sabadell Nord C.F.": ESCUDO_SABADELL_NORD,
+  "Sant Andreu de la Barca": ESCUDO_SANT_ANDREU,
+  "Sant Vicenç dels Horts": ESCUDO_SANT_VICENC_HORTS,
+  "Torrelles U.E.": ESCUDO_TORRELLES,
+  "Vallirana C.F.": ESCUDO_VALLIRANA
+};
+
+
+/* ============================================================
+   RADAR DE TEMPORADA — se lee de su propia pestaña en Google Sheets
+   ------------------------------------------------------------
+   La posición y los puntos NO salen de los resultados del propio
+   equipo: son de la CLASIFICACIÓN GENERAL del grupo, así que hay
+   que consultarlos en la web de la federación después de cada
+   jornada y añadir una fila nueva en esa pestaña. Los goles a favor
+   y en contra, en cambio, SÍ se calculan solos a partir de los
+   resultados ya cargados en la pestaña de calendario -- no hace
+   falta escribirlos aquí también.
+
+   Columnas de la pestaña (una fila por jornada, en este orden):
+   Jornada, Posicion, Puntos, tar_amarilla, tar_roja
+
+     Jornada       -> número de jornada
+     Posicion      -> puesto en la clasificación (1 = primero); en
+                       blanco o con "-" mientras no se sepa esa jornada
+     Puntos        -> puntos ACUMULADOS en toda la temporada
+     tar_amarilla  -> tarjetas amarillas ACUMULADAS en toda la temporada
+     tar_roja      -> tarjetas rojas ACUMULADAS en toda la temporada
+
+   La fila de la jornada 0 (todo a cero) se añade sola como punto de
+   partida antes de empezar la temporada -- no hace falta ponerla en
+   la hoja.
+
+   Mientras URL_RADAR esté vacío, se usan estos datos de ejemplo.
+   ============================================================ */
+let radarTemporada = [
+  { jornada: 0, posicion: 0, puntos: 0, golesFavor: 0, golesContra: 0, amarillas: 0, rojas: 0, fecha: "06/08/2026" }
+];
+
+/* hoja de Google Sheets publicada como CSV (pestaña de radar). Necesita
+   que el calendario ya esté cargado (para sumar los goles), por eso
+   cargarRadarYPintar() espera a que termine cargarCalendarioYArrancar()
+   antes de pintar -- se conectan más abajo, al arrancar la web. */
+const URL_RADAR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?gid=961026861&single=true&output=csv";
+
+/* ---------- suma los goles de UE Castellbisbal en todos los partidos ya
+   jugados hasta (e incluyendo) una jornada, a partir del calendario ---------- */
+function golesAcumuladosHastaJornada(jornada){
+  let favor = 0, contra = 0;
+  partidos.forEach(p => {
+    if(p.jornada > jornada || p.golesLocal === null || p.golesVisitante === null) return;
+    const esLocal = p.tipo === "LOCAL";
+    favor  += esLocal ? p.golesLocal : p.golesVisitante;
+    contra += esLocal ? p.golesVisitante : p.golesLocal;
+  });
+  return { favor, contra };
+}
+
+/* ---------- convierte una fila de la hoja de radar en un punto tal como lo espera el resto del código ---------- */
+function filaARadar(fila){
+  const jornada = Number(fila.Jornada);
+  const { favor, contra } = golesAcumuladosHastaJornada(jornada);
+  const partidoDeEsaJornada = partidos.find(p => p.jornada === jornada);
+  return {
+    jornada,
+    posicion: Number(fila.Posicion) || 0,
+    puntos: Number(fila.Puntos) || 0,
+    golesFavor: favor,
+    golesContra: contra,
+    amarillas: Number(fila.tar_amarilla) || 0,
+    rojas: Number(fila.tar_roja) || 0,
+    fecha: (partidoDeEsaJornada && partidoDeEsaJornada.fecha) || new Date().toLocaleDateString("es-ES")
+  };
+}
+
+/* ---------- carga el radar de la hoja (si hay URL y hay conexión) y,
+   tanto si viene de la hoja como si se queda con los datos de ejemplo,
+   pinta el resumen y las gráficas. "calendarioListo" es la promesa que
+   devuelve cargarCalendarioYArrancar(): hay que esperarla porque el
+   cálculo de goles necesita los resultados del calendario ya cargados ---------- */
+async function cargarRadarYPintar(calendarioListo){
+  await calendarioListo;
+  if(URL_RADAR){
+    try{
+      const resp = await fetch(URL_RADAR);
+      if(resp.ok){
+        const filas = parsearCSV(await resp.text());
+        const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-");
+        if(filasConDatos.length){
+          radarTemporada = [radarTemporada[0]].concat(filasConDatos.map(filaARadar));
+        }
+      }
+    }catch(err){
+      // sin conexión o falla la hoja: seguimos con los datos de ejemplo, la web no se rompe
+    }
+  }
+  pintarRadarResumen();
+  pintarRadarDesglose();
+}
+
+/* ============================================================
+   CLASIFICACIÓN — se lee de su propia pestaña en Google Sheets
+   ------------------------------------------------------------
+   Los puntos, la diferencia de goles y el orden de la tabla se
+   calculan solos: en la pestaña solo hace falta ir actualizando,
+   para el equipo (o equipos) que hayan jugado, estos datos:
+
+   Columnas de la pestaña (una fila por equipo, en este orden):
+   equipo, pj, g, e, p, gf, gc
+
+     equipo -> nombre EXACTO del equipo (para la UE Castellbisbal,
+               escribe exactamente "UE Castellbisbal", así la fila
+               se resalta sola en lila)
+     pj     -> partidos jugados
+     g      -> partidos ganados
+     e      -> partidos empatados
+     p      -> partidos perdidos
+     gf     -> goles a favor (acumulados en toda la temporada)
+     gc     -> goles en contra (acumulados en toda la temporada)
+
+   Mientras URL_CLASIFICACION esté vacío, se usan estos datos de ejemplo.
+   ============================================================ */
+let clasificacion = [
+  { equipo: "Penya Unión D. Málaga",         esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Abrera A.E.",                   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sant Vicenç dels Horts",        esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "UE Castellbisbal",              esNuestro: true,  pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Castelldefels U.E. B",          esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Juan XXIII C.S.",               esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Martorell C.F. B",              esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Juventud 25 de Septiembre B",   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Mirasol-Baco Unión C.F.",       esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Penya Barcelonista Sant Vicenç",esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sabadell Nord C.F.",            esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Rubí U.E. B",                   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Vista Alegre U.D. B",           esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Torrelles U.E.",                esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Vallirana C.F.",                esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sant Andreu de la Barca",       esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 }
+];
+
+/* hoja de Google Sheets publicada como CSV (pestaña de clasificación). La
+   tabla se copia y pega tal cual de la web de la federación, así que los
+   nombres de equipo vienen en su formato oficial (mayúsculas, abreviados,
+   con comillas) y no coinciden con los que usa el resto de la web -- por
+   eso hace falta la tabla NOMBRES_EQUIPOS_FEDERACION de aquí abajo, para
+   que el escudo y la fila resaltada de "UE Castellbisbal" se reconozcan
+   igual. Si la federación cambia el texto de algún equipo, hay que
+   actualizar aquí su entrada (el resto de la tabla no le afecta).
+   Mientras URL_CLASIFICACION esté vacío, se usan los datos de ejemplo. */
+const URL_CLASIFICACION = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?gid=1405244159&single=true&output=csv";
+
+function normalizarEquipoFederacion(nombre){
+  return nombre.toUpperCase().replace(/["“”]/g, "").replace(/\s+/g, " ").trim();
+}
+const NOMBRES_EQUIPOS_FEDERACION = {};
+[
+  ["Pª UNION D. MALAGA, CLUB \"A\"", "Penya Unión D. Málaga"],
+  ["ABRERA, A.E. \"A\"", "Abrera A.E."],
+  ["SANT VICENÇ DELS HORTS ASSOC. FUTBOL \"A\"", "Sant Vicenç dels Horts"],
+  ["CASTELLBISBAL, U.E. \"A\"", "UE Castellbisbal"],
+  ["CASTELLDEFELS, U.E. \"B\"", "Castelldefels U.E. B"],
+  ["JUAN XXIII,C.S. \"A\"", "Juan XXIII C.S."],
+  ["MARTORELL C.F. \"B\"", "Martorell C.F. B"],
+  ["JUVENTUD 25 DE SEPTIEMBRE \"B\"", "Juventud 25 de Septiembre B"],
+  ["MIRASOL-BACO UNIÓN, C.F. \"A\"", "Mirasol-Baco Unión C.F."],
+  ["Pª BARC. SANT VICENÇ HORTS \"A\"", "Penya Barcelonista Sant Vicenç"],
+  ["SABADELL NORD,CF. \"A\"", "Sabadell Nord C.F."],
+  ["RUBI, U.E. \"B\"", "Rubí U.E. B"],
+  ["VISTA ALEGRE,U.D. \"B\"", "Vista Alegre U.D. B"],
+  ["TORRELLES, U.E. \"A\"", "Torrelles U.E."],
+  ["VALLIRANA C.F. \"A\"", "Vallirana C.F."],
+  // la hoja tiene una errata ("ANT ANDREU" sin la "S"): se admiten las dos
+  ["ANT ANDREU DE LA BARCA AGRUP. \"A\"", "Sant Andreu de la Barca"],
+  ["SANT ANDREU DE LA BARCA AGRUP. \"A\"", "Sant Andreu de la Barca"]
+].forEach(([crudo, limpio]) => { NOMBRES_EQUIPOS_FEDERACION[normalizarEquipoFederacion(crudo)] = limpio; });
+
+/* ---------- convierte una fila de la hoja (formato federación) en un equipo tal como lo espera el resto del código ---------- */
+function filaAEquipoClasificacion(fila){
+  const nombreCrudo = fila.EQUIPO || "";
+  const nombreLimpio = NOMBRES_EQUIPOS_FEDERACION[normalizarEquipoFederacion(nombreCrudo)] || nombreCrudo;
+  const numero = v => Number(v) || 0;
+  return {
+    equipo: nombreLimpio,
+    esNuestro: nombreLimpio === "UE Castellbisbal",
+    pj: numero(fila.PJ),
+    g: numero(fila.PG),
+    e: numero(fila.PE),
+    p: numero(fila.PP),
+    gf: numero(fila.GF),
+    gc: numero(fila.GC)
+  };
+}
+
+/* ---------- carga la clasificación de la hoja (si hay URL y hay conexión) y,
+   tanto si viene de la hoja como si se queda con los datos de ejemplo, pinta la tabla ---------- */
+async function cargarClasificacionYPintar(){
+  if(URL_CLASIFICACION){
+    try{
+      const resp = await fetch(URL_CLASIFICACION);
+      if(resp.ok){
+        const filas = parsearCSV(await resp.text());
+        if(filas.length) clasificacion = filas.map(filaAEquipoClasificacion);
+      }
+    }catch(err){
+      // sin conexión o falla la hoja: seguimos con los datos de ejemplo, la web no se rompe
+    }
+  }
+  pintarClasificacion();
+}
+
+/* ---------- pinta la tabla de clasificación (ordenada y calculada sola) ---------- */
+function pintarClasificacion(){
+  const cont = document.getElementById("clasiList");
+  cont.innerHTML = "";
+
+  const TOTAL_JORNADAS = 30;
+
+  const conCalculos = clasificacion.map(eq => ({
+    ...eq,
+    dg: eq.gf - eq.gc,
+    pts: eq.g * 3 + eq.e
+  }));
+
+  conCalculos.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
+
+  // proyección "si esto sigue así": ritmo de puntos por partido de cada
+  // equipo, extrapolado a los partidos que le quedan por jugar. Solo tiene
+  // sentido a partir de la jornada 5 (con menos partidos, un resultado
+  // suelto desvía demasiado la estimación)
+  const jornadaActual = radarTemporada.length ? radarTemporada[radarTemporada.length - 1].jornada : 0;
+  const mostrarEstimacion = jornadaActual >= 5;
+
+  let posicionesEstimadas = {};
+  if(mostrarEstimacion){
+    const conProyeccion = conCalculos.map(eq => {
+      const ritmo = eq.pj > 0 ? eq.pts / eq.pj : 0;
+      const puntosFinales = eq.pts + ritmo * (TOTAL_JORNADAS - eq.pj);
+      return { equipo: eq.equipo, puntosFinales };
+    });
+    conProyeccion.sort((a, b) => b.puntosFinales - a.puntosFinales);
+    conProyeccion.forEach((eq, i) => { posicionesEstimadas[eq.equipo] = i + 1; });
+  }
+
+  const escudoCastellbisbal = document.querySelector(".crest").src;
+
+  conCalculos.forEach((eq, i) => {
+    const escudo = eq.esNuestro ? escudoCastellbisbal : (ESCUDOS_RIVALES[eq.equipo] || ESCUDO_GENERICO);
+    const posEstimada = mostrarEstimacion ? posicionesEstimadas[eq.equipo] : null;
+    const diferencia = posEstimada !== null ? (i + 1) - posEstimada : 0; // positivo = va a subir
+    let textoEstimada = "—";
+    if(posEstimada !== null){
+      const flecha = diferencia > 0 ? "▲" : diferencia < 0 ? "▼" : "";
+      textoEstimada = `${posEstimada}º ${flecha}`;
+    }
+    const row = document.createElement("div");
+    row.className = "clasi-row" + (eq.esNuestro ? " es-nuestro" : "");
+    row.innerHTML = `
+      <span class="clasi-pos">${i + 1}</span>
+      <span class="clasi-equipo"><img class="clasi-crest" src="${escudo}" alt="">${eq.equipo}</span>
+      <span>${eq.pj}</span>
+      <span>${eq.g}</span>
+      <span>${eq.e}</span>
+      <span>${eq.p}</span>
+      <span>${eq.gf}</span>
+      <span>${eq.gc}</span>
+      <span>${eq.dg > 0 ? "+" + eq.dg : eq.dg}</span>
+      <span class="clasi-pts">${eq.pts}</span>
+      <span class="clasi-est ${diferencia > 0 ? 'sube' : diferencia < 0 ? 'baja' : ''}">${textoEstimada}</span>
+    `;
+    cont.appendChild(row);
+  });
+}
+
+/* ---------- pinta el resumen de 6 datos con el último dato disponible ---------- */
+function pintarRadarResumen(){
+  const cont = document.getElementById("radarGrid");
+  if(!radarTemporada.length){
+    cont.innerHTML = '<div class="radar-item" style="grid-column:1/-1">Aún no hay datos de la temporada</div>';
+    return;
+  }
+  const ultimo = radarTemporada[radarTemporada.length - 1];
+  const items = [
+    { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
+    { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
+    { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
+    { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
+    { label: "Amarillas",        valor: ultimo.amarillas, clase: "es-amarilla" },
+    { label: "Rojas",            valor: ultimo.rojas, clase: "es-roja" }
+  ];
+  cont.innerHTML = items.map(it => `
+    <div class="radar-item">
+      <div class="radar-item-label">${it.label}</div>
+      <div class="radar-item-value ${it.clase || ""}">${it.valor}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("radarActualizado").textContent =
+    `Información actualizada tras jornada ${ultimo.jornada} en fecha ${ultimo.fecha}`;
+}
+
+/* ---------- dibuja una gráfica lineal sencilla en SVG (sin librerías) ----------
+   series: [{ key: "posicion", color: "#a868e8" }, ...]
+   opciones.invertirY: true para la posición (1º arriba del todo)
+   opciones.minX/maxX/minY/maxY: fuerza el eje a un rango fijo (si no
+   se indica, se calcula a partir de los propios datos) ---------- */
+function pintarGraficoLineal(contenedorId, datos, series, opciones){
+  opciones = opciones || {};
+  const cont = document.getElementById(contenedorId);
+  if(!datos.length){
+    cont.innerHTML = '<p style="color:var(--white-faint);font-size:12px;">Sin datos todavía</p>';
+    return;
+  }
+  const ancho = 320, padZq = 22, padDer = 10, padArr = 10, padAbj = 20, altoCaptionEje = 12;
+  const areaAlto = 100; // alto fijo del área donde se dibuja la línea (no cambia aunque haya más etiquetas)
+  const alto = padArr + areaAlto + padAbj + altoCaptionEje;
+  const jornadas = datos.map(d => d.jornada);
+  const minX = opciones.minX !== undefined ? opciones.minX : Math.min(...jornadas);
+  const maxX = opciones.maxX !== undefined ? opciones.maxX : Math.max(...jornadas);
+
+  let minY, maxY;
+  if(opciones.minY !== undefined && opciones.maxY !== undefined){
+    minY = opciones.minY;
+    maxY = opciones.maxY;
+  }else{
+    let valores = [];
+    series.forEach(s => datos.forEach(d => valores.push(d[s.key])));
+    minY = Math.min(...valores); maxY = Math.max(...valores);
+    if(minY === maxY){ minY = 0; maxY = Math.max(maxY, 1) + 1; }
+    const margen = (maxY - minY) * 0.15;
+    minY -= margen; maxY += margen;
+  }
+
+  // área interior donde se dibuja la línea (deja hueco a la izquierda y abajo para las etiquetas)
+  const areaAncho = ancho - padZq - padDer;
+
+  function pixelX(jornada){
+    const t = maxX === minX ? 0.5 : (jornada - minX) / (maxX - minX);
+    return padZq + t * areaAncho;
+  }
+  function pixelY(valor){
+    let t = (valor - minY) / (maxY - minY);
+    if(opciones.invertirY) return padArr + t * areaAlto;
+    return padArr + (1 - t) * areaAlto;
+  }
+
+  let svg = `<svg viewBox="0 0 ${ancho} ${alto}" preserveAspectRatio="none">`;
+  svg += `<line x1="${padZq}" y1="${padArr + areaAlto}" x2="${ancho - padDer}" y2="${padArr + areaAlto}" stroke="rgba(245,245,243,0.12)" stroke-width="1"/>`;
+  svg += `<line x1="${padZq}" y1="${padArr}" x2="${padZq}" y2="${padArr + areaAlto}" stroke="rgba(245,245,243,0.12)" stroke-width="1"/>`;
+
+  series.forEach(s => {
+    const puntos = datos.map(d => pixelX(d.jornada).toFixed(1) + "," + pixelY(d[s.key]).toFixed(1));
+    svg += `<polyline points="${puntos.join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    puntos.forEach(p => {
+      const [px, py] = p.split(",");
+      svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
+    });
+
+    // línea de tendencia (discontinua): solo con jornadas reales suficientes,
+    // proyecta con la media de ritmo hasta el final de la temporada
+    if(opciones.tendencia){
+      const jugadas = datos.filter(d => d.jornada > 0);
+      if(jugadas.length >= 5){
+        const n = jugadas.length;
+        const sumX = jugadas.reduce((a,d) => a + d.jornada, 0);
+        const sumY = jugadas.reduce((a,d) => a + d[s.key], 0);
+        const sumXY = jugadas.reduce((a,d) => a + d.jornada * d[s.key], 0);
+        const sumXX = jugadas.reduce((a,d) => a + d.jornada * d.jornada, 0);
+        const divisor = n * sumXX - sumX * sumX;
+        if(divisor !== 0){
+          const pendiente = (n * sumXY - sumX * sumY) / divisor;
+          const interseccion = (sumY - pendiente * sumX) / n;
+          const ultimoReal = jugadas[jugadas.length - 1];
+          let prediccion = interseccion + pendiente * maxX;
+          prediccion = Math.max(minY, Math.min(maxY, prediccion)); // no se sale del rango del eje
+          const x1 = pixelX(ultimoReal.jornada).toFixed(1), y1 = pixelY(ultimoReal[s.key]).toFixed(1);
+          const x2 = pixelX(maxX).toFixed(1), y2 = pixelY(prediccion).toFixed(1);
+          svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${s.color}" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.55"/>`;
+          svg += `<circle cx="${x2}" cy="${y2}" r="2.5" fill="none" stroke="${s.color}" stroke-width="1.5" opacity="0.8"/>`;
+        }
+      }
+    }
+  });
+
+  // etiquetas del eje horizontal: todas las jornadas, sin girar, solo el número
+  for(let j = Math.max(minX, 1); j <= maxX; j++){
+    const px = pixelX(j).toFixed(1);
+    svg += `<text x="${px}" y="${padArr + areaAlto + 12}" font-size="5.2" fill="rgba(245,245,243,0.45)" text-anchor="middle">${j}</text>`;
+  }
+  // título del eje horizontal, debajo de los números
+  svg += `<text x="${padZq + areaAncho / 2}" y="${alto - 2}" font-size="7" fill="rgba(245,245,243,0.6)" text-anchor="middle">Jornada</text>`;
+
+  // etiquetas del eje vertical: el mínimo y el máximo reales del eje
+  const yEtiquetaArriba = opciones.invertirY ? Math.round(minY) : Math.round(maxY);
+  const yEtiquetaAbajo = opciones.invertirY ? Math.round(maxY) : Math.round(minY);
+  svg += `<text x="${padZq - 5}" y="${padArr + 3}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaArriba}</text>`;
+  svg += `<text x="${padZq - 5}" y="${padArr + areaAlto}" font-size="7.5" fill="rgba(245,245,243,0.45)" text-anchor="end">${yEtiquetaAbajo}</text>`;
+
+  svg += `</svg>`;
+  cont.innerHTML = svg;
+}
+
+/* ---------- pinta el sumatorio de tarjetas (bolitas amarilla/roja) encima de esa gráfica ---------- */
+function pintarTotalTarjetas(){
+  const ultimo = radarTemporada[radarTemporada.length - 1];
+  document.getElementById("totalTarjetas").innerHTML =
+    `<span><i class="dot dot-amarilla"></i><span class="num-amarilla">${ultimo.amarillas}</span></span>` +
+    `<span><i class="dot dot-roja"></i><span class="num-roja">${ultimo.rojas}</span></span>`;
+}
+
+/* ---------- pinta las 3 gráficas del desglose, siempre de la J0 a la J30 ---------- */
+function pintarRadarDesglose(){
+  // en la gráfica, un 0 significa "todavía sin clasificar": se trata como si
+  // fuera el último puesto, para que la línea arranque abajo del todo en vez
+  // de arriba (que sería visualmente engañoso, como si fuera el 1er puesto)
+  const datosPosicion = radarTemporada.map(d => ({
+    jornada: d.jornada,
+    posicion: d.posicion === 0 ? 16 : d.posicion
+  }));
+  pintarGraficoLineal("chartPosicion", datosPosicion,
+    [{ key: "posicion", color: "#a868e8" }],
+    { invertirY: true, minX: 0, maxX: 30, minY: 0, maxY: 16, tendencia: true }
+  );
+
+  // "puntos por jornada" no viene directo de la hoja: se calcula solo,
+  // restando los puntos acumulados de la jornada anterior a los de esta
+  const datosPuntosJornada = radarTemporada.map((d, i) => ({
+    jornada: d.jornada,
+    puntosJornada: i === 0 ? 0 : d.puntos - radarTemporada[i - 1].puntos
+  }));
+  pintarGraficoLineal("chartPuntosJornada", datosPuntosJornada,
+    [{ key: "puntosJornada", color: "#a868e8" }],
+    { minX: 0, maxX: 30, minY: 0, maxY: 3 }
+  );
+
+  pintarGraficoLineal("chartEvolucionPuntos", radarTemporada,
+    [{ key: "puntos", color: "#a868e8" }],
+    { minX: 0, maxX: 30, minY: 0, tendencia: true }
+  );
+
+  pintarGraficoLineal("chartGoles", radarTemporada, [
+    { key: "golesFavor", color: "#22c55e" },
+    { key: "golesContra", color: "#dc2626" }
+  ], { minX: 0, maxX: 30, tendencia: true });
+  pintarGraficoLineal("chartTarjetas", radarTemporada, [
+    { key: "amarillas", color: "#eab308" },
+    { key: "rojas", color: "#dc2626" }
+  ], { minX: 0, maxX: 30 });
+  pintarTotalTarjetas();
+
+  // aviso de la línea de tendencia: solo se ve el mensaje si ya hay
+  // suficientes jornadas jugadas como para que la proyección tenga sentido
+  const avisoTendencia = document.getElementById("radarTendenciaAviso");
+  if(avisoTendencia){
+    const jornadaActual = radarTemporada[radarTemporada.length - 1].jornada;
+    avisoTendencia.style.display = jornadaActual >= 5 ? "" : "none";
+  }
+}
+
+/* ---------- escudo genérico para equipos rivales (sin logo propio) ---------- */
+
+/* ---------- formatear hora (admite "Por confirmar") ---------- */
+function formatearHora(hora){
+  return hora === "Por confirmar" ? hora : hora + " h";
+}
+
+/* ---------- convierte "DD/MM/AAAA" en objeto Date ---------- */
+function parseFecha(fecha){
+  const [d, m, y] = fecha.split("/").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/* ---------- elige automáticamente, por la fecha de hoy, cuál es el
+   partido actual/próximo y cuál fue el partido inmediatamente anterior.
+   Ya no hace falta marcar nada a mano en la lista de partidos. ---------- */
+function seleccionarPartidos(){
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
+  let indiceActual = ordenados.findIndex(p => parseFecha(p.fecha) >= hoy);
+  if(indiceActual === -1) indiceActual = ordenados.length - 1; // temporada acabada: se queda en el último
+  return {
+    partidoActual: ordenados[indiceActual],
+    partidoAnterior: indiceActual > 0 ? ordenados[indiceActual - 1] : null
+  };
+}
+
+/* ---------- pinta el banner de arriba (próximo / en directo / final) ---------- */
+/* dirección fija del campo propio, se usa solo si la hoja no trae nada para esa fila */
+const CAMPO_PROPIO_NOMBRE = "Campo Municipal";
+const CAMPO_PROPIO_MAPA = "https://maps.app.goo.gl/7GEpgcETFou2osYU9";
+
+/* ---------- pinta el nombre del campo y la chincheta de ubicación del banner ---------- */
+function pintarCampoBanner(esLocal, campo, direccion){
+  const venue = document.getElementById("liveVenue");
+  const nombre = campo || (esLocal ? CAMPO_PROPIO_NOMBRE : "Campo del rival");
+  let enlace = direccion || (esLocal ? CAMPO_PROPIO_MAPA : "");
+  // si en la hoja han pegado el enlace sin "https://" delante, se lo añadimos
+  // (si no, el navegador lo trataría como una dirección relativa y no funcionaría)
+  if(enlace && !/^https?:\/\//i.test(enlace)) enlace = "https://" + enlace;
+  venue.textContent = "📍 " + nombre;
+  if(enlace){ venue.href = enlace; } else { venue.removeAttribute("href"); }
+}
+
+/* ---------- pinta el banner de arriba (próximo / en directo / final), todo
+   a partir de la fila de la hoja que corresponde al partido de hoy ---------- */
+function pintarBannerPartido(partidoActual, partidoAnterior){
+  if(!partidoActual) return;
+
+  const esLocal = partidoActual.tipo === "LOCAL";
+  esLocalDestacado = esLocal;
+  bannerInfo.rival = partidoActual.rival;
+  bannerInfo.fecha = partidoActual.fecha;
+  bannerInfo.hora = partidoActual.hora;
+  bannerInfo.estado = partidoActual.estado || "proximo";
+
+  document.getElementById("liveJornada").textContent = "J" + partidoActual.jornada;
+  document.getElementById("liveCrest1").src = esLocal ? document.querySelector(".crest").src : (partidoActual.escudoRival || ESCUDO_GENERICO);
+  document.getElementById("liveCrest2").src = esLocal ? (partidoActual.escudoRival || ESCUDO_GENERICO) : document.querySelector(".crest").src;
+  document.getElementById("liveName1").textContent = esLocal ? "UE Castellbisbal" : partidoActual.rival;
+  document.getElementById("liveName2").textContent = esLocal ? partidoActual.rival : "UE Castellbisbal";
+  pintarCampoBanner(esLocal, partidoActual.campo, partidoActual.direccion);
+
+  const banner = document.getElementById("liveBanner");
+  const label = document.getElementById("liveLabel");
+  const score = document.getElementById("liveScore");
+  const fecha = document.getElementById("liveFecha");
+  const hora = document.getElementById("liveHora");
+  banner.classList.remove("is-directo", "is-final");
+
+  const estado = partidoActual.estado || "proximo";
+  const tieneResultado = partidoActual.golesLocal !== null && partidoActual.golesVisitante !== null;
+  // crest1/name1 siempre es el equipo que juega en casa, así que sus goles
+  // son siempre "golesLocal", sin importar si ese equipo es la UE Castellbisbal o no
+  const golesCastellbisbal = tieneResultado ? (esLocal ? partidoActual.golesLocal : partidoActual.golesVisitante) : 0;
+  const golesRival = tieneResultado ? (esLocal ? partidoActual.golesVisitante : partidoActual.golesLocal) : 0;
+  bannerInfo.golesCastellbisbal = golesCastellbisbal;
+  bannerInfo.golesRival = golesRival;
+
+  if(estado === "en_directo" || estado === "final"){
+    banner.classList.add(estado === "en_directo" ? "is-directo" : "is-final");
+    label.textContent = estado === "en_directo" ? "En directo" : "Final";
+    fecha.style.display = "none";
+    hora.style.display = "none";
+
+    score.innerHTML =
+      `<span class="live-score-num">${partidoActual.golesLocal ?? 0}</span>` +
+      `<span class="live-score-sep">–</span>` +
+      `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
+
+    // en cuanto el partido termina, el mismo resultado se refleja también
+    // en la tarjeta de "Último partido", sin tener que escribirlo dos veces
+    if(estado === "final"){
+      pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
+    }
+  }else{
+    label.textContent = "Próximo partido";
+    fecha.textContent = partidoActual.fecha;
+    hora.textContent = formatearHora(partidoActual.hora);
+    fecha.style.display = "";
+    hora.style.display = "";
+    score.innerHTML = `<span class="live-vs">VS</span>`;
+
+    // si la hoja está en "próximo" (nueva semana), la tarjeta de abajo
+    // muestra el resultado de la jornada anterior, tal como está en la hoja
+    pintarUltimoPartido(partidoAnterior);
+  }
+
+  // el tiempo solo tiene sentido antes o durante el partido, nunca después
+  if(estado === "proximo" || estado === "en_directo"){
+    cargarClimaPartido(partidoActual, esLocal);
+  }else{
+    document.getElementById("liveClima").style.display = "none";
+  }
+
+  // cuenta atrás: solo tiene sentido antes de que empiece el partido
+  if(estado === "proximo"){
+    iniciarCuentaAtras(partidoActual);
+  }else{
+    detenerCuentaAtras();
+  }
+
+  // botón "añadir al calendario": solo antes o durante el partido
+  const btnCalendario = document.getElementById("btnAnadirCalendario");
+  if(estado === "proximo" || estado === "en_directo"){
+    btnCalendario.href = generarEnlaceCalendario(partidoActual, esLocal);
+    btnCalendario.style.display = "";
+  }else{
+    btnCalendario.style.display = "none";
+  }
+
+  pintarRachaReciente();
+}
+
+/* ============================================================
+   CUENTA ATRÁS AL PRÓXIMO PARTIDO
+   ============================================================ */
+let intervaloCuentaAtras = null;
+
+function detenerCuentaAtras(){
+  if(intervaloCuentaAtras){ clearInterval(intervaloCuentaAtras); intervaloCuentaAtras = null; }
+  document.getElementById("liveCuentaAtras").style.display = "none";
+}
+
+function iniciarCuentaAtras(partido){
+  detenerCuentaAtras();
+  const elCuenta = document.getElementById("liveCuentaAtras");
+
+  // fecha y hora del partido en formato real; si la hora aún no está
+  // confirmada, se usa el mediodía como referencia aproximada
+  const [d, m, y] = partido.fecha.split("/");
+  let horas = 12, minutos = 0;
+  const horaMatch = /^(\d{1,2}):(\d{2})/.exec(partido.hora || "");
+  if(horaMatch){ horas = parseInt(horaMatch[1], 10); minutos = parseInt(horaMatch[2], 10); }
+  const fechaPartido = new Date(y, m - 1, d, horas, minutos);
+
+  function actualizar(){
+    const ahora = new Date();
+    const diffMs = fechaPartido - ahora;
+    if(diffMs <= 0){ detenerCuentaAtras(); return; }
+    const dias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const horasRestantes = Math.floor((diffMs / (1000 * 60 * 60)) % 24);
+    const minutosRestantes = Math.floor((diffMs / (1000 * 60)) % 60);
+    let texto = "⏱️ Faltan ";
+    if(dias > 0) texto += `${dias}d `;
+    texto += `${horasRestantes}h ${minutosRestantes}min`;
+    elCuenta.textContent = texto;
+    elCuenta.style.display = "";
+  }
+  actualizar();
+  intervaloCuentaAtras = setInterval(actualizar, 60000); // se refresca cada minuto
+}
+
+/* ============================================================
+   AÑADIR AL CALENDARIO (Google Calendar)
+   ============================================================ */
+function generarEnlaceCalendario(partido, esLocal){
+  const [d, m, y] = partido.fecha.split("/");
+  const horaMatch = /^(\d{1,2}):(\d{2})/.exec(partido.hora || "");
+  const horas = horaMatch ? horaMatch[1].padStart(2, "0") : "12";
+  const minutos = horaMatch ? horaMatch[2] : "00";
+  const inicio = `${y}${m.padStart(2,"0")}${d.padStart(2,"0")}T${horas}${minutos}00`;
+  const finFecha = new Date(y, m - 1, d, parseInt(horas,10) + 2, parseInt(minutos,10));
+  const fin = `${finFecha.getFullYear()}${String(finFecha.getMonth()+1).padStart(2,"0")}${String(finFecha.getDate()).padStart(2,"0")}T${String(finFecha.getHours()).padStart(2,"0")}${String(finFecha.getMinutes()).padStart(2,"0")}00`;
+
+  const titulo = esLocal
+    ? `UE Castellbisbal vs ${partido.rival}`
+    : `${partido.rival} vs UE Castellbisbal`;
+  const lugar = partido.campo || (esLocal ? "Camp Municipal" : "");
+
+  const url = new URL("https://calendar.google.com/calendar/render");
+  url.searchParams.set("action", "TEMPLATE");
+  url.searchParams.set("text", titulo);
+  url.searchParams.set("dates", `${inicio}/${fin}`);
+  url.searchParams.set("location", lugar);
+  url.searchParams.set("details", `Jornada ${partido.jornada} — UE Castellbisbal`);
+  return url.toString();
+}
+
+/* ============================================================
+   RACHA RECIENTE (últimos 5 resultados)
+   ============================================================ */
+function pintarRachaReciente(){
+  const cont = document.getElementById("liveRacha");
+  const dotsEl = document.getElementById("liveRachaDots");
+
+  const jugados = partidos
+    .filter(p => p.golesLocal !== null && p.golesVisitante !== null)
+    .sort((a, b) => a.jornada - b.jornada)
+    .slice(-5);
+
+  if(!jugados.length){ cont.style.display = "none"; return; }
+
+  dotsEl.innerHTML = jugados.map(p => {
+    const esLocal = p.tipo === "LOCAL";
+    const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
+    const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
+    const resultado = golesCastellbisbal > golesRival ? "v" : golesCastellbisbal < golesRival ? "d" : "e";
+    const letra = resultado === "v" ? "V" : resultado === "d" ? "D" : "E";
+    return `<span class="racha-dot ${resultado}" title="J${p.jornada}: ${golesCastellbisbal}-${golesRival} vs ${p.rival}">${letra}</span>`;
+  }).join("");
+
+  cont.style.display = "";
+}
+
+/* ============================================================
+   TIEMPO DEL PARTIDO
+   ------------------------------------------------------------
+   Se consulta a Open-Meteo (servicio gratuito, sin necesidad de
+   clave ni registro) desde el propio navegador de quien visita la
+   web. Primero intenta ubicar el campo del rival por su nombre; si
+   no lo encuentra, usa Castellbisbal como referencia aproximada de
+   la zona. Si el partido es dentro de más de 16 días, la previsión
+   todavía no existe y sencillamente no se muestra nada.
+   ============================================================ */
+const CASTELLBISBAL_COORDS = { lat: 41.4756, lon: 1.9847 };
+
+/* traduce el "weathercode" de Open-Meteo (estándar meteorológico
+   internacional) a un icono y un texto en español, sencillo */
+function interpretarCodigoTiempo(codigo){
+  const tabla = {
+    0: ["☀️", "despejado"], 1: ["🌤️", "poco nuboso"], 2: ["⛅", "intervalos nubosos"], 3: ["☁️", "nublado"],
+    45: ["🌫️", "niebla"], 48: ["🌫️", "niebla"],
+    51: ["🌦️", "llovizna"], 53: ["🌦️", "llovizna"], 55: ["🌦️", "llovizna"],
+    61: ["🌧️", "lluvia débil"], 63: ["🌧️", "lluvia"], 65: ["🌧️", "lluvia fuerte"],
+    71: ["🌨️", "nieve débil"], 73: ["🌨️", "nieve"], 75: ["🌨️", "nieve fuerte"],
+    80: ["🌦️", "chubascos"], 81: ["🌦️", "chubascos"], 82: ["⛈️", "chubascos fuertes"],
+    95: ["⛈️", "tormenta"], 96: ["⛈️", "tormenta"], 99: ["⛈️", "tormenta"]
+  };
+  return tabla[codigo] || ["🌡️", "—"];
+}
+
+/* intenta averiguar dónde queda el campo de esa jornada, por su nombre */
+async function localizarCampo(partido, esLocal){
+  if(esLocal) return CASTELLBISBAL_COORDS;
+  const nombreBusqueda = partido.rival
+    .replace(/\b(C\.?F\.?|U\.?E\.?|A\.?E\.?|Penya|Pª|Club|B|A)\b/gi, "")
+    .trim();
+  try{
+    const resp = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(nombreBusqueda)}&count=1&language=es&format=json`);
+    const datos = await resp.json();
+    if(datos.results && datos.results.length){
+      return { lat: datos.results[0].latitude, lon: datos.results[0].longitude };
+    }
+  }catch(err){ /* si falla, usamos la referencia de Castellbisbal */ }
+  return CASTELLBISBAL_COORDS; // aproximado: la zona es la misma comarca
+}
+
+/* convierte "DD/MM/AAAA" a "AAAA-MM-DD", el formato que pide Open-Meteo */
+function fechaParaOpenMeteo(fecha){
+  const [d, m, y] = fecha.split("/");
+  return `${y}-${m}-${d}`;
+}
+
+async function cargarClimaPartido(partido, esLocal){
+  const elClima = document.getElementById("liveClima");
+  elClima.style.display = "none";
+
+  try{
+    const coords = await localizarCampo(partido, esLocal);
+    const fechaISO = fechaParaOpenMeteo(partido.fecha);
+    const resp = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}` +
+      `&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max` +
+      `&timezone=Europe%2FMadrid&start_date=${fechaISO}&end_date=${fechaISO}`
+    );
+    const datos = await resp.json();
+    if(!datos.daily || !datos.daily.time || !datos.daily.time.length) return; // fuera del rango de previsión (16 días)
+
+    const [icono, texto] = interpretarCodigoTiempo(datos.daily.weathercode[0]);
+    const max = Math.round(datos.daily.temperature_2m_max[0]);
+    const min = Math.round(datos.daily.temperature_2m_min[0]);
+    const lluvia = datos.daily.precipitation_probability_max[0];
+    const viento = Math.round(datos.daily.windspeed_10m_max[0]);
+
+    elClima.textContent = `${icono} ${texto} · ${min}°–${max}°C · ${lluvia}% lluvia · viento ${viento} km/h`;
+    elClima.style.display = "";
+  }catch(err){
+    // sin conexión, o el servicio no responde: no se muestra nada, no se rompe el banner
+  }
+}
+
+/* ---------- pinta la sección "Último partido" con el resultado más reciente ---------- */
+/* ---------- si el partido actual pasa a "final" en la hoja de Google Sheets,
+   reflejamos ese mismo resultado también en la tarjeta de "Último partido"
+   (sin que haga falta escribirlo dos veces) ---------- */
+function pintarUltimoPartidoDesdeSheet(partido, golesCastellbisbal, golesRival){
+  const teams = document.getElementById("ultimoTeams");
+  const info = document.getElementById("ultimoInfo");
+  const acciones = document.getElementById("ultimoActions");
+  const jornadaTag = document.getElementById("ultimoJornada");
+
+  teams.style.display = "";
+  jornadaTag.style.display = "";
+  jornadaTag.textContent = "J" + partido.jornada;
+
+  const esLocal = partido.tipo === "LOCAL";
+  const escudoCastellbisbal = document.querySelector(".crest").src;
+  const escudoRival = partido.escudoRival || ESCUDO_GENERICO;
+  document.getElementById("ultimoCrest1").src = esLocal ? escudoCastellbisbal : escudoRival;
+  document.getElementById("ultimoCrest2").src = esLocal ? escudoRival : escudoCastellbisbal;
+  document.getElementById("ultimoName1").textContent = esLocal ? "UE Castellbisbal" : partido.rival;
+  document.getElementById("ultimoName2").textContent = esLocal ? partido.rival : "UE Castellbisbal";
+
+  const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
+  const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
+  const textoResultado = `${golesIzquierda} – ${golesDerecha}`;
+  document.getElementById("ultimoScore").innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>`;
+
+  const lugar = partido.campo || (esLocal ? "Campo Municipal" : "Campo del rival");
+  info.textContent = `${partido.fecha} · ${lugar}`;
+
+  const texto = `UE Castellbisbal ${textoResultado} ${partido.rival} — resultado final del ${partido.fecha}.`;
+  const btnWhatsapp = document.getElementById("btnWhatsapp");
+  btnWhatsapp.href = "https://wa.me/?text=" + encodeURIComponent(texto);
+  btnWhatsapp.onclick = (e) => {
+    e.preventDefault();
+    compartirPorWhatsapp(texto);
+  };
+  acciones.style.display = "";
+}
+
+function pintarUltimoPartido(partidoAnterior){
+  const teams = document.getElementById("ultimoTeams");
+  const info = document.getElementById("ultimoInfo");
+  const acciones = document.getElementById("ultimoActions");
+  const jornadaTag = document.getElementById("ultimoJornada");
+
+  if(!partidoAnterior){
+    // todavía no se ha jugado ningún partido esta temporada
+    teams.style.display = "none";
+    acciones.style.display = "none";
+    jornadaTag.style.display = "none";
+    info.textContent = "Aún no se ha jugado ningún partido esta temporada";
+    return;
+  }
+  teams.style.display = "";
+  jornadaTag.style.display = "";
+  jornadaTag.textContent = "J" + partidoAnterior.jornada;
+
+  const esLocal = partidoAnterior.tipo === "LOCAL";
+
+  const escudoCastellbisbal = document.querySelector(".crest").src;
+  const escudoRival = partidoAnterior.escudoRival || ESCUDO_GENERICO;
+  document.getElementById("ultimoCrest1").src = esLocal ? escudoCastellbisbal : escudoRival;
+  document.getElementById("ultimoCrest2").src = esLocal ? escudoRival : escudoCastellbisbal;
+  document.getElementById("ultimoName1").textContent = esLocal ? "UE Castellbisbal" : partidoAnterior.rival;
+  document.getElementById("ultimoName2").textContent = esLocal ? partidoAnterior.rival : "UE Castellbisbal";
+
+  const tieneResultado = partidoAnterior.golesLocal !== null && partidoAnterior.golesVisitante !== null;
+  const score = document.getElementById("ultimoScore");
+  let textoResultado = "";
+  if(tieneResultado){
+    const golesCastellbisbal = esLocal ? partidoAnterior.golesLocal : partidoAnterior.golesVisitante;
+    const golesRival = esLocal ? partidoAnterior.golesVisitante : partidoAnterior.golesLocal;
+    const golesIzquierda = esLocal ? golesCastellbisbal : golesRival;
+    const golesDerecha = esLocal ? golesRival : golesCastellbisbal;
+    textoResultado = `${golesIzquierda} – ${golesDerecha}`;
+    score.innerHTML = `<span class="live-vs has-resultado">${textoResultado}</span>`;
+  }else{
+    score.innerHTML = `<span class="live-vs">VS</span>`;
+  }
+
+  const lugar = partidoAnterior.campo || (esLocal ? "Campo Municipal" : "Campo del rival");
+  info.textContent = `${partidoAnterior.fecha} · ${lugar}`;
+
+  // botón "compartir resultado por WhatsApp"
+  const texto = tieneResultado
+    ? `UE Castellbisbal ${textoResultado} ${partidoAnterior.rival} — resultado final del ${partidoAnterior.fecha}.`
+    : `UE Castellbisbal vs ${partidoAnterior.rival} — ${partidoAnterior.fecha}.`;
+
+  const btnWhatsapp = document.getElementById("btnWhatsapp");
+  btnWhatsapp.href = "https://wa.me/?text=" + encodeURIComponent(texto);
+  btnWhatsapp.onclick = (e) => {
+    e.preventDefault();
+    compartirPorWhatsapp(texto);
+  };
+  acciones.style.display = "";
+}
+
+/* ---------- comparte por WhatsApp, con el escudo adjunto cuando es posible ---------- */
+async function compartirPorWhatsapp(texto){
+  try{
+    const escudoSrc = document.querySelector(".crest").src;
+    const respuesta = await fetch(escudoSrc);
+    const blob = await respuesta.blob();
+    const archivo = new File([blob], "escudo-ue-castellbisbal.png", { type: blob.type });
+
+    if(navigator.canShare && navigator.canShare({ files: [archivo] })){
+      await navigator.share({ files: [archivo], text: texto, title: "UE Castellbisbal" });
+      return;
+    }
+  }catch(err){
+    // si el usuario cancela el share nativo, no hacemos nada más
+    if(err && err.name === "AbortError") return;
+  }
+
+  // si el móvil no admite compartir archivos (o estamos en escritorio),
+  // abrimos WhatsApp solo con el texto — WhatsApp no permite adjuntar
+  // imagen automáticamente a través de un enlace normal
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+}
+
+/* ---------- construye el texto y comparte todo lo que muestra el banner de arriba ---------- */
+function compartirBanner(){
+  const nombreIzquierda = esLocalDestacado ? "UE Castellbisbal" : bannerInfo.rival;
+  const nombreDerecha = esLocalDestacado ? bannerInfo.rival : "UE Castellbisbal";
+  const venueEl = document.getElementById("liveVenue");
+  const venueTexto = venueEl.textContent.trim();
+  const venueUrl = venueEl.getAttribute("href");
+  // si hay enlace de ubicación, lo añadimos como URL real en su propia línea:
+  // así WhatsApp (y la mayoría de apps) lo convierten solas en un enlace pulsable,
+  // algo que el texto plano de la chincheta no permite
+  const bloqueUbicacion = venueUrl ? `${venueTexto}\n${venueUrl}` : venueTexto;
+  let texto;
+
+  if(bannerInfo.estado === "en_directo" || bannerInfo.estado === "final"){
+    const golesIzquierda = esLocalDestacado ? bannerInfo.golesCastellbisbal : bannerInfo.golesRival;
+    const golesDerecha = esLocalDestacado ? bannerInfo.golesRival : bannerInfo.golesCastellbisbal;
+    const etiqueta = bannerInfo.estado === "en_directo" ? "🔴 EN DIRECTO" : "⚪ FINAL";
+    texto =
+      `${etiqueta}\n` +
+      `${nombreIzquierda} ${golesIzquierda} – ${golesDerecha} ${nombreDerecha}\n` +
+      `${bloqueUbicacion}`;
+  }else{
+    const horaTexto = formatearHora(bannerInfo.hora);
+    texto =
+      `🟢 PRÓXIMO PARTIDO\n` +
+      `⚽ ${nombreIzquierda} vs ${nombreDerecha}\n` +
+      `📅 ${bannerInfo.fecha} · 🕐 ${horaTexto}\n` +
+      `${bloqueUbicacion}`;
+  }
+
+  compartirPorWhatsapp(texto);
+}
+
+/* ---------- pintar lista de calendario ---------- */
+const JORNADA_LIMITE_CALENDARIO = 10;
+let calendarioMostrarTodo = false;
+
+function pintarCalendario(){
+  const cont = document.getElementById("calendarList");
+  cont.innerHTML = "";
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  const escudoCastellbisbal = document.querySelector(".crest").src;
+
+  const totalPartidos = partidos.length;
+  const partidosAMostrar = calendarioMostrarTodo
+    ? partidos
+    : partidos.filter(p => p.jornada <= JORNADA_LIMITE_CALENDARIO);
+  const ocultos = totalPartidos - partidosAMostrar.length;
+
+  const btnVerMas = document.getElementById("btnVerMasCalendario");
+  if(ocultos > 0){
+    btnVerMas.style.display = "block";
+    document.getElementById("calendarVerMasCount").textContent = `(+${ocultos})`;
+  }else{
+    btnVerMas.style.display = "none";
+  }
+
+  partidosAMostrar.forEach(p => {
+    const tieneResultado = p.golesLocal !== null && p.golesVisitante !== null;
+    const esLocal = p.tipo === "LOCAL";
+
+    // partido ya jugado: fila simple, solo lo esencial (jornada, rival, resultado)
+    if(tieneResultado){
+      const golesCastellbisbal = esLocal ? p.golesLocal : p.golesVisitante;
+      const golesRival = esLocal ? p.golesVisitante : p.golesLocal;
+      const gano = golesCastellbisbal > golesRival;
+      const perdio = golesCastellbisbal < golesRival;
+      const row = document.createElement("div");
+      row.className = "calendar-row-simple" + (gano ? " gano" : perdio ? " perdio" : " empato");
+      row.innerHTML = `
+        <span class="cals-jornada">J${p.jornada}</span>
+        <span class="cals-rival">${esLocal ? "vs " : "@ "}${p.rival}</span>
+        <span class="cals-resultado">${golesCastellbisbal}-${golesRival}</span>
+      `;
+      cont.appendChild(row);
+      return;
+    }
+
+    const jugado = parseFecha(p.fecha) < hoy; // fecha pasada pero aún sin resultado cargado
+    const horaOResultado = formatearHora(p.hora);
+    const escudoRival = p.escudoRival || ESCUDO_GENERICO;
+    const rivalContenido = esLocal
+      ? `<img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">
+         <span class="cal-vs">VS</span>
+         <img class="cal-crest" src="${escudoRival}" alt="Escudo ${p.rival}">
+         <span class="cal-rival-text">${p.rival}</span>`
+      : `<span class="cal-rival-text">${p.rival}</span>
+         <img class="cal-crest" src="${escudoRival}" alt="Escudo ${p.rival}">
+         <span class="cal-vs">VS</span>
+         <img class="cal-crest" src="${escudoCastellbisbal}" alt="Escudo UE Castellbisbal">`;
+    const row = document.createElement("div");
+    row.className = "calendar-row" + (esLocal ? " local" : "") + (jugado ? " jugado" : "");
+    row.innerHTML = `
+      <div class="cal-line-top">
+        <span class="cal-jornada">J${p.jornada}</span>
+        <div class="cal-tag ${jugado ? 'jugado' : (esLocal ? 'local' : 'visitante')}">${jugado ? 'Jugado' : p.tipo}</div>
+      </div>
+      <span class="cal-rival">${rivalContenido}</span>
+      <div class="cal-line-bottom">
+        <span class="cal-fecha">${p.fecha}</span>
+        <span class="cal-hora">${horaOResultado}</span>
+      </div>
+    `;
+    cont.appendChild(row);
+  });
+}
+
+document.getElementById("btnCompartirBanner").onclick = (e) => {
+  e.preventDefault();
+  compartirBanner();
+};
+document.getElementById("btnVerMasCalendario").onclick = () => {
+  calendarioMostrarTodo = true;
+  pintarCalendario();
+};
+/* la carga real (calendario, clasificación, radar) se dispara junto al
+   resto del arranque, al final de este script -- así el radar puede
+   esperar a que el calendario esté listo antes de sumar los goles */
+
+/* datos de ejemplo: se usan solo si la hoja no carga (sin conexión,
+   URL_CALENDARIO vacío, fallo de red al abrir en local, etc.) */
+let partidos = [
+  { jornada: 1, rival: "Vallirana C.F.", fecha: "20/09/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_VALLIRANA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 2, rival: "Abrera A.E.", fecha: "27/09/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_ABRERA, campo: "Camp De Futbol Mpal. D'abrera", direccion: "https://maps.app.goo.gl/qNxLGLpzEe45WVJ29" },
+  { jornada: 3, rival: "Sant Andreu de la Barca", fecha: "04/10/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_ANDREU, campo: "Camp De Futbol Iem Can Salvi", direccion: "https://maps.app.goo.gl/f51P6wY4EKV8zLHy8" },
+  { jornada: 4, rival: "Juan XXIII C.S.", fecha: "11/10/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUAN_XXIII, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 5, rival: "Juventud 25 de Septiembre B", fecha: "18/10/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUVENTUD_25, campo: "Camp De Futbol Mpal. Del 25 De Setembre", direccion: "https://maps.app.goo.gl/G1w7yeN7GkcRvt2K9" },
+  { jornada: 6, rival: "Penya Barcelonista Sant Vicenç", fecha: "25/10/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_PENYA_BARCELONISTA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 7, rival: "Rubí U.E. B", fecha: "01/11/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_RUBI, campo: "Camp De Futbol Zem Can Rosés", direccion: "https://maps.app.goo.gl/x1ZGRnSMUiYbF7928" },
+  { jornada: 8, rival: "Torrelles U.E.", fecha: "08/11/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_TORRELLES, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 9, rival: "Penya Unión D. Málaga", fecha: "15/11/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_PENYA_MALAGA, campo: "Camp De Futbol Mpal. La Parellada", direccion: "https://maps.app.goo.gl/Kwn2d1wQj5HNn5of8" },
+  { jornada: 10, rival: "Sant Vicenç dels Horts", fecha: "22/11/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_VICENC_HORTS, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 11, rival: "Castelldefels U.E. B", fecha: "29/11/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_CASTELLDEFELS, campo: "Camp D´esports Mpal. Els Canyars", direccion: "https://maps.app.goo.gl/LJ5PGKzsboxYFGgAA" },
+  { jornada: 12, rival: "Martorell C.F. B", fecha: "13/12/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_MARTORELL, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 13, rival: "Mirasol-Baco Unión C.F.", fecha: "20/12/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_MIRASOL_BACO, campo: "Camp De Futbol Mpal. De Mira-sol", direccion: "https://maps.app.goo.gl/9S7qbezNB2aptaSW9" },
+  { jornada: 14, rival: "Sabadell Nord C.F.", fecha: "10/01/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SABADELL_NORD, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 15, rival: "Vista Alegre U.D. B", fecha: "17/01/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_VISTA_ALEGRE, campo: "Camp D´esports Mpal. Can Vinader", direccion: "https://maps.app.goo.gl/3pKzZy5d82Au6htc6" },
+  { jornada: 16, rival: "Vallirana C.F.", fecha: "24/01/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_VALLIRANA, campo: "Camp De Futbol Mpal. De Vallirana", direccion: "https://maps.app.goo.gl/FyMfAf961Fv3B8Vk7" },
+  { jornada: 17, rival: "Abrera A.E.", fecha: "31/01/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_ABRERA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 18, rival: "Sant Andreu de la Barca", fecha: "14/02/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_ANDREU, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 19, rival: "Juan XXIII C.S.", fecha: "21/02/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUAN_XXIII, campo: "Camp De Futbol Mpal. De Les Arenes", direccion: "https://maps.app.goo.gl/jsHS5ueE8FYtDpm59" },
+  { jornada: 20, rival: "Juventud 25 de Septiembre B", fecha: "28/02/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUVENTUD_25, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 21, rival: "Penya Barcelonista Sant Vicenç", fecha: "07/03/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_PENYA_BARCELONISTA, campo: "Camp De Futbol Mpal. La Barruana", direccion: "https://maps.app.goo.gl/YHgv8A3FA9X4drA59" },
+  { jornada: 22, rival: "Rubí U.E. B", fecha: "14/03/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_RUBI, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 23, rival: "Torrelles U.E.", fecha: "21/03/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_TORRELLES, campo: "Camp De Futbol Cem Can Roig", direccion: "https://maps.app.goo.gl/gHU8h89SjLCgUbwA6" },
+  { jornada: 24, rival: "Penya Unión D. Málaga", fecha: "04/04/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_PENYA_MALAGA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 25, rival: "Sant Vicenç dels Horts", fecha: "11/04/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_VICENC_HORTS, campo: "Camp De Futbol Mpal. De La Guardia", direccion: "https://maps.app.goo.gl/oevXeJX6A7LeoXAj8" },
+  { jornada: 26, rival: "Castelldefels U.E. B", fecha: "18/04/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_CASTELLDEFELS, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 27, rival: "Martorell C.F. B", fecha: "25/04/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_MARTORELL, campo: "Camp De Futbol Cem Torrent De Llops", direccion: "https://maps.app.goo.gl/znaFzFpiWUyNLaCN9" },
+  { jornada: 28, rival: "Mirasol-Baco Unión C.F.", fecha: "02/05/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_MIRASOL_BACO, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
+  { jornada: 29, rival: "Sabadell Nord C.F.", fecha: "09/05/2027", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SABADELL_NORD, campo: "Camp De Futbol Mpal. Ca N´oriac", direccion: "https://maps.app.goo.gl/m6CWCpPwZSUAjFvW7" },
+  { jornada: 30, rival: "Vista Alegre U.D. B", fecha: "16/05/2027", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_VISTA_ALEGRE, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA }
+];
+
+/* hoja de Google Sheets publicada como CSV (pestaña de calendario): Archivo →
+   Compartir → Publicar en la web → esta pestaña → CSV. Mientras esté vacío,
+   se usan los datos de ejemplo de arriba. */
+const URL_CALENDARIO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?output=csv";
+
+/* ---------- parser de CSV sencillo pero que respeta comas dentro de comillas
+   (hace falta porque el enlace de Google Maps trae comas en la dirección) ---------- */
+function parsearCSV(texto){
+  const filas = [];
+  let fila = [], campo = "", entreComillas = false;
+  const limpio = texto.replace(/^﻿/, "").replace(/\r\n/g, "\n");
+  for(let i = 0; i < limpio.length; i++){
+    const c = limpio[i];
+    if(entreComillas){
+      if(c === '"'){
+        if(limpio[i + 1] === '"'){ campo += '"'; i++; }
+        else{ entreComillas = false; }
+      }else{ campo += c; }
+    }else{
+      if(c === '"'){ entreComillas = true; }
+      else if(c === ','){ fila.push(campo); campo = ""; }
+      else if(c === '\n'){ fila.push(campo); filas.push(fila); fila = []; campo = ""; }
+      else{ campo += c; }
+    }
+  }
+  if(campo !== "" || fila.length){ fila.push(campo); filas.push(fila); }
+
+  const cabecera = filas.shift().map(h => h.trim());
+  return filas
+    .filter(f => f.some(v => v.trim() !== ""))
+    .map(f => Object.fromEntries(cabecera.map((h, i) => [h, (f[i] || "").trim()])));
+}
+
+/* ---------- "camp municipal" tal cual se escribe desde el móvil pasa a
+   "Camp Municipal", para que se vea igual de cuidado que el resto de la web ---------- */
+function capitalizar(texto){
+  return texto.replace(/\S+/g, p => p.charAt(0).toUpperCase() + p.slice(1));
+}
+
+/* ---------- convierte una fila de la hoja en un partido tal como lo espera el resto del código ---------- */
+function filaAPartido(fila){
+  const numeroOVacio = v => (v === undefined || v === "" || v === "-") ? null : Number(v);
+  return {
+    jornada: Number(fila.jornada),
+    rival: fila.rival,
+    fecha: fila.fecha,
+    hora: fila.hora,
+    tipo: fila.tipo,
+    estado: (fila.estado && fila.estado !== "-") ? fila.estado : "proximo",
+    golesLocal: numeroOVacio(fila.goles_local),
+    golesVisitante: numeroOVacio(fila.goles_visitante),
+    escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
+    campo: fila.campo ? capitalizar(fila.campo) : fila.campo,
+    direccion: fila["dirección"] || fila.direccion || ""
+  };
+}
+
+/* ---------- carga el calendario de la hoja (si hay URL y hay conexión) y,
+   tanto si viene de la hoja como si se queda con los datos de ejemplo,
+   pinta el banner de arriba y la lista completa del calendario ---------- */
+async function cargarCalendarioYArrancar(){
+  if(URL_CALENDARIO){
+    try{
+      const resp = await fetch(URL_CALENDARIO);
+      if(resp.ok){
+        const filas = parsearCSV(await resp.text());
+        if(filas.length) partidos = filas.map(filaAPartido);
+      }
+    }catch(err){
+      // sin conexión o falla la hoja: seguimos con los datos de ejemplo, la web no se rompe
+    }
+  }
+  const { partidoActual, partidoAnterior } = seleccionarPartidos();
+  pintarBannerPartido(partidoActual, partidoAnterior);
+  pintarCalendario();
+}
+/* ---------- arranque: el calendario va primero porque el radar necesita
+   sus resultados para sumar los goles; clasificación va aparte porque no
+   depende de nada más ---------- */
+const calendarioListo = cargarCalendarioYArrancar();
+cargarClasificacionYPintar();
+cargarRadarYPintar(calendarioListo);
+
+/* ---------- escudos por defecto, para que nunca se vean "rotos" mientras
+   carga la hoja (o si falla la conexión, por ejemplo probando en local) ---------- */
+(function pintarEscudosPorDefecto(){
+  const escudoPropio = document.querySelector(".crest").src;
+  ["liveCrest1", "liveCrest2", "ultimoCrest1", "ultimoCrest2"].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if(el && !el.getAttribute("src")){ el.src = i % 2 === 0 ? escudoPropio : ESCUDO_GENERICO; }
+  });
+})();
+
+/* ---------- franja de escudos rivales del hero: se pinta una vez con los
+   15 escudos que tengamos guardados, duplicados para que el desplazamiento
+   en bucle no se note el "salto" al volver al principio ---------- */
+/* ---------- botón "Quiero hablar con el club" (Colaboradores): abre un
+   pequeño formulario (nombre, apellidos, contacto) y, al enviarlo, prepara
+   el correo con esos datos ya escritos.
+   EMAIL_COLABORADORES es temporal, cámbialo cuando tengas el definitivo. ---------- */
+const EMAIL_COLABORADORES = "sperezp@gmail.com";
+const btnHablemos = document.getElementById("btnHablemos");
+const modalHablemos = document.getElementById("modalHablemos");
+const formHablemos = document.getElementById("formHablemos");
+const modalCerrar = document.getElementById("modalCerrar");
+
+function abrirModalHablemos(){ modalHablemos.classList.add("is-open"); }
+function cerrarModalHablemos(){ modalHablemos.classList.remove("is-open"); }
+
+if(btnHablemos){
+  btnHablemos.addEventListener("click", (e) => {
+    e.preventDefault();
+    abrirModalHablemos();
+  });
+}
+/* ---------- modal de "membresía de aficionado" (nombre + apellido) ----------
+   Nota: de momento no hay ningún botón visible que abra este modal — el
+   enlace del hero que lo abría ahora es el de "Cero insultos en la grada",
+   que enlaza directo a la FCF. Si en el futuro quieres retomar la
+   membresía, solo hay que añadir un botón con un id y conectarlo aquí
+   llamando a abrirModalMembresia(). ---------- */
+const modalMembresia = document.getElementById("modalMembresia");
+const formMembresia = document.getElementById("formMembresia");
+const modalCerrarMembresia = document.getElementById("modalCerrarMembresia");
+
+function abrirModalMembresia(){ modalMembresia.classList.add("is-open"); }
+function cerrarModalMembresia(){ modalMembresia.classList.remove("is-open"); }
+
+modalCerrarMembresia.addEventListener("click", cerrarModalMembresia);
+modalMembresia.addEventListener("click", (e) => {
+  if(e.target === modalMembresia) cerrarModalMembresia();
+});
+
+const btnParticipar = document.getElementById("btnParticipar");
+if(btnParticipar){
+  btnParticipar.addEventListener("click", (e) => {
+    e.preventDefault();
+    abrirModalMembresia();
+  });
+}
+formMembresia.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById("campoNombreMembresia").value.trim();
+  const apellido = document.getElementById("campoApellidoMembresia").value.trim();
+  const correo = document.getElementById("campoCorreoMembresia").value.trim();
+  const forma = document.getElementById("campoFormaMembresia").value.trim();
+  const mensaje = document.getElementById("campoMensajeMembresia").value.trim();
+
+  const asunto = "Quiero colaborar como persona con la UE Castellbisbal";
+  const cuerpo = `Nombre: ${nombre}\nApellido: ${apellido}\nCorreo: ${correo}\nForma de colaborar: ${forma}` +
+    (mensaje ? `\n\nMensaje:\n${mensaje}` : "") +
+    `\n\nQuiero colaborar como persona con la UE Castellbisbal.`;
+
+  window.location.href = `mailto:${EMAIL_COLABORADORES}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  cerrarModalMembresia();
+  formMembresia.reset();
+});
+
+/* ---------- rellena el formulario de membresía con los datos de la cuenta
+   (Google o Microsoft) — el usuario sigue teniendo que pulsar "Solicitar
+   membresía" para confirmar y enviarlo, no se envía solo ---------- */
+function rellenarFormularioMembresia(nombre, apellido, correo){
+  document.getElementById("campoNombreMembresia").value = nombre;
+  document.getElementById("campoApellidoMembresia").value = apellido;
+  document.getElementById("campoCorreoMembresia").value = correo;
+}
+
+/* ---------- inicio de sesión con Google y Microsoft para la membresía ----------
+   PARA CONECTARLOS: crea una app en Google Cloud Console y otra en Azure
+   (Entra ID), y pega aquí sus identificadores. Mientras estén vacíos, esos
+   botones no aparecen y solo se ve el formulario manual — no rompen nada. ---------- */
+const GOOGLE_CLIENT_ID = ""; // <-- pega aquí tu Client ID de Google Cloud (acaba en .apps.googleusercontent.com)
+const MICROSOFT_CLIENT_ID = ""; // <-- pega aquí el "Application (client) ID" de tu app en Azure
+
+/* decodifica el token que devuelve Google (JWT) para sacar nombre y correo, sin librerías */
+function decodificarJwt(token){
+  const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  const json = decodeURIComponent(
+    atob(base64).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
+  );
+  return JSON.parse(json);
+}
+
+window.addEventListener("load", () => {
+  // --- Google ---
+  if(GOOGLE_CLIENT_ID && window.google && google.accounts && google.accounts.id){
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: (respuesta) => {
+        const datos = decodificarJwt(respuesta.credential);
+        rellenarFormularioMembresia(datos.given_name || "", datos.family_name || "", datos.email || "");
+      }
+    });
+    google.accounts.id.renderButton(document.getElementById("googleBtnDiv"), {
+      theme: "outline", size: "large", text: "continue_with", shape: "rectangular"
+    });
+  }
+
+  // --- Microsoft ---
+  const btnMicrosoftLogin = document.getElementById("btnMicrosoftLogin");
+  if(MICROSOFT_CLIENT_ID && window.msal){
+    const msalInstance = new msal.PublicClientApplication({
+      auth: {
+        clientId: MICROSOFT_CLIENT_ID,
+        redirectUri: window.location.origin + window.location.pathname
+      }
+    });
+    btnMicrosoftLogin.addEventListener("click", async () => {
+      try{
+        const resultado = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+        const nombreCompleto = (resultado.account && resultado.account.name) || "";
+        const partes = nombreCompleto.trim().split(" ");
+        const nombre = partes[0] || "";
+        const apellido = partes.slice(1).join(" ");
+        const correo = (resultado.account && resultado.account.username) || "";
+        rellenarFormularioMembresia(nombre, apellido, correo);
+      }catch(err){
+        // el usuario canceló el inicio de sesión, o falló: no pasa nada, sigue el formulario manual
+      }
+    });
+  }else if(btnMicrosoftLogin){
+    btnMicrosoftLogin.hidden = true; // sin Client ID configurado, se oculta el botón
+  }
+});
+
+modalCerrar.addEventListener("click", cerrarModalHablemos);
+modalHablemos.addEventListener("click", (e) => {
+  if(e.target === modalHablemos) cerrarModalHablemos(); // clic fuera de la tarjeta, también cierra
+});
+
+formHablemos.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const nombre = document.getElementById("campoNombre").value.trim();
+  const apellidos = document.getElementById("campoApellidos").value.trim();
+  const entidad = document.getElementById("campoEntidad").value.trim();
+  const contacto = document.getElementById("campoContacto").value.trim();
+
+  const asunto = "Quiero colaborar con la UE Castellbisbal";
+  const cuerpo =
+    `Nombre: ${nombre}\n` +
+    `Apellidos: ${apellidos}\n` +
+    `Entidad, negocio o comercio: ${entidad}\n` +
+    `Correo o teléfono: ${contacto}\n\n` +
+    `Hemos visto el programa de colaboradores de la UE Castellbisbal y nos gustaría hablar con vosotros.`;
+
+  window.location.href = `mailto:${EMAIL_COLABORADORES}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  cerrarModalHablemos();
+  formHablemos.reset();
+});
+
+/* ---------- modales legales (Aviso legal / Privacidad / Cookies): se abren
+   y cierran igual que el de contacto, cada uno con su propio botón y modal ---------- */
+const modalesLegales = [
+  { boton: "btnAvisoLegal", modal: "modalAvisoLegal" },
+  { boton: "btnPrivacidad", modal: "modalPrivacidad" },
+  { boton: "btnCookies", modal: "modalCookies" }
+];
+modalesLegales.forEach(({ boton, modal }) => {
+  const btn = document.getElementById(boton);
+  const el = document.getElementById(modal);
+  if(!btn || !el) return;
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    el.classList.add("is-open");
+  });
+  el.querySelector(".modal-cerrar-legal").addEventListener("click", () => el.classList.remove("is-open"));
+  el.addEventListener("click", (e) => {
+    if(e.target === el) el.classList.remove("is-open");
+  });
+});
+
+/* ---------- favicon dinámico (usa el mismo escudo ya incrustado) ---------- */
+document.getElementById("favicon").href = document.querySelector(".crest").src;
+
+/* ---------- año automático en el footer ---------- */
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* ---------- menú móvil ---------- */
+const menuToggle = document.getElementById("menuToggle");
+const headerNav = document.getElementById("headerNav");
+menuToggle.addEventListener("click", () => {
+  const abierto = headerNav.classList.toggle("is-open");
+  menuToggle.classList.toggle("is-open", abierto);
+  menuToggle.setAttribute("aria-expanded", abierto ? "true" : "false");
+});
+headerNav.querySelectorAll("a").forEach(a => {
+  a.addEventListener("click", () => {
+    headerNav.classList.remove("is-open");
+    menuToggle.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  });
+});
+
+/* ---------- cabecera: fondo sólido al hacer scroll ---------- */
+const header = document.getElementById("siteHeader");
+window.addEventListener("scroll", () => {
+  header.classList.toggle("is-scrolled", window.scrollY > 40);
+});
+
+/* ---------- botón "volver arriba", con el escudo encima ---------- */
+const btnBackToTop = document.getElementById("btnBackToTop");
+const backToTopCrest = document.getElementById("backToTopCrest");
+backToTopCrest.src = document.querySelector(".crest").src;
+window.addEventListener("scroll", () => {
+  const visible = window.scrollY > 700;
+  btnBackToTop.classList.toggle("is-visible", visible);
+  backToTopCrest.classList.toggle("is-visible", visible);
+});
+btnBackToTop.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ---------- animación de aparición al hacer scroll ---------- */
+const revealEls = document.querySelectorAll(".reveal");
+if("IntersectionObserver" in window){
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add("is-visible");
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.15 });
+  revealEls.forEach(el => io.observe(el));
+}else{
+  revealEls.forEach(el => el.classList.add("is-visible"));
+}
+</script>
+
+</body>
+</html>
