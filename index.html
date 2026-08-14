@@ -273,7 +273,8 @@ a:focus-visible, button:focus-visible{
   padding-left:10px;
   border-left:1px solid var(--line);
 }
-#liveReloj.reloj-parpadea{ color:#dc2626; animation:live-blink 1s infinite; }
+#liveReloj.reloj-verde{ color:#4ade80; animation:live-blink 1s infinite; }
+#liveReloj.reloj-rojo{ color:#dc2626; animation:live-blink 1s infinite; }
 .live-teams{
   display:flex;
   align-items:center;
@@ -3206,15 +3207,23 @@ function parseFecha(fecha){
   return new Date(y, m - 1, d);
 }
 
-/* ---------- elige automáticamente, por la fecha de hoy, cuál es el
-   partido actual/próximo y cuál fue el partido inmediatamente anterior.
-   Ya no hace falta marcar nada a mano en la lista de partidos. ---------- */
+/* ---------- elige cuál es el partido destacado del banner: la fila que en
+   la hoja tenga marcado a mano un estado (proximo / en_directo / final) es
+   la que manda -- el resto de filas se dejan con "-" o en blanco, tal como
+   ya explica el comentario de la sección CALENDARIO. Si ninguna fila tiene
+   nada marcado (por ejemplo, con los datos de ejemplo), se usa la fecha de
+   hoy como respaldo, igual que antes. ---------- */
 function seleccionarPartidos(){
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
-  let indiceActual = ordenados.findIndex(p => parseFecha(p.fecha) >= hoy);
-  if(indiceActual === -1) indiceActual = ordenados.length - 1; // temporada acabada: se queda en el último
+  let indiceActual = ordenados.findIndex(p => p.estado);
+
+  if(indiceActual === -1){
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    indiceActual = ordenados.findIndex(p => parseFecha(p.fecha) >= hoy);
+    if(indiceActual === -1) indiceActual = ordenados.length - 1; // temporada acabada: se queda en el último
+  }
+
   return {
     partidoActual: ordenados[indiceActual],
     partidoAnterior: indiceActual > 0 ? ordenados[indiceActual - 1] : null
@@ -3286,9 +3295,11 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       `<span class="live-score-sep">–</span>` +
       `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
 
+    // ni en directo ni en final hace falta ya la ubicación del campo
+    venueEl.style.display = "none";
+
     if(estado === "final"){
-      // partido acabado: no hace falta el campo, se ve mejor el resultado en puntos
-      venueEl.style.display = "none";
+      // partido acabado: se ve mejor el resultado en puntos que el campo
       badgeWrap.style.display = "";
       badgeWrap.innerHTML = badgePuntosHTML(golesCastellbisbal, golesRival);
       detenerRelojPartido();
@@ -3297,8 +3308,6 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
     }else{
       badgeWrap.style.display = "none";
-      venueEl.style.display = "";
-      pintarCampoBanner(esLocal, partidoActual.campo, partidoActual.direccion);
       iniciarRelojPartido(partidoActual);
     }
   }else{
@@ -3332,9 +3341,9 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
     detenerCuentaAtras();
   }
 
-  // botón "añadir al calendario": solo antes o durante el partido
+  // botón "añadir al calendario": solo antes de que empiece el partido
   const btnCalendario = document.getElementById("btnAnadirCalendario");
-  if(estado === "proximo" || estado === "en_directo"){
+  if(estado === "proximo"){
     btnCalendario.href = generarEnlaceCalendario(partidoActual, esLocal);
     btnCalendario.style.display = "";
   }else{
@@ -3396,9 +3405,12 @@ function detenerRelojPartido(){
   if(intervaloReloj){ clearInterval(intervaloReloj); intervaloReloj = null; }
   const el = document.getElementById("liveReloj");
   el.style.display = "none";
-  el.classList.remove("reloj-parpadea");
+  el.classList.remove("reloj-verde", "reloj-rojo");
 }
 
+/* color verde mientras el reloj está corriendo de verdad (1ª y 2ª parte,
+   con su tiempo añadido); rojo mientras está parado (descanso, o el tope
+   fijo de "90'" a la espera de que se marque "final" en la hoja) */
 function calcularMinutoPartido(kickoff){
   const DURACION_PARTE = 45, ANADIDO = 2, DESCANSO = 17;
   const finPrimeraConAnadido = DURACION_PARTE + ANADIDO;      // 47'
@@ -3408,19 +3420,19 @@ function calcularMinutoPartido(kickoff){
   if(transcurridos < 0) transcurridos = 0;
 
   if(transcurridos <= DURACION_PARTE){
-    return { texto: Math.floor(transcurridos) + "'", parpadea: false };
+    return { texto: Math.floor(transcurridos) + "'", color: "verde" };
   }
   if(transcurridos <= finPrimeraConAnadido){
-    return { texto: "45+" + Math.floor(transcurridos - DURACION_PARTE) + "'", parpadea: false };
+    return { texto: "45+" + Math.floor(transcurridos - DURACION_PARTE) + "'", color: "verde" };
   }
   if(transcurridos <= finDescanso){
-    return { texto: "45'", parpadea: true }; // descanso: parado y parpadeando
+    return { texto: "45'", color: "rojo" }; // descanso: parado
   }
   const transcurridosSegunda = transcurridos - finDescanso;
   if(transcurridosSegunda < DURACION_PARTE){
-    return { texto: (DURACION_PARTE + Math.floor(transcurridosSegunda)) + "'", parpadea: false };
+    return { texto: (DURACION_PARTE + Math.floor(transcurridosSegunda)) + "'", color: "verde" };
   }
-  return { texto: "90'", parpadea: true }; // tope duro: parado y parpadeando hasta que se marque "final"
+  return { texto: "90'", color: "rojo" }; // tope duro: parado hasta que se marque "final"
 }
 
 function iniciarRelojPartido(partido){
@@ -3434,9 +3446,10 @@ function iniciarRelojPartido(partido){
   const kickoff = new Date(y, m - 1, d, horas, minutos);
 
   function actualizar(){
-    const { texto, parpadea } = calcularMinutoPartido(kickoff);
+    const { texto, color } = calcularMinutoPartido(kickoff);
     el.textContent = texto;
-    el.classList.toggle("reloj-parpadea", parpadea);
+    el.classList.toggle("reloj-verde", color === "verde");
+    el.classList.toggle("reloj-rojo", color === "rojo");
     el.style.display = "";
   }
   actualizar();
@@ -3886,7 +3899,11 @@ function filaAPartido(fila){
     fecha: fila.fecha,
     hora: fila.hora,
     tipo: fila.tipo,
-    estado: (fila.estado && fila.estado !== "-") ? fila.estado : "proximo",
+    // se deja vacío tal cual si la fila no tiene nada marcado -- así
+    // seleccionarPartidos() sabe distinguir "esta es la fila destacada"
+    // de "esta fila no tiene nada que decir". Al pintar el banner ya se
+    // usa "proximo" por defecto si hiciera falta.
+    estado: (fila.estado && fila.estado !== "-") ? fila.estado : "",
     golesLocal: numeroOVacio(fila.goles_local),
     golesVisitante: numeroOVacio(fila.goles_visitante),
     escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
