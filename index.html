@@ -936,7 +936,7 @@ a:focus-visible, button:focus-visible{
 .radar-resumen{ padding-top:24px; }
 .radar-grid{
   display:grid;
-  grid-template-columns:repeat(9, 1fr);
+  grid-template-columns:repeat(5, 1fr);
   border:1px solid var(--line);
   border-radius:4px;
   overflow:hidden;
@@ -948,6 +948,11 @@ a:focus-visible, button:focus-visible{
   background:var(--black-soft);
 }
 .radar-item:last-child{ border-right:none; }
+@media (min-width:769px){
+  .radar-item{ border-bottom:1px solid var(--line); }
+  .radar-item:nth-child(5n){ border-right:none; }
+  .radar-item:nth-child(n+6){ border-bottom:none; }
+}
 .radar-item-label{
   font-size:10px;
   letter-spacing:0.1em;
