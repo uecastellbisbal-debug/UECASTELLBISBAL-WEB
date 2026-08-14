@@ -1365,6 +1365,15 @@ a:focus-visible, button:focus-visible{
 }
 .cal-tipo.local{ background:var(--lilac-dark); color:var(--lilac-light); }
 .cal-tipo.visitante{ background:rgba(245,245,243,0.08); color:var(--white-dim); }
+.calendar-tipo-leyenda{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  color:var(--white-faint);
+}
+.calendar-tipo-leyenda .cal-tipo{ width:18px; height:18px; }
 .cal-rival{
   display:flex;
   align-items:center;
@@ -2241,8 +2250,16 @@ a:focus-visible, button:focus-visible{
         <div class="radar-chart" id="chartEvolucionPuntos"></div>
       </div>
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Goles a favor / en contra</p>
-        <div class="radar-chart" id="chartGoles"></div>
+        <p class="radar-chart-title">Goles a favor / en contra por jornada</p>
+        <div class="radar-chart" id="chartGolesJornada"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-a"></i> A favor</span>
+          <span><i class="dot dot-b"></i> En contra</span>
+        </div>
+      </div>
+      <div class="radar-chart-box">
+        <p class="radar-chart-title">Evolución Goles a favor / en contra</p>
+        <div class="radar-chart" id="chartEvolucionGoles"></div>
         <div class="radar-legend">
           <span><i class="dot dot-a"></i> A favor</span>
           <span><i class="dot dot-b"></i> En contra</span>
@@ -2270,6 +2287,10 @@ a:focus-visible, button:focus-visible{
       <div>
         <p class="section-eyebrow">Temporada 2026/27</p>
         <h2 class="section-title">Calendario y resultados</h2>
+        <p class="calendar-tipo-leyenda">
+          <span class="cal-tipo local">L</span> Local
+          <span class="cal-tipo visitante">V</span> Visitante
+        </p>
       </div>
     </div>
     <div class="calendar-header">
@@ -3146,7 +3167,20 @@ function pintarRadarDesglose(){
     { minX: 0, maxX: 30, minY: 0, tendencia: true }
   );
 
-  pintarGraficoLineal("chartGoles", radarTemporada, [
+  // "goles por jornada" tampoco viene directo de la hoja: se calcula
+  // igual que "puntos por jornada", restando los acumulados de la
+  // jornada anterior a los de esta
+  const datosGolesJornada = radarTemporada.map((d, i) => ({
+    jornada: d.jornada,
+    golesFavorJornada: i === 0 ? 0 : d.golesFavor - radarTemporada[i - 1].golesFavor,
+    golesContraJornada: i === 0 ? 0 : d.golesContra - radarTemporada[i - 1].golesContra
+  }));
+  pintarGraficoLineal("chartGolesJornada", datosGolesJornada, [
+    { key: "golesFavorJornada", color: "#22c55e" },
+    { key: "golesContraJornada", color: "#dc2626" }
+  ], { minX: 0, maxX: 30 });
+
+  pintarGraficoLineal("chartEvolucionGoles", radarTemporada, [
     { key: "golesFavor", color: "#22c55e" },
     { key: "golesContra", color: "#dc2626" }
   ], { minX: 0, maxX: 30, tendencia: true });
