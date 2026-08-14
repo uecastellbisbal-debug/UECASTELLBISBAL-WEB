@@ -936,7 +936,7 @@ a:focus-visible, button:focus-visible{
 .radar-resumen{ padding-top:24px; }
 .radar-grid{
   display:grid;
-  grid-template-columns:repeat(8, 1fr);
+  grid-template-columns:repeat(9, 1fr);
   border:1px solid var(--line);
   border-radius:4px;
   overflow:hidden;
@@ -2967,7 +2967,7 @@ function calcularPartidosGanados(){
   return { ganados, jugados: finales.length };
 }
 
-/* ---------- pinta el resumen de 7 datos con el último dato disponible ---------- */
+/* ---------- pinta el resumen de 9 datos con el último dato disponible ---------- */
 function pintarRadarResumen(){
   const cont = document.getElementById("radarGrid");
   if(!radarTemporada.length){
@@ -2981,10 +2981,14 @@ function pintarRadarResumen(){
   const totalRojas = radarTemporada.reduce((suma, d) => suma + d.rojasJornada, 0);
   const { ganados, jugados } = calcularPartidosGanados();
   const porcentajeGanados = jugados > 0 ? Math.round((ganados / jugados) * 100) : 0;
+  // puntos posibles = partidos finalizados x 3 (el máximo por partido)
+  const puntosMax = jugados * 3;
+  const porcentajePuntos = puntosMax > 0 ? Math.round((totalPuntos / puntosMax) * 100) : 0;
   const items = [
     { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
     { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
     { label: "Puntos",           valor: totalPuntos, clase: "es-puntos" },
+    { label: "Puntos ganados",   valor: `${totalPuntos}/${puntosMax} (${porcentajePuntos}%)`, clase: "es-ganados" },
     { label: "Partidos ganados", valor: `${ganados}/${jugados} (${porcentajeGanados}%)`, clase: "es-ganados" },
     { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
     { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
