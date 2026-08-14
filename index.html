@@ -160,7 +160,7 @@ a:focus-visible, button:focus-visible{
 .masthead-logo{
   display:flex;
   justify-content:center;
-  padding:136px 24px 6px; /* la cabecera sigue en 2 líneas mientras esté el enlace temporal de "Plantilla 26/27" */
+  padding:146px 24px 6px; /* la cabecera sigue en 2 líneas mientras esté el enlace temporal de "Plantilla 26/27" */
   position:relative;
 }
 .masthead-logo::before{
@@ -193,7 +193,7 @@ a:focus-visible, button:focus-visible{
   z-index:1;
 }
 @media (max-width:640px){
-  .masthead-logo{ padding:124px 16px 4px; }
+  .masthead-logo{ padding:132px 16px 4px; }
   .masthead-logo img{ height:83px; width:294px; }
   .masthead-logo::before{ top:24px; width:150px; height:150px; }
 }
@@ -439,11 +439,18 @@ a:focus-visible, button:focus-visible{
    tamaño de letra/icono que "Sigue a la UE en Instagram" -- aquí solo
    se cambia el color a rojo y se le añade el parpadeo */
 .brand-plantilla-temp{
-  color:#f87171;
+  color:#ff5252;
+  background:rgba(0,0,0,0.6);
+  padding:5px 12px;
+  border-radius:20px;
+  box-shadow:0 3px 12px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,82,82,0.35);
   animation:live-blink 1.3s infinite;
 }
-.brand-plantilla-temp svg{ color:#f87171; }
+.brand-plantilla-temp svg{ color:#ff5252; }
 .brand-plantilla-temp:hover{ color:var(--white); }
+@media (max-width:640px){
+  .brand-plantilla-temp{ padding:4px 10px; }
+}
 @media (max-width:640px){
   .brand-instagram{ font-size:11.5px; gap:6px; }
   .brand-instagram svg{ width:17px; height:17px; }
