@@ -955,11 +955,16 @@ a:focus-visible, button:focus-visible{
 }
 .radar-item-label{
   font-size:10px;
+  line-height:1.3;
   letter-spacing:0.1em;
   text-transform:uppercase;
   color:var(--lilac-light);
   font-weight:700;
   margin-bottom:10px;
+  /* reserva sitio para 2 líneas siempre, aunque la etiqueta quepa en 1 --
+     así el valor de debajo arranca a la misma altura en todos los cuadros,
+     sin depender de en qué ancho de pantalla justo le toca partirse */
+  min-height:26px;
 }
 .radar-item-value{
   font-family:var(--display);
@@ -1657,21 +1662,11 @@ a:focus-visible, button:focus-visible{
   border-radius:4px;
   box-shadow:0 14px 34px rgba(0,0,0,0.5);
 }
-.patrocinador-logo{
-  width:180px;
-  height:90px;
-  object-fit:contain;
-  filter:grayscale(1);
-  position:relative;
-  transition:filter .25s ease, transform .25s ease;
-}
-.patrocinador-logo:hover{
-  transform:scale(2.1);
-  z-index:5;
-  filter:grayscale(0);
-  background:rgba(5,5,5,0.92);
-  border-radius:4px;
-  box-shadow:0 14px 34px rgba(0,0,0,0.5);
+.patrocinador-texto{
+  font-family:var(--display);
+  font-size:18px;
+  color:var(--white-dim);
+  letter-spacing:0.02em;
 }
 .sponsor-name{
   font-family:var(--display);
@@ -2302,12 +2297,12 @@ a:focus-visible, button:focus-visible{
     </div>
     <div class="clasi-scroll">
       <div class="clasi-header">
-        <span>Pos</span>
+        <span>P.</span>
         <span class="clasi-col-equipo">Equipo</span>
         <span>PJ</span>
-        <span>G</span>
-        <span>E</span>
-        <span>P</span>
+        <span>PG</span>
+        <span>PE</span>
+        <span>PP</span>
         <span>GF</span>
         <span>GC</span>
         <span>DG</span>
@@ -2444,7 +2439,7 @@ a:focus-visible, button:focus-visible{
       <div class="sponsor-col tier-patrocinadores">
         <p class="sponsor-col-label">Patrocinadores</p>
         <div class="sponsor-names">
-          <img class="patrocinador-logo" src="assets/patrocinador-logo.svg" alt="Patrocinador">
+          <p class="patrocinador-texto">Empresa Tecnológica</p>
         </div>
       </div>
 
@@ -3014,8 +3009,8 @@ function pintarRadarResumen(){
     { label: "Partidos ganados", valor: `${ganados}/${jugados} (${porcentajeGanados}%)`, clase: "es-ganados" },
     { label: "Goles a favor",    valor: ultimo.golesFavor, clase: "es-gf" },
     { label: "Goles en contra",  valor: ultimo.golesContra, clase: "es-gc" },
-    { label: "Amarillas",        valor: totalAmarillas, clase: "es-amarilla" },
-    { label: "Rojas",            valor: totalRojas, clase: "es-roja" }
+    { label: "Tar. Amarilla",    valor: totalAmarillas, clase: "es-amarilla" },
+    { label: "Tar. Roja",        valor: totalRojas, clase: "es-roja" }
   ];
   cont.innerHTML = items.map(it => `
     <div class="radar-item">
