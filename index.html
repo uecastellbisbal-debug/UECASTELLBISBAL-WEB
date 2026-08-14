@@ -3208,14 +3208,14 @@ function parseFecha(fecha){
 }
 
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
-   la hoja tenga marcado a mano un estado (proximo / en_directo / final) es
-   la que manda -- el resto de filas se dejan con "-" o en blanco, tal como
-   ya explica el comentario de la sección CALENDARIO. Si ninguna fila tiene
-   nada marcado (por ejemplo, con los datos de ejemplo), se usa la fecha de
-   hoy como respaldo, igual que antes. ---------- */
+   la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda
+   (un partido ya "final" es historial, no debe volver a salir como
+   destacado aunque sea el más reciente). Si ninguna fila tiene "proximo"
+   ni "en_directo" (por ejemplo, con los datos de ejemplo, o si aún no se
+   ha marcado nada), se usa la fecha de hoy como respaldo. ---------- */
 function seleccionarPartidos(){
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
-  let indiceActual = ordenados.findIndex(p => p.estado);
+  let indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
 
   if(indiceActual === -1){
     const hoy = new Date();
@@ -3899,11 +3899,11 @@ function filaAPartido(fila){
     fecha: fila.fecha,
     hora: fila.hora,
     tipo: fila.tipo,
-    // se deja vacío tal cual si la fila no tiene nada marcado -- así
-    // seleccionarPartidos() sabe distinguir "esta es la fila destacada"
-    // de "esta fila no tiene nada que decir". Al pintar el banner ya se
-    // usa "proximo" por defecto si hiciera falta.
-    estado: (fila.estado && fila.estado !== "-") ? fila.estado : "",
+    // solo se acepta si es uno de los 3 valores válidos -- cualquier otra
+    // cosa (celda vacía, "-", o texto suelto tipo "na" que a veces deja una
+    // fórmula o un autorelleno de la hoja) se trata como "sin marcar", para
+    // que seleccionarPartidos() no la confunda con la fila destacada
+    estado: ["proximo", "en_directo", "final"].includes(fila.estado) ? fila.estado : "",
     golesLocal: numeroOVacio(fila.goles_local),
     golesVisitante: numeroOVacio(fila.goles_visitante),
     escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
