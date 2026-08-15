@@ -1594,6 +1594,43 @@ a:focus-visible, button:focus-visible{
   0%, 100%{ color:var(--lilac-light); }
   50%{ color:var(--white); }
 }
+.sponsors-cta-logos{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  margin:20px 0 6px;
+}
+.sponsors-cta-logo-badge{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--black-soft);
+  border:1px solid var(--line);
+}
+.sponsors-cta-logo-badge svg{
+  width:40px;
+  height:40px;
+  fill:none;
+  stroke:var(--lilac-light);
+  stroke-width:3.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.sponsors-cta-logo-club img{
+  width:56px;
+  height:56px;
+  object-fit:contain;
+}
+.sponsors-cta-logos-mas{
+  font-family:var(--display);
+  font-size:22px;
+  font-weight:800;
+  color:var(--lilac-light);
+}
 .sponsors-cta-bloque{
   max-width:600px;
   margin:0 auto;
@@ -2524,6 +2561,21 @@ a:focus-visible, button:focus-visible{
 
     <div class="sponsors-cta">
       <p class="sponsors-cta-titulo">¿Quieres que colaboremos?</p>
+
+      <div class="sponsors-cta-logos">
+        <div class="sponsors-cta-logo-badge">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="22" cy="24" r="10"></circle>
+            <path d="M4 54c0-11 8-18 18-18s18 7 18 18"></path>
+            <circle cx="46" cy="27" r="8"></circle>
+            <path d="M34 54c1-9 7-15 16-15s15 6 14 15" opacity="0.55"></path>
+          </svg>
+        </div>
+        <span class="sponsors-cta-logos-mas">+</span>
+        <div class="sponsors-cta-logo-badge sponsors-cta-logo-club">
+          <img src="assets/logo-uecastellbisbal.png" alt="UE Castellbisbal">
+        </div>
+      </div>
 
       <div class="sponsors-cta-bloque">
         <div class="sponsors-cta-divisor"></div>
