@@ -1504,6 +1504,27 @@ a:focus-visible, button:focus-visible{
 .clasi-row .clasi-equipo{
   text-align:left;
 }
+.clasi-header > span:first-child,
+.clasi-row > span:first-child,
+.clasi-header .clasi-col-equipo,
+.clasi-row .clasi-equipo{
+  position:sticky;
+  z-index:3;
+  background:var(--black);
+}
+.clasi-header > span:first-child,
+.clasi-row > span:first-child{
+  left:0;
+}
+.clasi-header .clasi-col-equipo,
+.clasi-row .clasi-equipo{
+  left:40px;
+  box-shadow:2px 0 6px rgba(0,0,0,0.35);
+}
+.clasi-row.es-nuestro > span:first-child,
+.clasi-row.es-nuestro .clasi-equipo{
+  background:#130a1f;
+}
 .clasi-row{
   border-bottom:1px solid var(--line);
   border-left:2px solid transparent;
