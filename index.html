@@ -4239,6 +4239,19 @@ document.getElementById("btnCompartirBanner").onclick = (e) => {
   compartirBanner();
 };
 
+/* ---------- PWA de prueba: registro del service worker ----------
+   Chrome/Android exige un service worker registrado (además del
+   manifest) para considerar la web instalable y disparar
+   "beforeinstallprompt" -- sin esto, el botón de abajo nunca llega a
+   aparecer en Android. El service worker no cachea nada (ver su propio
+   archivo), así que esto no afecta a que los datos se sigan viendo
+   siempre al día. */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(() => {});
+  });
+}
+
 /* ---------- PWA de prueba: botón "Instalar app" ----------
    En Android/Chrome, Chrome dispara "beforeinstallprompt" cuando la web
    cumple los requisitos (manifest + iconos); guardamos ese evento y lo
