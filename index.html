@@ -139,18 +139,22 @@ a:focus-visible, button:focus-visible{
   display:flex;
   align-items:center;
   justify-content:center;
+  gap:16px;
+  padding:0 12px;
   background:var(--lilac-dark);
   border-bottom:1px solid rgba(123,53,200,0.4);
 }
-.top-bar p{
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
-  color:var(--lilac-light);
+.top-bar .brand-instagram{
+  font-size:10.5px;
+  gap:5px;
 }
-.top-bar p strong{ color:var(--white); font-weight:800; }
-
+.top-bar .brand-instagram svg{ width:14px; height:14px; }
+.top-bar .brand-plantilla-temp{ padding:3px 9px; }
+@media (max-width:480px){
+  .top-bar{ gap:10px; }
+  .top-bar .brand-instagram span{ display:none; }
+  .top-bar .brand-instagram{ gap:0; }
+}
 /* ============================================================
    HEADER
    ============================================================ */
@@ -160,7 +164,7 @@ a:focus-visible, button:focus-visible{
 .masthead-logo{
   display:flex;
   justify-content:center;
-  padding:146px 24px 6px; /* la cabecera sigue en 2 líneas mientras esté el enlace temporal de "Plantilla 26/27" */
+  padding:110px 24px 6px;
   position:relative;
 }
 .masthead-logo::before{
@@ -193,7 +197,7 @@ a:focus-visible, button:focus-visible{
   z-index:1;
 }
 @media (max-width:640px){
-  .masthead-logo{ padding:132px 16px 4px; }
+  .masthead-logo{ padding:121px 16px 4px; }
   .masthead-logo img{ height:83px; width:294px; }
   .masthead-logo::before{ top:24px; width:150px; height:150px; }
 }
@@ -415,9 +419,8 @@ a:focus-visible, button:focus-visible{
 }
 .brand{
   display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:6px;
+  align-items:center;
+  gap:10px;
 }
 .brand-instagram{
   display:inline-flex;
@@ -2134,25 +2137,23 @@ a:focus-visible, button:focus-visible{
 <div class="hero-photo" role="img" aria-label="Campo municipal de la UE Castellbisbal"></div>
 
 <div class="top-bar">
-  <p>Web de aficionados · <strong>Primer equipo</strong></p>
+  <a class="brand-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    <span>Sigue a la UE en Instagram</span>
+  </a>
+  <!-- ENLACE TEMPORAL: solo para las primeras jornadas, luego se quita
+       este <a> -- la plantilla ya está siempre disponible en el menú de
+       arriba -->
+  <a class="brand-instagram brand-plantilla-temp" href="#plantilla">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 4h6a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+    <span>Plantilla 26/27</span>
+  </a>
 </div>
 
 <header class="site-header" id="siteHeader">
   <div class="wrap">
     <div class="brand">
       <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
-      <a class="brand-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        <span>Sigue a la UE en Instagram</span>
-      </a>
-      <!-- ENLACE TEMPORAL: solo para las primeras jornadas, luego se
-           quita este <a> (y se puede volver a poner .brand en fila con
-           flex-direction:row si ya no hace falta la segunda línea) --
-           la plantilla ya está siempre disponible en el menú de arriba -->
-      <a class="brand-instagram brand-plantilla-temp" href="#plantilla">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 4h6a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
-        <span>Plantilla 26/27</span>
-      </a>
     </div>
     <nav class="header-nav" id="headerNav">
       <a href="#ultimo-partido">Último partido</a>
