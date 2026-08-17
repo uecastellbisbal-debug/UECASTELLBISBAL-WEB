@@ -60,7 +60,7 @@
 
 *{ margin:0; padding:0; box-sizing:border-box; }
 
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overscroll-behavior-y:none; }
 
 body{
   background:var(--black);
@@ -145,14 +145,14 @@ a:focus-visible, button:focus-visible{
   border-bottom:1px solid rgba(123,53,200,0.4);
 }
 .top-bar .brand-instagram{
-  font-size:12.5px;
+  font-size:14.5px;
   gap:5px;
 }
 .top-bar .brand-instagram svg{ width:14px; height:14px; }
 .top-bar .brand-plantilla-temp{ padding:3px 9px; }
 @media (max-width:480px){
   .top-bar{ gap:8px; padding:0 8px; }
-  .top-bar .brand-instagram{ font-size:11px; gap:4px; }
+  .top-bar .brand-instagram{ font-size:13px; gap:4px; }
   .top-bar .brand-instagram svg{ width:12px; height:12px; }
   .top-bar .brand-plantilla-temp{ padding:3px 7px; }
 }
