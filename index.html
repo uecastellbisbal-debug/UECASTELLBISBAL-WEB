@@ -145,14 +145,14 @@ a:focus-visible, button:focus-visible{
   border-bottom:1px solid rgba(123,53,200,0.4);
 }
 .top-bar .brand-instagram{
-  font-size:10.5px;
+  font-size:12.5px;
   gap:5px;
 }
 .top-bar .brand-instagram svg{ width:14px; height:14px; }
 .top-bar .brand-plantilla-temp{ padding:3px 9px; }
 @media (max-width:480px){
   .top-bar{ gap:8px; padding:0 8px; }
-  .top-bar .brand-instagram{ font-size:9px; gap:4px; }
+  .top-bar .brand-instagram{ font-size:11px; gap:4px; }
   .top-bar .brand-instagram svg{ width:12px; height:12px; }
   .top-bar .brand-plantilla-temp{ padding:3px 7px; }
 }
@@ -3711,7 +3711,7 @@ async function localizarCampo(partido, esLocal){
 /* convierte "DD/MM/AAAA" a "AAAA-MM-DD", el formato que pide Open-Meteo */
 function fechaParaOpenMeteo(fecha){
   const [d, m, y] = fecha.split("/");
-  return `${y}-${m}-${d}`;
+  return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
 }
 
 async function cargarClimaPartido(partido, esLocal){
