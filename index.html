@@ -3367,7 +3367,7 @@ function pintarClasificacion(){
     row.className = "clasi-row" + (eq.esNuestro ? " es-nuestro" : "");
     row.innerHTML = `
       <span class="clasi-pos">${i + 1}</span>
-      <span class="clasi-equipo"><img class="clasi-crest" src="${escudo}" alt="">${eq.equipo}</span>
+      <span class="clasi-equipo"><img class="clasi-crest" src="${escudo}" alt="">${escaparHTML(eq.equipo)}</span>
       <span class="clasi-pts">${eq.pts}</span>
       <span>${eq.pj}</span>
       <span>${eq.g}</span>
@@ -4225,7 +4225,7 @@ function pintarCalendario(){
     row.innerHTML = `
       <span class="cal-jornada">J${p.jornada}</span>
       <span class="cal-tipo ${esLocal ? "local" : "visitante"}">${esLocal ? "L" : "V"}</span>
-      <span class="cal-rival"><img class="cal-crest" src="${escudoRival}" alt=""><span class="cal-rival-text">${p.rival}</span></span>
+      <span class="cal-rival"><img class="cal-crest" src="${escudoRival}" alt=""><span class="cal-rival-text">${escaparHTML(p.rival)}</span></span>
       ${fechaHTML}
       ${horaHTML}
       <span class="cal-bola"></span>
@@ -4348,6 +4348,16 @@ const URL_CALENDARIO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG
 function fetchCSVSinCache(url){
   const sinCache = url + (url.includes("?") ? "&" : "?") + "cb=" + Date.now();
   return fetch(sinCache, { cache: "no-store" });
+}
+
+/* ---------- escapa texto que viene de la hoja antes de meterlo con innerHTML
+   (nombres de rival, de equipo...): sin esto, cualquiera con permiso de
+   edición en el Google Sheet podría colar HTML/JS en una celda y que se
+   ejecutara en el navegador de quien visite la web ---------- */
+function escaparHTML(texto){
+  const div = document.createElement("div");
+  div.textContent = texto ?? "";
+  return div.innerHTML;
 }
 
 /* ---------- parser de CSV sencillo pero que respeta comas dentro de comillas
