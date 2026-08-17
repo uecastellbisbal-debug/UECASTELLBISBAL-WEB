@@ -167,22 +167,14 @@ a:focus-visible, button:focus-visible{
 }
 .top-bar .brand-instagram svg{ width:14px; height:14px; }
 .top-bar .brand-plantilla-temp{ padding:4px 9px 7px; }
-.top-bar .brand-instalar-app{ padding:4px 9px 7px; }
 @media (max-width:480px){
   .top-bar{ gap:6px; padding:0 6px; }
   .top-bar .brand-instagram{ font-size:12.5px; gap:3px; }
   .top-bar .brand-instagram svg{ width:11px; height:11px; }
   .top-bar .brand-plantilla-temp{ padding:3px 6px 6px; }
-  .top-bar .brand-instalar-app{ padding:3px 6px 6px; }
 }
 @media (max-width:340px){
   .top-bar .brand-instagram span{ white-space:nowrap; }
-}
-@media (max-width:360px){
-  /* con las dos pastillas a la vez no cabe el texto entero: en pantallas
-     muy estrechas, "Instala nuestra APP" se queda solo en icono */
-  .top-bar .brand-instalar-app span{ display:none; }
-  .top-bar .brand-instalar-app{ gap:0; }
 }
 /* ============================================================
    HEADER
@@ -488,20 +480,6 @@ a:focus-visible, button:focus-visible{
 @media (max-width:640px){
   .brand-plantilla-temp{ padding:4px 10px; }
 }
-.brand-instalar-app{
-  border:none;
-  background:rgba(0,0,0,0.4);
-  color:var(--lilac-light);
-  padding:5px 12px;
-  border-radius:20px;
-  box-shadow:0 3px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(168,104,232,0.4);
-  cursor:pointer;
-}
-.brand-instalar-app svg{ color:var(--lilac-light); }
-.brand-instalar-app:hover{ color:var(--white); background:rgba(0,0,0,0.6); }
-@media (max-width:640px){
-  .brand-instalar-app{ padding:4px 10px; }
-}
 @media (max-width:640px){
   .brand-instagram{ font-size:11.5px; gap:6px; }
   .brand-instagram svg{ width:17px; height:17px; }
@@ -588,6 +566,21 @@ a:focus-visible, button:focus-visible{
   }
   .nav-instagram svg{ width:18px; height:18px; flex:none; color:var(--lilac-light); }
   .nav-instagram:hover{ color:var(--white); }
+  .nav-instalar-app{
+    margin-left:22px;
+    margin-bottom:-8px;
+    border:none;
+    border-bottom:none;
+    background:none;
+    padding:0;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:800;
+    color:var(--lilac-light);
+    animation:live-blink 1.3s infinite;
+  }
+  .nav-instalar-app svg{ color:var(--lilac-light); }
+  .nav-instalar-app:hover{ color:var(--white); }
 }
 
 /* ============================================================
@@ -2348,12 +2341,6 @@ a:focus-visible, button:focus-visible{
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 4h6a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
     <span>Conoce nuestra plantilla 26/27</span>
   </a>
-  <!-- PRUEBA PWA: solo se muestra si el navegador puede instalar la web
-       como app (o en iOS, donde siempre se explica el paso manual) -->
-  <button class="brand-instagram brand-instalar-app" id="btnInstalarApp" type="button" aria-label="Instala nuestra APP" style="display:none;">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-    <span>Instala nuestra APP</span>
-  </button>
 </div>
 
 <header class="site-header" id="siteHeader">
@@ -2362,6 +2349,12 @@ a:focus-visible, button:focus-visible{
       <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
     </div>
     <nav class="header-nav" id="headerNav">
+      <!-- PRUEBA PWA: solo se muestra si el navegador puede instalar la
+           web como app (o en iOS, donde siempre se explica el paso manual) -->
+      <button class="nav-instagram nav-instalar-app" id="btnInstalarApp" type="button" aria-label="Instala nuestra APP" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <span>Instala nuestra APP</span>
+      </button>
       <a class="nav-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         <span>Sigue a la UE en Instagram</span>
