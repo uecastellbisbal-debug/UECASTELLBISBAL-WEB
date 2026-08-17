@@ -27,6 +27,18 @@
 <meta name="twitter:image" content="https://uecastellbisbal-debug.github.io/UECASTELLBISBAL-WEB/assets/logo-uecastellbisbal.png">
 
 <link rel="icon" type="image/png" id="favicon" href="">
+
+<!-- PWA: permite "instalar" la web como app en el móvil (icono en pantalla
+     de inicio, se abre a pantalla completa sin la barra del navegador).
+     Sigue siendo la misma web -- los datos se siguen leyendo en directo
+     de Google Sheets cada vez que se abre, igual que en el navegador. -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2e1150">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UE Castellbisbal">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -392,7 +404,7 @@ a:focus-visible, button:focus-visible{
   margin-top:18px;
   display:flex;
   justify-content:center;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
   gap:10px;
 }
 @media (max-width:640px){
@@ -2382,6 +2394,7 @@ a:focus-visible, button:focus-visible{
     <div class="live-actions">
       <a class="match-action match-action-primary" id="btnCompartirBanner" href="#" target="_blank" rel="noopener">Compartir</a>
       <a class="match-action" id="btnAnadirCalendario" href="#" target="_blank" rel="noopener" style="display:none;">📅 Añadir al calendario</a>
+      <button class="match-action" id="btnInstalarApp" type="button" style="display:none;">📲 Instalar app</button>
     </div>
   </div>
 </section>
@@ -4205,6 +4218,47 @@ document.getElementById("btnCompartirBanner").onclick = (e) => {
   e.preventDefault();
   compartirBanner();
 };
+
+/* ---------- PWA de prueba: botón "Instalar app" ----------
+   En Android/Chrome, Chrome dispara "beforeinstallprompt" cuando la web
+   cumple los requisitos (manifest + iconos); guardamos ese evento y lo
+   lanzamos al pulsar el botón. iOS Safari no tiene esa API -- ahí solo
+   podemos explicarle al usuario cómo hacerlo a mano (Compartir > Añadir
+   a pantalla de inicio). Si ya está instalada, el botón no se muestra. */
+const btnInstalarApp = document.getElementById("btnInstalarApp");
+let promptInstalacionDiferido = null;
+
+function appYaInstalada(){
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+function esIOS(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+
+if(!appYaInstalada() && esIOS()){
+  btnInstalarApp.style.display = "";
+}
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  promptInstalacionDiferido = e;
+  if(!appYaInstalada()) btnInstalarApp.style.display = "";
+});
+
+btnInstalarApp.onclick = async () => {
+  if(promptInstalacionDiferido){
+    promptInstalacionDiferido.prompt();
+    await promptInstalacionDiferido.userChoice;
+    promptInstalacionDiferido = null;
+    btnInstalarApp.style.display = "none";
+  }else if(esIOS()){
+    alert('Para instalar la app: toca el botón "Compartir" (el cuadrado con la flecha hacia arriba) y luego "Añadir a pantalla de inicio".');
+  }
+};
+
+window.addEventListener("appinstalled", () => {
+  btnInstalarApp.style.display = "none";
+});
 document.getElementById("btnVerMasCalendario").onclick = () => {
   calendarioMostrarTodo = true;
   pintarCalendario();
