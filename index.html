@@ -491,6 +491,7 @@ a:focus-visible, button:focus-visible{
   color:var(--white);
 }
 .header-nav a:hover{ color:var(--white); }
+.nav-instagram{ display:none; }
 
 .menu-toggle{
   display:none;
@@ -532,6 +533,21 @@ a:focus-visible, button:focus-visible{
   }
   .header-nav.is-open{ transform:translateX(0); }
   .menu-toggle{ display:flex; z-index:101; }
+  .nav-instagram{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-left:14px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+    text-transform:none;
+    letter-spacing:normal;
+    font-weight:700;
+    color:var(--lilac-light);
+  }
+  .nav-instagram svg{ width:18px; height:18px; flex:none; color:var(--lilac-light); }
+  .nav-instagram:hover{ color:var(--white); }
 }
 
 /* ============================================================
@@ -584,8 +600,17 @@ a:focus-visible, button:focus-visible{
    siempre, y la foto queda como una atmósfera fija de fondo,
    visible sobre todo en la cabecera y el hero.
    -------------------------------------------------------------- */
+/* la zona marca la altura real (cabecera + logo + banner + recuadro lila):
+   la foto es absolute dentro de ella, así que no puede pintarse ni un
+   píxel más abajo del final de "Cero insultos en la grada", y overflow:
+   hidden recorta cualquier margen que el zoom del Ken Burns saque de esa
+   caja */
+.hero-photo-zone{
+  position:relative;
+  overflow:hidden;
+}
 .hero-photo{
-  position:fixed;
+  position:absolute;
   inset:0;
   z-index:-2;
   background-size:cover;
@@ -1874,6 +1899,7 @@ a:focus-visible, button:focus-visible{
 @media (max-width:768px){
   .hero-about-section{ padding:48px 0; }
   .about-grid{ grid-template-columns:1fr; gap:28px; }
+  .about-block-pueblo{ border-top:none; }
 }
 
 /* ============================================================
@@ -2274,13 +2300,7 @@ a:focus-visible, button:focus-visible{
 <script src="https://alcdn.msauth.net/browser/3.14.0/js/msal-browser.min.js" defer></script>
 </head>
 <body>
-<div class="hero-photo" role="img" aria-label="Campo municipal de la UE Castellbisbal"></div>
-
 <div class="top-bar">
-  <a class="brand-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-    <span>Sigue a la UE en Instagram</span>
-  </a>
   <!-- ENLACE TEMPORAL: solo para las primeras jornadas, luego se quita
        este <a> -- la plantilla ya está siempre disponible en el menú de
        arriba -->
@@ -2296,6 +2316,10 @@ a:focus-visible, button:focus-visible{
       <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
     </div>
     <nav class="header-nav" id="headerNav">
+      <a class="nav-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span>Sigue a la UE en Instagram</span>
+      </a>
       <a href="#ultimo-partido">Último partido</a>
       <a href="#radar-resumen">Radar de temporada</a>
       <a href="#calendario">Calendario y resultados</a>
@@ -2309,6 +2333,13 @@ a:focus-visible, button:focus-visible{
     </button>
   </div>
 </header>
+
+<!-- La foto de fondo va confinada a esta zona (cabecera, logo, banner y
+     recuadro lila): al ser position:absolute dentro de un contenedor cuya
+     altura la marcan estos mismos bloques, es fisicamente imposible que se
+     vea mas alla del final de "Cero insultos en la grada" -->
+<div class="hero-photo-zone">
+  <div class="hero-photo" role="img" aria-label="Campo municipal de la UE Castellbisbal"></div>
 
 <div class="masthead-logo">
   <img src="assets/logo-uecastellbisbal.png" alt="UE Castellbisbal — uecastellbisbal.cat">
@@ -2380,15 +2411,10 @@ a:focus-visible, button:focus-visible{
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
   </a>
 </section>
+</div>
+<!-- fin hero-photo-zone -->
 
-<!-- ============ A PARTIR DE AQUÍ: fondo negro sólido normal ============
-     La foto fija solo debe verse en la cabecera y el hero de arriba. Todo
-     lo que viene después va dentro de este contenedor, que es una caja
-     normal (no ligada al hero) con su propio fondo negro opaco: al pintarse
-     por encima de la foto (que tiene z-index negativo) la tapa del todo,
-     de forma estable durante el scroll -- no depende de sombras de texto
-     ni de que cada tarjeta individual sea opaca, evitando destellos de la
-     imagen al hacer scroll rápido. -->
+<!-- ============ A PARTIR DE AQUÍ: fondo negro sólido normal ============ -->
 <div class="page-body">
 
 <!-- ============ ÚLTIMO PARTIDO ============ -->
@@ -2719,7 +2745,7 @@ a:focus-visible, button:focus-visible{
         <li><span class="pueblo-top10-icon">⛪</span><div><strong>Església de Sant Vicenç</strong><p>Templo histórico que preside el centro urbano y constituye uno de los principales referentes patrimoniales del municipio.</p></div></li>
         <li><span class="pueblo-top10-icon">🏰</span><div><strong>Torre Fossada</strong><p>Vestigio del pasado medieval de Castellbisbal y testimonio de la importancia estratégica que tuvo el territorio a lo largo de la historia.</p></div></li>
         <li><span class="pueblo-top10-icon">🌳</span><div><strong>Entorno del río Llobregat</strong><p>Un espacio natural privilegiado para caminar, correr, ir en bicicleta o simplemente disfrutar de la naturaleza a pocos minutos del casco urbano.</p></div></li>
-        <li><span class="pueblo-top10-icon">🥾</span><div><strong>Riera de Rubí</strong><p>Uno de los elementos naturales más característicos del municipio, con rutas y paisajes que conectan Castellbisbal con su entorno más rural.</p></div></li>
+        <li><span class="pueblo-top10-icon">🥾</span><div><strong>La Font de la Botzegada</strong><p>También llamada Salt de la Botzegada, es un rincón natural e insólito de Castellbisbal. Un paraje húmedo en el curso del torrente de Pegueres, famoso por albergar una pequeña cascada que fluye con mayor intensidad en épocas de lluvia.</p></div></li>
         <li><span class="pueblo-top10-icon">🌲</span><div><strong>Urbanizaciones y miradores</strong><p>Zonas como Can Costa, Can Santeugini o Comte de Sert ofrecen tranquilidad, naturaleza y algunas de las mejores vistas sobre el municipio y el valle del Llobregat.</p></div></li>
         <li><span class="pueblo-top10-icon">🚂</span><div><strong>Viaductos y puentes ferroviarios</strong><p>Las impresionantes infraestructuras ferroviarias de Castellbisbal se han convertido en una seña de identidad del paisaje local, reflejando la importancia logística y de comunicaciones del municipio.</p></div></li>
         <li><span class="pueblo-top10-icon">⚽</span><div><strong>Campo Municipal</strong><p>La casa de la UE Castellbisbal y uno de los principales puntos de encuentro deportivo del municipio, donde cada fin de semana se reúnen generaciones de aficionados para vivir el fútbol local.</p></div></li>
@@ -3421,6 +3447,14 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
   let svg = `<svg viewBox="0 0 ${ancho} ${alto}" preserveAspectRatio="none">`;
   svg += `<line x1="${padZq}" y1="${padArr + areaAlto}" x2="${ancho - padDer}" y2="${padArr + areaAlto}" stroke="rgba(245,245,243,0.12)" stroke-width="1"/>`;
   svg += `<line x1="${padZq}" y1="${padArr}" x2="${padZq}" y2="${padArr + areaAlto}" stroke="rgba(245,245,243,0.12)" stroke-width="1"/>`;
+
+  // línea guía, fina y discontinua: enlaza visualmente el último dato real
+  // con su jornada, proyectándose desde el eje hasta arriba del todo
+  const ultimaJornada = jornadas[jornadas.length - 1];
+  if(ultimaJornada < maxX){
+    const xUltima = pixelX(ultimaJornada).toFixed(1);
+    svg += `<line x1="${xUltima}" y1="${padArr + areaAlto}" x2="${xUltima}" y2="${padArr}" stroke="rgba(245,245,243,0.35)" stroke-width="0.6" stroke-dasharray="2,2"/>`;
+  }
 
   series.forEach(s => {
     if(s.colorFn){
