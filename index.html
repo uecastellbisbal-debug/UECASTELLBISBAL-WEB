@@ -151,9 +151,13 @@ a:focus-visible, button:focus-visible{
 .top-bar .brand-instagram svg{ width:14px; height:14px; }
 .top-bar .brand-plantilla-temp{ padding:3px 9px; }
 @media (max-width:480px){
-  .top-bar{ gap:10px; }
-  .top-bar .brand-instagram span{ display:none; }
-  .top-bar .brand-instagram{ gap:0; }
+  .top-bar{ gap:8px; padding:0 8px; }
+  .top-bar .brand-instagram{ font-size:9px; gap:4px; }
+  .top-bar .brand-instagram svg{ width:12px; height:12px; }
+  .top-bar .brand-plantilla-temp{ padding:3px 7px; }
+}
+@media (max-width:340px){
+  .top-bar .brand-instagram span{ white-space:nowrap; }
 }
 /* ============================================================
    HEADER
