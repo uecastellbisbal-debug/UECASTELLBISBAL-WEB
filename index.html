@@ -1877,6 +1877,138 @@ a:focus-visible, button:focus-visible{
 }
 
 /* ============================================================
+   NUESTRO PUEBLO (5º bloque de "Sobre nosotros", a todo lo ancho)
+   ============================================================ */
+.about-block-pueblo{
+  grid-column:1 / -1;
+  padding-top:40px;
+  margin-top:8px;
+  border-top:1px solid var(--line);
+}
+.about-block-pueblo .about-block-text{ margin-bottom:20px; max-width:760px; }
+.pueblo-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:none;
+  border:none;
+  padding:0;
+  font-family:var(--display);
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--lilac-light);
+  cursor:pointer;
+  transition:color .2s ease;
+}
+.pueblo-toggle:hover{ color:var(--white); }
+.pueblo-toggle svg{
+  width:16px; height:16px;
+  transition:transform .25s ease;
+}
+.pueblo-toggle[aria-expanded="true"] svg{ transform:rotate(180deg); }
+.pueblo-mas{ margin-top:24px; }
+.pueblo-subtitulo{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:14px;
+  letter-spacing:0.06em;
+  color:var(--white);
+  margin:28px 0 14px;
+}
+.pueblo-cifras-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px 24px;
+}
+.pueblo-cifra{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  font-size:13.5px;
+  line-height:1.5;
+  color:var(--white-dim);
+}
+.pueblo-cifra strong{ color:var(--white); font-weight:700; }
+.pueblo-top10{
+  list-style:none;
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:18px 32px;
+  counter-reset:pueblo-top10;
+}
+.pueblo-top10 li{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+.pueblo-top10-icon{
+  flex:none;
+  font-size:20px;
+  line-height:1.4;
+}
+.pueblo-top10 li strong{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--display);
+  font-size:13.5px;
+  letter-spacing:0.02em;
+  color:var(--white);
+  counter-increment:pueblo-top10;
+}
+.pueblo-top10 li strong::before{
+  content:counter(pueblo-top10);
+  flex:none;
+  width:18px; height:18px;
+  border-radius:50%;
+  background:var(--lilac);
+  color:var(--white);
+  font-size:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.pueblo-top10 li p{
+  margin-top:6px;
+  font-size:13px;
+  line-height:1.6;
+  color:var(--white-dim);
+}
+.pueblo-columnas{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:32px;
+  margin-top:28px;
+}
+.pueblo-lista{
+  list-style:none;
+}
+.pueblo-lista li{
+  position:relative;
+  padding-left:16px;
+  font-size:13.5px;
+  line-height:1.7;
+  color:var(--white-dim);
+}
+.pueblo-lista li::before{
+  content:"";
+  position:absolute;
+  left:0; top:9px;
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--lilac-light);
+}
+@media (max-width:768px){
+  .pueblo-cifras-grid{ grid-template-columns:1fr 1fr; }
+  .pueblo-top10{ grid-template-columns:1fr; }
+  .pueblo-columnas{ grid-template-columns:1fr; gap:24px; }
+}
+@media (max-width:480px){
+  .pueblo-cifras-grid{ grid-template-columns:1fr; }
+}
+
+/* ============================================================
    BOTÓN "VOLVER ARRIBA"
    ============================================================ */
 .back-to-top{
@@ -2551,6 +2683,71 @@ a:focus-visible, button:focus-visible{
       <h2 class="about-block-title">Nuestro equipo</h2>
       <p class="about-block-text">Nuestro primer equipo compite esta temporada 2026/27 en el Grupo 12 de Tercera Catalana, la categoría organizada por la Federació Catalana de Futbol.</p>
       <a class="about-link" href="https://www.fcf.cat/ca/competicio?temporadaId=22&disciplinaId=19308233&competicioId=58161869&grupId=58161883" target="_blank" rel="noopener">Acceso FCF grupo 12 de tercera catalana</a>
+    </div>
+    <div class="about-block about-block-pueblo">
+      <span class="about-number">05</span>
+      <svg class="about-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <h2 class="about-block-title">Nuestro pueblo</h2>
+      <p class="about-block-text">Castellbisbal, corazón del Vallès Occidental. Un municipio de más de 13.000 habitantes situado junto al río Llobregat, donde historia, naturaleza, deporte y tradición conviven a pocos minutos de Barcelona. Desde el emblemático Puente del Diablo hasta sus espacios naturales y su intensa vida asociativa, Castellbisbal ofrece una identidad única que combina pasado, presente y futuro.</p>
+
+      <button class="pueblo-toggle" id="puebloToggle" type="button" aria-expanded="false" aria-controls="puebloMas">
+        <span>Conocer más sobre Castellbisbal</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <div class="pueblo-mas" id="puebloMas" hidden>
+      <p class="pueblo-subtitulo">Castellbisbal en cifras</p>
+      <div class="pueblo-cifras-grid">
+        <div class="pueblo-cifra"><span>📍</span><span><strong>Comarca:</strong> Vallès Occidental</span></div>
+        <div class="pueblo-cifra"><span>🌍</span><span><strong>Provincia:</strong> Barcelona</span></div>
+        <div class="pueblo-cifra"><span>📏</span><span><strong>Superficie:</strong> 31 km²</span></div>
+        <div class="pueblo-cifra"><span>👥</span><span><strong>Población:</strong> aproximadamente 13.000 habitantes</span></div>
+        <div class="pueblo-cifra"><span>⛰️</span><span><strong>Altitud:</strong> 132 m sobre el nivel del mar</span></div>
+        <div class="pueblo-cifra"><span>🚗</span><span><strong>Distancia a Barcelona:</strong> 30 km</span></div>
+        <div class="pueblo-cifra"><span>🌊</span><span><strong>Río principal:</strong> Llobregat</span></div>
+        <div class="pueblo-cifra"><span>🚆</span><span><strong>Conexiones:</strong> AP-7, A-2, C-243c y líneas de cercanías</span></div>
+        <div class="pueblo-cifra"><span>🏘️</span><span><strong>Núcleos y urbanizaciones:</strong> Castellbisbal pueblo, Can Costa, Can Santeugini, Comte de Sert, Santa Teresita, Costablanca, entre otros</span></div>
+      </div>
+
+      <p class="about-block-text">Situado en un punto estratégico entre Barcelona y el interior de Cataluña, Castellbisbal combina tradición, entorno natural e importante actividad industrial y logística. El municipio se encuentra en la confluencia del río Llobregat y la riera de Rubí, lo que ha convertido el territorio en un lugar de paso y asentamiento desde épocas muy antiguas.</p>
+
+      <p class="pueblo-subtitulo">⭐ Top 10 lugares imprescindibles de Castellbisbal</p>
+      <ol class="pueblo-top10">
+        <li><span class="pueblo-top10-icon">🌉</span><div><strong>Pont del Diable</strong><p>El gran icono de Castellbisbal. Este histórico puente de origen romano formó parte de la antigua Vía Augusta y es uno de los monumentos más emblemáticos del Baix Llobregat y el Vallès.</p></div></li>
+        <li><span class="pueblo-top10-icon">🚶</span><div><strong>Carrer Major</strong><p>La calle más representativa del municipio. Pasear por el Carrer Major es descubrir la esencia de Castellbisbal, con sus comercios, terrazas y el ambiente cotidiano de la vida local.</p></div></li>
+        <li><span class="pueblo-top10-icon">⛪</span><div><strong>Plaça de l'Església</strong><p>El auténtico corazón del pueblo. Un espacio de encuentro para vecinos y visitantes donde se celebran actos, fiestas y eventos que forman parte de la identidad de Castellbisbal.</p></div></li>
+        <li><span class="pueblo-top10-icon">⛪</span><div><strong>Església de Sant Vicenç</strong><p>Templo histórico que preside el centro urbano y constituye uno de los principales referentes patrimoniales del municipio.</p></div></li>
+        <li><span class="pueblo-top10-icon">🏰</span><div><strong>Torre Fossada</strong><p>Vestigio del pasado medieval de Castellbisbal y testimonio de la importancia estratégica que tuvo el territorio a lo largo de la historia.</p></div></li>
+        <li><span class="pueblo-top10-icon">🌳</span><div><strong>Entorno del río Llobregat</strong><p>Un espacio natural privilegiado para caminar, correr, ir en bicicleta o simplemente disfrutar de la naturaleza a pocos minutos del casco urbano.</p></div></li>
+        <li><span class="pueblo-top10-icon">🥾</span><div><strong>Riera de Rubí</strong><p>Uno de los elementos naturales más característicos del municipio, con rutas y paisajes que conectan Castellbisbal con su entorno más rural.</p></div></li>
+        <li><span class="pueblo-top10-icon">🌲</span><div><strong>Urbanizaciones y miradores</strong><p>Zonas como Can Costa, Can Santeugini o Comte de Sert ofrecen tranquilidad, naturaleza y algunas de las mejores vistas sobre el municipio y el valle del Llobregat.</p></div></li>
+        <li><span class="pueblo-top10-icon">🚂</span><div><strong>Viaductos y puentes ferroviarios</strong><p>Las impresionantes infraestructuras ferroviarias de Castellbisbal se han convertido en una seña de identidad del paisaje local, reflejando la importancia logística y de comunicaciones del municipio.</p></div></li>
+        <li><span class="pueblo-top10-icon">⚽</span><div><strong>Campo Municipal</strong><p>La casa de la UE Castellbisbal y uno de los principales puntos de encuentro deportivo del municipio, donde cada fin de semana se reúnen generaciones de aficionados para vivir el fútbol local.</p></div></li>
+      </ol>
+
+      <div class="pueblo-columnas">
+        <div>
+          <p class="pueblo-subtitulo">Naturaleza y deporte</p>
+          <ul class="pueblo-lista">
+            <li>Senderos junto al río Llobregat.</li>
+            <li>Rutas BTT y de montaña.</li>
+            <li>Áreas forestales y miradores.</li>
+            <li>Campo Municipal de Fútbol.</li>
+            <li>Amplia red de instalaciones deportivas y actividades asociativas.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="pueblo-subtitulo">Identidad y tradiciones</p>
+          <p class="about-block-text">Castellbisbal es conocido por sus fiestas populares, su fuerte tejido asociativo y su sentimiento de pertenencia. Destacan:</p>
+          <ul class="pueblo-lista">
+            <li>Festa Major de Castellbisbal.</li>
+            <li>Tradiciones culturales catalanas.</li>
+            <li>Entidades deportivas como la UE Castellbisbal.</li>
+            <li>Actividades de cultura popular y participación vecinal.</li>
+          </ul>
+        </div>
+      </div>
+      </div>
     </div>
   </div>
 </section>
@@ -4316,6 +4513,15 @@ headerNav.querySelectorAll("a").forEach(a => {
     menuToggle.classList.remove("is-open");
     menuToggle.setAttribute("aria-expanded", "false");
   });
+});
+
+/* ---------- "Nuestro pueblo": despliega el contenido ampliado ---------- */
+const puebloToggle = document.getElementById("puebloToggle");
+const puebloMas = document.getElementById("puebloMas");
+puebloToggle.addEventListener("click", () => {
+  const abierto = puebloMas.hidden;
+  puebloMas.hidden = !abierto;
+  puebloToggle.setAttribute("aria-expanded", abierto ? "true" : "false");
 });
 
 /* ---------- cabecera: fondo sólido al hacer scroll ---------- */
