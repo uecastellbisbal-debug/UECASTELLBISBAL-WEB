@@ -4252,13 +4252,15 @@ if("serviceWorker" in navigator){
   });
 }
 
-/* ---------- PWA de prueba: botón "Instalar app" ----------
+/* ---------- PWA de prueba: botón "Instalar app" / "Invita a usar nuestra APP" ----------
    En Android/Chrome, Chrome dispara "beforeinstallprompt" cuando la web
    cumple los requisitos (manifest + iconos); guardamos ese evento y lo
    lanzamos al pulsar el botón. iOS Safari no tiene esa API -- ahí solo
    podemos explicarle al usuario cómo hacerlo a mano (Compartir > Añadir
-   a pantalla de inicio). Si ya está instalada, el botón no se muestra. */
+   a pantalla de inicio). Si ya está instalada, el mismo botón cambia a
+   "Invita a usar nuestra APP", para compartir el enlace con otros. */
 const btnInstalarApp = document.getElementById("btnInstalarApp");
+const btnInstalarAppTexto = btnInstalarApp.querySelector("span");
 let promptInstalacionDiferido = null;
 
 function appYaInstalada(){
@@ -4268,7 +4270,15 @@ function esIOS(){
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
 }
 
-if(!appYaInstalada() && esIOS()){
+function mostrarBotonInvitar(){
+  btnInstalarAppTexto.textContent = "Invita a usar nuestra APP";
+  btnInstalarApp.setAttribute("aria-label", "Invita a usar nuestra APP");
+  btnInstalarApp.style.display = "";
+}
+
+if(appYaInstalada()){
+  mostrarBotonInvitar();
+}else if(esIOS()){
   btnInstalarApp.style.display = "";
 }
 
@@ -4278,12 +4288,24 @@ window.addEventListener("beforeinstallprompt", (e) => {
   if(!appYaInstalada()) btnInstalarApp.style.display = "";
 });
 
+window.addEventListener("appinstalled", () => {
+  promptInstalacionDiferido = null;
+  mostrarBotonInvitar();
+});
+
 btnInstalarApp.onclick = async () => {
-  if(promptInstalacionDiferido){
+  if(appYaInstalada()){
+    const texto = "📲 Instala la app de la UE Castellbisbal para tener siempre a mano el próximo partido, el calendario y la clasificación: " + location.href;
+    if(navigator.share){
+      try{ await navigator.share({ title: "UE Castellbisbal", text: texto, url: location.href }); }
+      catch(err){ /* si el usuario cancela el share nativo, no hacemos nada más */ }
+    }else{
+      window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+    }
+  }else if(promptInstalacionDiferido){
     promptInstalacionDiferido.prompt();
     await promptInstalacionDiferido.userChoice;
     promptInstalacionDiferido = null;
-    btnInstalarApp.style.display = "none";
   }else if(esIOS()){
     alert('Para instalar la app: toca el botón "Compartir" (el cuadrado con la flecha hacia arriba) y luego "Añadir a pantalla de inicio".');
   }
