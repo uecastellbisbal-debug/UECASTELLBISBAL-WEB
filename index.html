@@ -2956,16 +2956,18 @@ async function cargarRadarYPintar(calendarioListo){
 /* ============================================================
    CLASIFICACIÓN — se lee de su propia pestaña en Google Sheets
    ------------------------------------------------------------
-   Los puntos, la diferencia de goles y el orden de la tabla se
-   calculan solos: en la pestaña solo hace falta ir actualizando,
-   para el equipo (o equipos) que hayan jugado, estos datos:
+   La diferencia de goles y el orden de la tabla se calculan solos.
+   Los puntos ("Pun.") se leen tal cual de la hoja, no se recalculan
+   aquí, porque la federación a veces resta puntos por sanción y eso
+   no se puede deducir solo de partidos ganados/empatados.
 
-   Columnas de la pestaña (una fila por equipo, en este orden):
-   equipo, pj, g, e, p, gf, gc
+   Columnas de la pestaña (una fila por equipo, tal como las pega la
+   federación): Pos., Equipo, Pun., PJ, PG, PE, PP, GF, GC
 
      equipo -> nombre EXACTO del equipo (para la UE Castellbisbal,
                escribe exactamente "UE Castellbisbal", así la fila
                se resalta sola en lila)
+     pun    -> puntos
      pj     -> partidos jugados
      g      -> partidos ganados
      e      -> partidos empatados
@@ -2976,22 +2978,22 @@ async function cargarRadarYPintar(calendarioListo){
    Mientras URL_CLASIFICACION esté vacío, se usan estos datos de ejemplo.
    ============================================================ */
 let clasificacion = [
-  { equipo: "Penya Unión D. Málaga",         esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Abrera A.E.",                   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Sant Vicenç dels Horts",        esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "UE Castellbisbal",              esNuestro: true,  pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Castelldefels U.E. B",          esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Juan XXIII C.S.",               esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Martorell C.F. B",              esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Juventud 25 de Septiembre B",   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Mirasol-Baco Unión C.F.",       esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Penya Barcelonista Sant Vicenç",esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Sabadell Nord C.F.",            esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Rubí U.E. B",                   esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Vista Alegre U.D. B",           esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Torrelles U.E.",                esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Vallirana C.F.",                esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
-  { equipo: "Sant Andreu de la Barca",       esNuestro: false, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 }
+  { equipo: "Penya Unión D. Málaga",         esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Abrera A.E.",                   esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sant Vicenç dels Horts",        esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "UE Castellbisbal",              esNuestro: true,  pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Castelldefels U.E. B",          esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Juan XXIII C.S.",               esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Martorell C.F. B",              esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Juventud 25 de Septiembre B",   esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Mirasol-Baco Unión C.F.",       esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Penya Barcelonista Sant Vicenç",esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sabadell Nord C.F.",            esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Rubí U.E. B",                   esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Vista Alegre U.D. B",           esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Torrelles U.E.",                esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Vallirana C.F.",                esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 },
+  { equipo: "Sant Andreu de la Barca",       esNuestro: false, pun: 0, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0 }
 ];
 
 /* hoja de Google Sheets publicada como CSV (pestaña de clasificación). La
@@ -3050,6 +3052,7 @@ function filaAEquipoClasificacion(fila){
   return {
     equipo: nombreLimpio,
     esNuestro: nombreLimpio === "UE Castellbisbal",
+    pun: numero(fila["Pun."]),
     pj: numero(fila.PJ),
     g: numero(fila.PG),
     e: numero(fila.PE),
@@ -3089,7 +3092,7 @@ function pintarClasificacion(){
   const conCalculos = clasificacion.map(eq => ({
     ...eq,
     dg: eq.gf - eq.gc,
-    pts: eq.g * 3 + eq.e
+    pts: eq.pun
   }));
 
   conCalculos.sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf);
