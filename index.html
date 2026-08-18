@@ -4436,7 +4436,7 @@ window.addEventListener("load", () => {
   // Notification.permission para decidir si ocultar el botón: usamos
   // nuestra propia marca, que solo se guarda si de verdad se consiguió
   // el token. Así, si algo falla, el botón se queda para poder reintentar.
-  if(localStorage.getItem("avisosActivados") !== "1"){
+  if(localStorage.getItem("avisosActivadosV2") !== "1"){
     btnActivarAvisos.style.display = "";
   }
 
@@ -4465,7 +4465,7 @@ window.addEventListener("load", () => {
         }catch(errGuardado){
           console.error("No se pudo guardar el token en el Sheet:", errGuardado);
         }
-        localStorage.setItem("avisosActivados", "1");
+        localStorage.setItem("avisosActivadosV2", "1");
         btnActivarAvisos.querySelector("span").textContent = "Avisos activados";
         btnActivarAvisos.style.opacity = "0.6";
         btnActivarAvisos.style.pointerEvents = "none";
