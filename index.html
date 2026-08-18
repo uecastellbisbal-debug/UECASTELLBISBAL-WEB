@@ -182,72 +182,16 @@ a:focus-visible, button:focus-visible{
 /* ============================================================
    PARTIDO: PRÓXIMO / EN DIRECTO / FINAL
    ============================================================ */
-.masthead-logo{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:20px;
-  padding:108px 24px 6px;
-  position:relative;
-}
-.masthead-logo::before{
-  content:"";
-  position:absolute;
-  top:38px; left:50%;
-  width:260px; height:260px;
-  transform:translateX(-50%);
-  background:radial-gradient(circle, rgba(168,104,232,0.35) 0%, rgba(168,104,232,0) 70%);
-  filter:blur(6px);
-  animation:masthead-glow-pulse 5s ease-in-out infinite;
-  pointer-events:none;
-}
-@keyframes masthead-glow-pulse{
-  0%, 100%{ opacity:0.7; transform:translateX(-50%) scale(1); }
-  50%{ opacity:1; transform:translateX(-50%) scale(1.08); }
-}
-/* logotipo reconstruido en HTML/CSS (antes era un PNG plano): el escudo
-   ya está disponible como recurso limpio en el resto de la web, y el
-   texto usa las mismas fuentes que el resto del sitio -- así queda
-   nítido a cualquier tamaño y no hace falta recortar ninguna imagen */
-.masthead-crest{
-  width:64px; height:76px;
-  object-fit:contain;
-  flex:none;
-  filter:drop-shadow(0 4px 14px rgba(0,0,0,0.6));
-  position:relative;
-  z-index:1;
-}
-.masthead-text{
-  position:relative;
-  z-index:1;
-  text-align:left;
-}
-.masthead-title{
-  font-family:var(--display);
-  text-transform:uppercase;
-  font-size:clamp(22px, 4.6vw, 40px);
-  line-height:1;
-  letter-spacing:0.01em;
-  background:linear-gradient(180deg, #f7e9ab 0%, #d4af37 42%, #a8791f 58%, #f0d878 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-}
-@media (max-width:640px){
-  .masthead-logo{ padding:121px 16px 6px; gap:12px; }
-  .masthead-crest{ width:44px; height:52px; }
-}
-@media (max-width:400px){
-  .masthead-logo{ flex-direction:column; gap:8px; }
-  .masthead-text{ text-align:center; }
-}
 .live-banner{
+  /* deja hueco arriba para no meterse debajo de la barra lila + cabecera
+     (ambas position:fixed) -- antes lo hacía el logotipo de cabecera,
+     ahora que el título vive dentro del propio header, este es el primer
+     bloque en flujo normal, así que hereda ese hueco */
   margin-top:0;
-  padding:0 0 2px;
+  padding:104px 0 2px;
 }
 @media (max-width:640px){
-  .live-banner{ margin-top:0; }
+  .live-banner{ margin-top:0; padding-top:112px; }
 }
 .live-card{
   max-width:640px;
@@ -467,6 +411,22 @@ a:focus-visible, button:focus-visible{
   display:flex;
   align-items:center;
   gap:10px;
+}
+.brand-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(15px, 2.4vw, 22px);
+  line-height:1;
+  letter-spacing:0.01em;
+  white-space:nowrap;
+  background:linear-gradient(180deg, #f7e9ab 0%, #d4af37 42%, #a8791f 58%, #f0d878 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+}
+@media (max-width:480px){
+  .brand-title{ font-size:14px; }
 }
 .brand-instagram{
   display:inline-flex;
@@ -2367,6 +2327,7 @@ a:focus-visible, button:focus-visible{
   <div class="wrap">
     <div class="brand">
       <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
+      <p class="brand-title">Uecastellbisbal.cat</p>
     </div>
     <nav class="header-nav" id="headerNav">
       <!-- PRUEBA PWA: solo se muestra si el navegador puede instalar la
@@ -2399,13 +2360,6 @@ a:focus-visible, button:focus-visible{
      vea mas alla del final de "Cero insultos en la grada" -->
 <div class="hero-photo-zone">
   <div class="hero-photo" role="img" aria-label="Campo municipal de la UE Castellbisbal"></div>
-
-<div class="masthead-logo">
-  <img class="masthead-crest" src="assets/escudo-castellbisbal.png" alt="Escudo UE Castellbisbal">
-  <div class="masthead-text">
-    <p class="masthead-title">Uecastellbisbal.cat</p>
-  </div>
-</div>
 
 <!-- ============ PARTIDO: PRÓXIMO / EN DIRECTO / FINAL ============ -->
 <section class="live-banner" id="liveBanner">
