@@ -2286,6 +2286,31 @@ a:focus-visible, button:focus-visible{
   padding:56px 0 40px;
   border-top:1px solid var(--line);
 }
+.sitemap-footer{
+  max-width:640px;
+  margin:0 auto 28px;
+  padding-bottom:28px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+}
+.sitemap-title{
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:14px;
+}
+.sitemap-links{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px 24px;
+  font-size:12.5px;
+  color:var(--white-dim);
+}
+.sitemap-links a{ transition:color .2s ease; }
+.sitemap-links a:hover{ color:var(--white); }
 .footer-disclaimer{
   max-width:560px;
   margin:0 auto 24px;
@@ -2917,6 +2942,18 @@ a:focus-visible, button:focus-visible{
 <!-- ============ FOOTER ============ -->
 <footer class="site-footer">
   <div class="wrap">
+    <div class="sitemap-footer">
+      <p class="sitemap-title">Mapa web</p>
+      <nav class="sitemap-links">
+        <a href="#ultimo-partido">Último partido</a>
+        <a href="#radar-resumen">Radar de temporada</a>
+        <a href="#calendario">Calendario y resultados</a>
+        <a href="#clasificacion">Clasificación</a>
+        <a href="#plantilla">Plantilla</a>
+        <a href="#sobre-nosotros">Sobre nosotros</a>
+        <a href="#colaboradores">Colaboradores</a>
+      </nav>
+    </div>
     <p class="footer-disclaimer">Página web comunitaria no oficial — Sin afiliación con UE Castellbisbal. Creada por aficionados para los aficionados. Todos los derechos de marca y contenido pertenecen a sus respectivos propietarios.</p>
     <div class="footer-bottom">
       <span>© <span id="year"></span> UE Castellbisbal</span>
