@@ -36,11 +36,17 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 /* se dispara cuando llega un push y la web NO está abierta en primer
-   plano -- aquí es donde se construye la notificación del sistema */
+   plano -- aquí es donde se construye la notificación del sistema.
+   El aviso se manda como "mensaje de datos" (payload.data), no como
+   "mensaje de notificación" (payload.notification) -- si lleva
+   "notification", Chrome muestra su propio aviso automático A LA VEZ
+   que este, y sale duplicado (uno con icono, el nuestro, y otro sin
+   icono, el de Chrome). Con solo "data", el único que se muestra es
+   este de aquí. */
 messaging.onBackgroundMessage((payload) => {
-  const titulo = (payload.notification && payload.notification.title) || "UE Castellbisbal";
+  const titulo = (payload.data && payload.data.title) || "UE Castellbisbal";
   const opciones = {
-    body: (payload.notification && payload.notification.body) || "",
+    body: (payload.data && payload.data.body) || "",
     icon: "assets/icon-192.png",
     badge: "assets/icon-192.png"
   };

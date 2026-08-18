@@ -4424,11 +4424,26 @@ window.addEventListener("load", () => {
   const VAPID_KEY_AVISOS = "BN_FrWfNo49rZkFz2ySb-ck1kskxIy-Mg2xBCBdkKYX2-j5rHp7xWSlz5N53IyxRqEPcbpyotr2icY_NX37JuXI";
   const URL_GUARDAR_TOKEN = "https://script.google.com/macros/s/AKfycbyxfVQh90fP4Y_zVsL9syq-mXVTIVK83l-fIGbQsGHwx0YdG-DuFgOnNVhuF46juMuN/exec";
 
+  let messaging;
   try{
     firebase.initializeApp(firebaseConfig);
+    messaging = firebase.messaging();
   }catch(err){
     return; // navegador sin soporte (o SDK que no ha cargado bien): no mostramos el botón
   }
+
+  // si llega un aviso con la web abierta y en primer plano, el service
+  // worker no interviene (eso solo pasa en segundo plano) -- por eso
+  // hace falta este otro manejador para que también se vea algo aquí.
+  // Los avisos se mandan como "mensaje de datos" (payload.data), ver el
+  // motivo en el comentario del service worker.
+  messaging.onMessage((payload) => {
+    const titulo = (payload.data && payload.data.title) || "UE Castellbisbal";
+    const cuerpo = (payload.data && payload.data.body) || "";
+    navigator.serviceWorker.ready.then((registro) => {
+      registro.showNotification(titulo, { body: cuerpo, icon: "assets/icon-192.png" });
+    });
+  });
 
   // ojo: "permiso concedido" y "token conseguido" no es lo mismo -- el
   // permiso puede quedar concedido aunque falle sacar el token (fallo de
@@ -4448,7 +4463,6 @@ window.addEventListener("load", () => {
         return;
       }
       const registro = await navigator.serviceWorker.ready;
-      const messaging = firebase.messaging();
       const token = await messaging.getToken({ vapidKey: VAPID_KEY_AVISOS, serviceWorkerRegistration: registro });
       if(token){
         console.log("Token de avisos push:", token);
