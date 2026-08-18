@@ -1123,6 +1123,8 @@ a:focus-visible, button:focus-visible{
 .radar-chart-total span{ display:flex; align-items:center; gap:5px; }
 .num-amarilla{ color:#eab308; }
 .num-roja{ color:#dc2626; }
+.num-verde{ color:#22c55e; }
+.num-lilac{ color:var(--lilac-light); }
 .radar-chart-title{
   font-size:12px;
   font-weight:700;
@@ -1148,6 +1150,9 @@ a:focus-visible, button:focus-visible{
 .dot-b{ background:#dc2626; }
 .dot-amarilla{ background:#eab308; }
 .dot-roja{ background:#dc2626; }
+.dot-verde-claro{ background:#4ade80; }
+.dot-rojo-claro{ background:#f87171; }
+.dot-lilac{ background:var(--lilac-light); }
 @media (max-width:768px){
   .radar-charts{ grid-template-columns:1fr; }
 }
@@ -2496,19 +2501,46 @@ a:focus-visible, button:focus-visible{
     </div>
     <div class="radar-charts">
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Posición en la clasificación</p>
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Posición en la clasificación</p>
+          <div class="radar-chart-total" id="totalPosicion"></div>
+        </div>
         <div class="radar-chart" id="chartPosicion"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-verde-claro"></i> Mejora</span>
+          <span><i class="dot dot-amarilla"></i> Igual</span>
+          <span><i class="dot dot-rojo-claro"></i> Empeora</span>
+        </div>
       </div>
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Puntos por jornada</p>
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Puntos por jornada</p>
+          <div class="radar-chart-total" id="totalPuntosJornada"></div>
+        </div>
         <div class="radar-chart" id="chartPuntosJornada"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-verde-claro"></i> Victoria</span>
+          <span><i class="dot dot-amarilla"></i> Empate</span>
+          <span><i class="dot dot-rojo-claro"></i> Derrota</span>
+        </div>
       </div>
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Evolución de puntos</p>
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Evolución de puntos</p>
+          <div class="radar-chart-total" id="totalEvolucionPuntos"></div>
+        </div>
         <div class="radar-chart" id="chartEvolucionPuntos"></div>
+        <div class="radar-legend">
+          <span><i class="dot dot-verde-claro"></i> Victoria</span>
+          <span><i class="dot dot-amarilla"></i> Empate</span>
+          <span><i class="dot dot-rojo-claro"></i> Derrota</span>
+        </div>
       </div>
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Goles a favor / en contra por jornada</p>
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Goles a favor / en contra por jornada</p>
+          <div class="radar-chart-total" id="totalGolesJornada"></div>
+        </div>
         <div class="radar-chart" id="chartGolesJornada"></div>
         <div class="radar-legend">
           <span><i class="dot dot-a"></i> A favor</span>
@@ -2516,7 +2548,10 @@ a:focus-visible, button:focus-visible{
         </div>
       </div>
       <div class="radar-chart-box">
-        <p class="radar-chart-title">Evolución Goles a favor / en contra</p>
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Evolución Goles a favor / en contra</p>
+          <div class="radar-chart-total" id="totalEvolucionGoles"></div>
+        </div>
         <div class="radar-chart" id="chartEvolucionGoles"></div>
         <div class="radar-legend">
           <span><i class="dot dot-a"></i> A favor</span>
@@ -3472,6 +3507,18 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
     svg += `<line x1="${xUltima}" y1="${padArr + areaAlto}" x2="${xUltima}" y2="${padArr}" stroke="rgba(245,245,243,0.35)" stroke-width="0.6" stroke-dasharray="2,2"/>`;
   }
 
+  // línea(s) de media: horizontal, discontinua, sale del eje vertical --
+  // solo se pinta si opciones.medias trae un valor válido (los gráficos
+  // acumulados, como "evolución de puntos/goles", no la usan: la media de
+  // un acumulado no se puede comparar jornada a jornada)
+  if(opciones.medias){
+    opciones.medias.forEach(m => {
+      if(m.valor === null || m.valor === undefined || isNaN(m.valor)) return;
+      const yMedia = pixelY(m.valor).toFixed(1);
+      svg += `<line x1="${padZq}" y1="${yMedia}" x2="${ancho - padDer}" y2="${yMedia}" stroke="${m.color}" stroke-width="0.7" stroke-dasharray="3,2" opacity="0.45"/>`;
+    });
+  }
+
   series.forEach(s => {
     if(s.colorFn){
       // color por punto/segmento (por ejemplo: verde/amarillo/rojo según
@@ -3534,6 +3581,64 @@ function pintarTotalTarjetas(){
     `<span><i class="dot dot-roja"></i><span class="num-roja">${totalRojas}</span></span>`;
 }
 
+/* ---------- pinta el sumatorio o media de cada una de las otras gráficas del
+   desglose, encima de cada una y con los mismos colores que su leyenda ---------- */
+/* ---------- calcula las medias del desglose (posición, puntos, goles,
+   tarjetas) contando solo las jornadas que ya están en estado "final" en
+   el calendario -- una jornada puede tener fila en "radar" antes de
+   jugarse (por ejemplo, con datos de prueba), así que no basta con mirar
+   si la fila existe, hay que cruzarla con el calendario ---------- */
+function calcularMediasDesglose(){
+  const jornadasFinales = new Set(partidos.filter(p => p.estado === "final").map(p => p.jornada));
+  const media = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : null;
+
+  const finales = radarTemporada.filter(d => jornadasFinales.has(d.jornada));
+  const finalesConPosicion = finales.filter(d => d.posicion > 0);
+
+  // goles "de esa jornada" (no vienen así de la hoja: hay que restar el
+  // acumulado de la jornada anterior), solo para las jornadas finales
+  const golesJornadaFinales = finales.map(d => {
+    const i = radarTemporada.indexOf(d);
+    const anterior = radarTemporada[i - 1];
+    return {
+      golesFavorJornada: anterior ? d.golesFavor - anterior.golesFavor : d.golesFavor,
+      golesContraJornada: anterior ? d.golesContra - anterior.golesContra : d.golesContra
+    };
+  });
+
+  return {
+    posicionMedia: media(finalesConPosicion.map(d => d.posicion)),
+    puntosMedia: media(finales.map(d => d.puntosJornada)),
+    puntosTotales: finales.reduce((s, d) => s + d.puntosJornada, 0),
+    golesFavorMedia: media(golesJornadaFinales.map(d => d.golesFavorJornada)),
+    golesContraMedia: media(golesJornadaFinales.map(d => d.golesContraJornada)),
+    amarillasMedia: media(finales.map(d => d.amarillasJornada)),
+    rojasMedia: media(finales.map(d => d.rojasJornada))
+  };
+}
+
+function pintarTotalesDesglose(medias){
+  document.getElementById("totalPosicion").innerHTML = medias.posicionMedia !== null
+    ? `Media <span class="num-lilac">${medias.posicionMedia.toFixed(1)}º</span>`
+    : "Sin datos todavía";
+
+  document.getElementById("totalPuntosJornada").innerHTML = medias.puntosMedia !== null
+    ? `Media <span class="num-lilac">${medias.puntosMedia.toFixed(2)}</span>`
+    : "Sin datos todavía";
+
+  document.getElementById("totalEvolucionPuntos").innerHTML =
+    `<span><i class="dot dot-lilac"></i><span class="num-lilac">${medias.puntosTotales}</span></span>`;
+
+  // goles a favor/en contra: se usa el acumulado de la última fila de la
+  // hoja (ya viene sumado, no hace falta recalcularlo)
+  const ultimo = radarTemporada[radarTemporada.length - 1] || { golesFavor: 0, golesContra: 0 };
+  const totalesGoles =
+    `<span><i class="dot dot-a"></i><span class="num-verde">${ultimo.golesFavor}</span></span>` +
+    `<span><i class="dot dot-b"></i><span class="num-roja">${ultimo.golesContra}</span></span>`;
+  document.getElementById("totalGolesJornada").innerHTML = totalesGoles;
+  document.getElementById("totalEvolucionGoles").innerHTML = totalesGoles;
+}
+
 /* ---------- color de la línea de posición: verde si mejora respecto a la
    jornada anterior, amarillo si se mantiene, rojo si empeora (menos = mejor).
    La primera jornada real se compara contra el 16 (última posición), que es
@@ -3555,6 +3660,8 @@ function colorPuntosJornada(datos, i){
 
 /* ---------- pinta las gráficas del desglose, siempre de la J0 a la J30 ---------- */
 function pintarRadarDesglose(){
+  const medias = calcularMediasDesglose();
+
   // en la gráfica, un 0 significa "todavía sin clasificar": se trata como si
   // fuera el último puesto, para que la línea arranque abajo del todo en vez
   // de arriba (que sería visualmente engañoso, como si fuera el 1er puesto)
@@ -3565,18 +3672,22 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartPosicion", datosPosicion,
     [{ key: "posicion", colorFn: colorEvolucionPosicion }],
     { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16,
-      etiquetasY: Array.from({ length: 16 }, (_, i) => i + 1) }
+      etiquetasY: Array.from({ length: 16 }, (_, i) => i + 1),
+      medias: [{ valor: medias.posicionMedia, color: "#a868e8" }] }
   );
 
   pintarGraficoLineal("chartPuntosJornada", radarTemporada,
     [{ key: "puntosJornada", colorFn: colorPuntosJornada }],
-    { minX: 0, maxX: 30, minY: 0, maxY: 3 }
+    { minX: 0, maxX: 30, minY: 0, maxY: 3,
+      medias: [{ valor: medias.puntosMedia, color: "#a868e8" }] }
   );
 
   // "evolución de puntos" no viene directo de la hoja: es el sumatorio
   // (acumulado) de los puntos de cada jornada, calculado aquí mismo.
   // Se colorea igual que "puntos por jornada" (por eso se lleva también
-  // el puntosJornada de cada punto, aunque el eje pinte el acumulado)
+  // el puntosJornada de cada punto, aunque el eje pinte el acumulado). No
+  // lleva línea de media: la media de un acumulado no se puede comparar
+  // jornada a jornada, así que no tendría sentido visual.
   let sumaPuntos = 0;
   const datosEvolucionPuntos = radarTemporada.map(d => {
     sumaPuntos += d.puntosJornada;
@@ -3598,8 +3709,14 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartGolesJornada", datosGolesJornada, [
     { key: "golesFavorJornada", color: "#22c55e" },
     { key: "golesContraJornada", color: "#dc2626" }
-  ], { minX: 0, maxX: 30 });
+  ], { minX: 0, maxX: 30,
+    medias: [
+      { valor: medias.golesFavorMedia, color: "#a868e8" },
+      { valor: medias.golesContraMedia, color: "#a868e8" }
+    ] });
 
+  // "evolución de goles" tampoco lleva línea de media, por el mismo
+  // motivo que "evolución de puntos": es un acumulado.
   pintarGraficoLineal("chartEvolucionGoles", radarTemporada, [
     { key: "golesFavor", color: "#22c55e" },
     { key: "golesContra", color: "#dc2626" }
@@ -3607,8 +3724,13 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartTarjetas", radarTemporada, [
     { key: "amarillasJornada", color: "#eab308" },
     { key: "rojasJornada", color: "#dc2626" }
-  ], { minX: 0, maxX: 30 });
+  ], { minX: 0, maxX: 30,
+    medias: [
+      { valor: medias.amarillasMedia, color: "#a868e8" },
+      { valor: medias.rojasMedia, color: "#a868e8" }
+    ] });
   pintarTotalTarjetas();
+  pintarTotalesDesglose(medias);
 }
 
 /* ---------- escudo genérico para equipos rivales (sin logo propio) ---------- */
