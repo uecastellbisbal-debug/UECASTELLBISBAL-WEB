@@ -4402,11 +4402,10 @@ if("serviceWorker" in navigator){
 
 /* ---------- PRUEBA: avisos push con Firebase Cloud Messaging ----------
    Fase 2 del plan: pide permiso y consigue el "token" que identifica a
-   este dispositivo/navegador. De momento el token solo se ve por la
-   consola -- en cuanto montemos el Apps Script que lo recoja (fase 3),
-   aquí se mandará también a esa dirección para guardarlo en una pestaña
-   del Google Sheet. Si el navegador no soporta push (o falla algo), el
-   botón simplemente no funciona -- no rompe el resto de la web. */
+   este dispositivo/navegador, y lo manda al Apps Script para que lo
+   guarde en la pestaña "notificaciones" del Google Sheet. Si el
+   navegador no soporta push (o falla algo), el botón simplemente no
+   funciona -- no rompe el resto de la web. */
 window.addEventListener("load", () => {
   const btnActivarAvisos = document.getElementById("btnActivarAvisos");
   if(!btnActivarAvisos || typeof firebase === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)){
@@ -4423,6 +4422,7 @@ window.addEventListener("load", () => {
     measurementId: "G-7PW6T5CFP9"
   };
   const VAPID_KEY_AVISOS = "BN_FrWfNo49rZkFz2ySb-ck1kskxIy-Mg2xBCBdkKYX2-j5rHp7xWSlz5N53IyxRqEPcbpyotr2icY_NX37JuXI";
+  const URL_GUARDAR_TOKEN = "https://script.google.com/macros/s/AKfycbyxfVQh90fP4Y_zVsL9syq-mXVTIVK83l-fIGbQsGHwx0YdG-DuFgOnNVhuF46juMuN/exec";
 
   try{
     firebase.initializeApp(firebaseConfig);
@@ -4452,6 +4452,19 @@ window.addEventListener("load", () => {
       const token = await messaging.getToken({ vapidKey: VAPID_KEY_AVISOS, serviceWorkerRegistration: registro });
       if(token){
         console.log("Token de avisos push:", token);
+        // Apps Script no responde bien a peticiones "application/json"
+        // (dispara un preflight CORS que no sabe contestar) -- por eso se
+        // manda como texto plano; el propio script hace JSON.parse() del
+        // cuerpo igualmente.
+        try{
+          await fetch(URL_GUARDAR_TOKEN, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ token: token })
+          });
+        }catch(errGuardado){
+          console.error("No se pudo guardar el token en el Sheet:", errGuardado);
+        }
         localStorage.setItem("avisosActivados", "1");
         btnActivarAvisos.querySelector("span").textContent = "Avisos activados";
         btnActivarAvisos.style.opacity = "0.6";
