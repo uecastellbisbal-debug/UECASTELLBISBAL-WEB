@@ -3669,9 +3669,13 @@ function seleccionarPartidos(){
   let indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
 
   if(indiceActual === -1){
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    indiceActual = ordenados.findIndex(p => parseFecha(p.fecha) >= hoy);
+    // si ninguna fila está marcada como "proximo"/"en_directo", el
+    // siguiente partido de verdad es el primero que todavía no esté
+    // "final" (no se puede usar solo la fecha: si la temporada tiene
+    // partidos con fecha muy adelantada ya jugados -- por ejemplo de
+    // prueba --, comparar contra la fecha de hoy elegiría ese partido
+    // viejo en vez del próximo real)
+    indiceActual = ordenados.findIndex(p => p.estado !== "final");
     if(indiceActual === -1) indiceActual = ordenados.length - 1; // temporada acabada: se queda en el último
   }
 
