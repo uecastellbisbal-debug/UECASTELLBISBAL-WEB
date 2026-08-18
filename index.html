@@ -2341,6 +2341,9 @@ a:focus-visible, button:focus-visible{
 <!-- Librerías de inicio de sesión con Google y Microsoft, para la membresía de aficionado -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://alcdn.msauth.net/browser/3.14.0/js/msal-browser.min.js" defer></script>
+<!-- Firebase: solo Cloud Messaging, para los avisos push (prueba) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js" defer></script>
 </head>
 <body>
 <div class="top-bar">
@@ -2365,6 +2368,11 @@ a:focus-visible, button:focus-visible{
       <button class="nav-instagram nav-instalar-app" id="btnInstalarApp" type="button" aria-label="Instala nuestra APP" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         <span>Instala nuestra APP</span>
+      </button>
+      <!-- PRUEBA: avisos push con Firebase Cloud Messaging -->
+      <button class="nav-instagram nav-instalar-app" id="btnActivarAvisos" type="button" aria-label="Activa los avisos" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span>Activa los avisos</span>
       </button>
       <a class="nav-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -4391,6 +4399,63 @@ if("serviceWorker" in navigator){
     navigator.serviceWorker.register("service-worker.js").catch(() => {});
   });
 }
+
+/* ---------- PRUEBA: avisos push con Firebase Cloud Messaging ----------
+   Fase 2 del plan: pide permiso y consigue el "token" que identifica a
+   este dispositivo/navegador. De momento el token solo se ve por la
+   consola -- en cuanto montemos el Apps Script que lo recoja (fase 3),
+   aquí se mandará también a esa dirección para guardarlo en una pestaña
+   del Google Sheet. Si el navegador no soporta push (o falla algo), el
+   botón simplemente no funciona -- no rompe el resto de la web. */
+window.addEventListener("load", () => {
+  const btnActivarAvisos = document.getElementById("btnActivarAvisos");
+  if(!btnActivarAvisos || typeof firebase === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)){
+    return;
+  }
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAaL_3wpjbBL650ADe111P68K1hALpxsC0",
+    authDomain: "uecastellbisbal.firebaseapp.com",
+    projectId: "uecastellbisbal",
+    storageBucket: "uecastellbisbal.firebasestorage.app",
+    messagingSenderId: "981794835763",
+    appId: "1:981794835763:web:a41c6c9dfb259bae33c246",
+    measurementId: "G-7PW6T5CFP9"
+  };
+  const VAPID_KEY_AVISOS = "BN_FrWfNo49rZkFz2ySb-ck1kskxIy-Mg2xBCBdkKYX2-j5rHp7xWSlz5N53IyxRqEPcbpyotr2icY_NX37JuXI";
+
+  try{
+    firebase.initializeApp(firebaseConfig);
+  }catch(err){
+    return; // navegador sin soporte (o SDK que no ha cargado bien): no mostramos el botón
+  }
+
+  if(Notification.permission !== "granted"){
+    btnActivarAvisos.style.display = "";
+  }
+
+  btnActivarAvisos.onclick = async () => {
+    try{
+      const permiso = await Notification.requestPermission();
+      if(permiso !== "granted"){
+        alert("No se han activado los avisos. Puedes activarlos más tarde desde los ajustes del navegador.");
+        return;
+      }
+      const registro = await navigator.serviceWorker.ready;
+      const messaging = firebase.messaging();
+      const token = await messaging.getToken({ vapidKey: VAPID_KEY_AVISOS, serviceWorkerRegistration: registro });
+      if(token){
+        console.log("Token de avisos push:", token);
+        btnActivarAvisos.querySelector("span").textContent = "Avisos activados";
+        btnActivarAvisos.style.opacity = "0.6";
+        btnActivarAvisos.style.pointerEvents = "none";
+      }
+    }catch(err){
+      console.error("No se pudo activar el aviso push:", err);
+      alert("No se han podido activar los avisos en este navegador.");
+    }
+  };
+});
 
 /* ---------- PWA de prueba: botón "Instalar app" / "Invita a usar nuestra APP" ----------
    En Android/Chrome, Chrome dispara "beforeinstallprompt" cuando la web
