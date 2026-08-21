@@ -713,7 +713,6 @@ a:focus-visible, button:focus-visible{
 }
 @media (min-width:900px){
   .hero-links-col{ grid-template-columns:repeat(5, 1fr); }
-  .hero-zero-insults{ grid-column:auto; }
 }
 .hero-zero-insults{
   grid-column:1 / -1;
@@ -770,6 +769,13 @@ a:focus-visible, button:focus-visible{
   .hero-zero-insults{ gap:6px; padding:8px; }
   .hero-zero-insults img{ width:22px; height:22px; }
   .hero-zero-insults span{ font-size:11px; letter-spacing:0.015em; }
+}
+@media (min-width:900px){
+  /* en escritorio hay 5 columnas (4 botones + este) en vez de 2, así que
+     este ya no necesita ocupar toda la fila él solo -- si mantuviéramos
+     el grid-column:1/-1 de más arriba, "sobraría" una columna invisible
+     al final de la fila de botones y quedarían más estrechos que esta barra */
+  .hero-zero-insults{ grid-column:auto; }
 }
 
 .hero-title{
