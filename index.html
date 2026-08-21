@@ -4318,13 +4318,12 @@ function pintarUltimoPartido(partidoAnterior){
   acciones.style.display = "";
 }
 
-/* ---------- comparte por WhatsApp, con el escudo adjunto cuando es posible ---------- */
+/* ---------- comparte por WhatsApp, con la imagen de marca adjunta cuando es posible ---------- */
 async function compartirPorWhatsapp(texto){
   try{
-    const escudoSrc = document.querySelector(".crest").src;
-    const respuesta = await fetch(escudoSrc);
+    const respuesta = await fetch("assets/logo-uecastellbisbal.png");
     const blob = await respuesta.blob();
-    const archivo = new File([blob], "escudo-ue-castellbisbal.png", { type: blob.type });
+    const archivo = new File([blob], "uecastellbisbal-cat.png", { type: blob.type });
 
     if(navigator.canShare && navigator.canShare({ files: [archivo] })){
       await navigator.share({ files: [archivo], text: texto, title: "UE Castellbisbal" });
