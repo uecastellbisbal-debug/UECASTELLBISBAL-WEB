@@ -221,7 +221,9 @@ a:focus-visible, button:focus-visible{
   background:linear-gradient(135deg, rgba(22,163,74,0.14), var(--black-soft) 55%);
   border:1px solid rgba(22,163,74,0.4);
 }
-.live-banner.is-directo .live-card{
+.live-banner.is-directo .live-card,
+.live-banner.is-aplazado .live-card,
+.live-banner.is-suspendido .live-card{
   background:linear-gradient(135deg, rgba(220,38,38,0.12), var(--black-soft) 55%);
   border-color:rgba(220,38,38,0.4);
 }
@@ -250,7 +252,9 @@ a:focus-visible, button:focus-visible{
   border-radius:50%;
   background:#22c55e;
 }
-.live-banner.is-directo .live-dot{
+.live-banner.is-directo .live-dot,
+.live-banner.is-aplazado .live-dot,
+.live-banner.is-suspendido .live-dot{
   background:#dc2626;
   animation:live-pulse 1.6s infinite, live-blink 1.2s infinite;
 }
@@ -274,7 +278,9 @@ a:focus-visible, button:focus-visible{
   text-transform:uppercase;
   color:#4ade80;
 }
-.live-banner.is-directo .live-label{ color:#f87171; animation:live-blink 1.2s infinite; }
+.live-banner.is-directo .live-label,
+.live-banner.is-aplazado .live-label,
+.live-banner.is-suspendido .live-label{ color:#f87171; animation:live-blink 1.2s infinite; }
 .live-banner.is-final .live-label{ color:#94a3b8; }
 .live-label.is-recap{ color:var(--white-faint); }
 .live-minute{
@@ -3902,7 +3908,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   const score = document.getElementById("liveScore");
   const fecha = document.getElementById("liveFecha");
   const hora = document.getElementById("liveHora");
-  banner.classList.remove("is-directo", "is-final");
+  banner.classList.remove("is-directo", "is-final", "is-aplazado", "is-suspendido");
 
   const estado = partidoActual.estado || "proximo";
   const tieneResultado = partidoActual.golesLocal !== null && partidoActual.golesVisitante !== null;
@@ -3916,9 +3922,16 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   const venueEl = document.getElementById("liveVenue");
   const badgeWrap = document.getElementById("liveBadgeWrap");
 
-  if(estado === "en_directo" || estado === "final"){
-    banner.classList.add(estado === "en_directo" ? "is-directo" : "is-final");
-    label.textContent = estado === "en_directo" ? "En directo" : "Final";
+  if(estado === "en_directo" || estado === "final" || estado === "aplazado" || estado === "suspendido"){
+    banner.classList.add(
+      estado === "en_directo" ? "is-directo" :
+      estado === "final" ? "is-final" :
+      estado === "aplazado" ? "is-aplazado" : "is-suspendido"
+    );
+    label.textContent =
+      estado === "en_directo" ? "En directo" :
+      estado === "final" ? "Final" :
+      estado === "aplazado" ? "Aplazado" : "Suspendido";
     fecha.style.display = "none";
     hora.style.display = "none";
 
@@ -3927,7 +3940,8 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       `<span class="live-score-sep">–</span>` +
       `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
 
-    // ni en directo ni en final hace falta ya la ubicación del campo
+    // ni en directo, ni en final, ni aplazado, ni suspendido hace falta ya
+    // la ubicación del campo
     venueEl.style.display = "none";
 
     if(estado === "final"){
@@ -3938,11 +3952,18 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       // y el mismo resultado se refleja también en la tarjeta de "Último
       // partido", sin tener que escribirlo dos veces
       pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
-    }else{
+    }else if(estado === "en_directo"){
       badgeWrap.style.display = "none";
       iniciarRelojPartido(partidoActual);
       // mientras el partido destacado está en directo, "Último partido"
       // sigue mostrando el resultado anterior (el suyo propio aún no existe)
+      pintarUltimoPartido(partidoAnterior);
+    }else{
+      // aplazado / suspendido: mismo formato que en directo (misma tarjeta
+      // roja, sin fecha/hora/campo), pero sin el reloj en marcha porque el
+      // partido no está avanzando en este momento
+      badgeWrap.style.display = "none";
+      detenerRelojPartido();
       pintarUltimoPartido(partidoAnterior);
     }
   }else{
@@ -4328,10 +4349,13 @@ function compartirBanner(){
   const bloqueUbicacion = venueUrl ? `${venueTexto}\n${venueUrl}` : venueTexto;
   let texto;
 
-  if(bannerInfo.estado === "en_directo" || bannerInfo.estado === "final"){
+  if(["en_directo", "final", "aplazado", "suspendido"].includes(bannerInfo.estado)){
     const golesIzquierda = esLocalDestacado ? bannerInfo.golesCastellbisbal : bannerInfo.golesRival;
     const golesDerecha = esLocalDestacado ? bannerInfo.golesRival : bannerInfo.golesCastellbisbal;
-    const etiqueta = bannerInfo.estado === "en_directo" ? "🔴 EN DIRECTO" : "⚪ FINAL";
+    const etiqueta =
+      bannerInfo.estado === "en_directo" ? "🔴 EN DIRECTO" :
+      bannerInfo.estado === "final" ? "⚪ FINAL" :
+      bannerInfo.estado === "aplazado" ? "🟡 APLAZADO" : "🟡 SUSPENDIDO";
     texto =
       `${etiqueta}\n` +
       `${nombreIzquierda} ${golesIzquierda} – ${golesDerecha} ${nombreDerecha}\n` +
@@ -4695,7 +4719,7 @@ function filaAPartido(fila){
     // cosa (celda vacía, "-", o texto suelto tipo "na" que a veces deja una
     // fórmula o un autorelleno de la hoja) se trata como "sin marcar", para
     // que seleccionarPartidos() no la confunda con la fila destacada
-    estado: ["proximo", "en_directo", "final"].includes(fila.estado) ? fila.estado : "",
+    estado: ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(fila.estado) ? fila.estado : "",
     golesLocal: numeroOVacio(fila.goles_local),
     golesVisitante: numeroOVacio(fila.goles_visitante),
     escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
