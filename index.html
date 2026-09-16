@@ -980,6 +980,17 @@ a:focus-visible, button:focus-visible{
   font-weight:500;
   color:var(--white-dim);
 }
+.roster-photo-icon{
+  display:inline-flex;
+  margin-left:5px;
+  vertical-align:-2px;
+}
+.roster-photo-icon svg{
+  width:12px;
+  height:12px;
+  color:var(--lilac-light);
+  flex:none;
+}
 
 /* ---------- foto del jugador al pasar el ratón por encima del nombre ----------
    Para poner la foto real de un jugador: busca su fila (el bloque
@@ -4653,6 +4664,21 @@ document.getElementById("btnVerMasCalendario").onclick = () => {
   calendarioMostrarTodo = true;
   pintarCalendario();
 };
+
+/* ---------- icono de cámara al final del nombre de quien ya tenga foto
+   puesta -- se detecta solo (mirando si su .roster-photo-popup tiene
+   background-image en el style), así que cualquier foto que se añada más
+   adelante lo lleva sin tener que tocar esto ---------- */
+document.querySelectorAll(".roster-photo-popup").forEach(popup => {
+  if(!popup.style.backgroundImage) return;
+  const nombre = popup.previousElementSibling;
+  if(!nombre || !nombre.classList.contains("roster-name")) return;
+  const icono = document.createElement("span");
+  icono.className = "roster-photo-icon";
+  icono.setAttribute("aria-hidden", "true");
+  icono.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+  nombre.appendChild(icono);
+});
 /* la carga real (calendario, clasificación, radar) se dispara junto al
    resto del arranque, al final de este script -- así el radar puede
    esperar a que el calendario esté listo antes de sumar los goles */
