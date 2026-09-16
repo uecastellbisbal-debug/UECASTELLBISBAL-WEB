@@ -3298,8 +3298,16 @@ async function cargarRadarYPintar(calendarioListo){
       // sin conexión o falla la hoja: seguimos con los datos de ejemplo, la web no se rompe
     }
   }
-  pintarRadarResumen();
-  pintarRadarDesglose();
+  // mientras no haya ninguna jornada real cargada desde la hoja,
+  // radarTemporada solo tiene el punto de ejemplo (jornada 0) -- en ese
+  // caso no mostramos nada en vez de un resumen/gráficas vacíos con ceros
+  const hayDatosRadar = radarTemporada.length > 1;
+  document.getElementById("radar-resumen").style.display = hayDatosRadar ? "" : "none";
+  document.getElementById("radar-desglose").style.display = hayDatosRadar ? "" : "none";
+  if(hayDatosRadar){
+    pintarRadarResumen();
+    pintarRadarDesglose();
+  }
 }
 
 /* ============================================================
