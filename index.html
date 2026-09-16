@@ -4264,10 +4264,14 @@ function pintarUltimoPartido(partidoAnterior){
     acciones.style.display = "none";
     jornadaTag.style.display = "none";
     info.textContent = "Aún no se ha jugado ningún partido esta temporada";
+    info.style.color = "var(--lilac-light)";
     return;
   }
   teams.style.display = "";
   jornadaTag.style.display = "";
+  // "info" reutiliza el mismo elemento que el aviso de arriba (que se
+  // pinta en lila) -- al haber ya un resultado, volvemos a su color normal
+  info.style.color = "";
   jornadaTag.textContent = "J" + partidoAnterior.jornada;
 
   const esLocal = partidoAnterior.tipo === "LOCAL";
