@@ -4447,6 +4447,12 @@ if("serviceWorker" in navigator){
   });
 }
 
+/* ---------- enlaces "Instalar app" y "Activa los avisos": desactivados
+   por ahora a petición del club (todavía no ha empezado la liga) -- toda
+   la lógica de abajo se queda intacta para cuando se reactiven, solo hay
+   que cambiar este false a true ---------- */
+const MOSTRAR_ENLACES_APP_AVISOS = false;
+
 /* ---------- PRUEBA: avisos push con Firebase Cloud Messaging ----------
    Fase 2 del plan: pide permiso y consigue el "token" que identifica a
    este dispositivo/navegador, y lo manda al Apps Script para que lo
@@ -4455,7 +4461,7 @@ if("serviceWorker" in navigator){
    funciona -- no rompe el resto de la web. */
 window.addEventListener("load", () => {
   const btnActivarAvisos = document.getElementById("btnActivarAvisos");
-  if(!btnActivarAvisos || typeof firebase === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)){
+  if(!MOSTRAR_ENLACES_APP_AVISOS || !btnActivarAvisos || typeof firebase === "undefined" || !("Notification" in window) || !("serviceWorker" in navigator)){
     return;
   }
 
@@ -4562,21 +4568,21 @@ function mostrarBotonInvitar(){
   btnInstalarApp.style.display = "";
 }
 
-if(appYaInstalada()){
+if(MOSTRAR_ENLACES_APP_AVISOS && appYaInstalada()){
   mostrarBotonInvitar();
-}else if(esIOS()){
+}else if(MOSTRAR_ENLACES_APP_AVISOS && esIOS()){
   btnInstalarApp.style.display = "";
 }
 
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   promptInstalacionDiferido = e;
-  if(!appYaInstalada()) btnInstalarApp.style.display = "";
+  if(MOSTRAR_ENLACES_APP_AVISOS && !appYaInstalada()) btnInstalarApp.style.display = "";
 });
 
 window.addEventListener("appinstalled", () => {
   promptInstalacionDiferido = null;
-  mostrarBotonInvitar();
+  if(MOSTRAR_ENLACES_APP_AVISOS) mostrarBotonInvitar();
 });
 
 btnInstalarApp.onclick = async () => {
