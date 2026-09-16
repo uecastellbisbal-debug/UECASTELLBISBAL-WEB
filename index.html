@@ -4566,12 +4566,17 @@ if("serviceWorker" in navigator){
    pon MOSTRAR_BANNER_PROMOCIONAL a false. */
 const MOSTRAR_BANNER_PROMOCIONAL = true;
 const BANNER_PROMOCIONAL_IMG = "assets/banners/banner-promo-test.jpg";
+// se apaga solo a partir de esta fecha y hora (la del propio dispositivo
+// de quien visita la web), sin tener que venir a tocar nada -- pensado
+// para que el aviso del partido deje de salir una vez ya ha empezado.
+// Mes en 0: Ene=0, Feb=1 ... Sep=8, Oct=9...
+const BANNER_PROMOCIONAL_HASTA = new Date(2026, 8, 19, 16, 0);
 
 const bannerPromoOverlay = document.getElementById("bannerPromoOverlay");
 function cerrarBannerPromo(){
   bannerPromoOverlay.style.display = "none";
 }
-if(MOSTRAR_BANNER_PROMOCIONAL){
+if(MOSTRAR_BANNER_PROMOCIONAL && new Date() < BANNER_PROMOCIONAL_HASTA){
   document.getElementById("bannerPromoImg").src = BANNER_PROMOCIONAL_IMG;
   bannerPromoOverlay.style.display = "flex";
 }
