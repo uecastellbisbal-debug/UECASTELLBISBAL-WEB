@@ -114,19 +114,22 @@ img{ max-width:100%; display:block; }
    BANNER PROMOCIONAL A PANTALLA (aviso puntual con imagen)
    ============================================================ */
 .banner-promo-overlay{
+  /* sin fondo oscuro ni pantalla completa: solo flota centrada, la web
+     de detrás se sigue viendo y se puede seguir usando */
   position:fixed;
-  inset:0;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
   z-index:600;
-  background:rgba(0,0,0,0.82);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
+  max-width:80vw;
+  max-height:80vh;
+  pointer-events:none;
 }
 .banner-promo-box{
   position:relative;
   max-width:80vw;
   max-height:80vh;
+  pointer-events:auto;
 }
 .banner-promo-img{
   display:block;
@@ -4577,13 +4580,9 @@ function cerrarBannerPromo(){
 }
 if(MOSTRAR_BANNER_PROMOCIONAL){
   document.getElementById("bannerPromoImg").src = BANNER_PROMOCIONAL_IMG;
-  bannerPromoOverlay.style.display = "flex";
+  bannerPromoOverlay.style.display = "block";
 }
 document.getElementById("btnCerrarBannerPromo").onclick = cerrarBannerPromo;
-// también se cierra si se hace clic fuera de la imagen (en el fondo oscuro)
-bannerPromoOverlay.addEventListener("click", (e) => {
-  if(e.target === bannerPromoOverlay) cerrarBannerPromo();
-});
 window.addEventListener("keydown", (e) => {
   if(e.key === "Escape") cerrarBannerPromo();
 });
