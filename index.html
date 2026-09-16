@@ -3304,16 +3304,8 @@ async function cargarRadarYPintar(calendarioListo){
       // sin conexión o falla la hoja: seguimos con los datos de ejemplo, la web no se rompe
     }
   }
-  // mientras no haya ninguna jornada real cargada desde la hoja,
-  // radarTemporada solo tiene el punto de ejemplo (jornada 0) -- en ese
-  // caso no mostramos nada en vez de un resumen/gráficas vacíos con ceros
-  const hayDatosRadar = radarTemporada.length > 1;
-  document.getElementById("radar-resumen").style.display = hayDatosRadar ? "" : "none";
-  document.getElementById("radar-desglose").style.display = hayDatosRadar ? "" : "none";
-  if(hayDatosRadar){
-    pintarRadarResumen();
-    pintarRadarDesglose();
-  }
+  pintarRadarResumen();
+  pintarRadarDesglose();
 }
 
 /* ============================================================
@@ -3533,10 +3525,22 @@ function pintarRadarResumen(){
   // el cartel de "actualizado el..." usa la última fila que tenga fecha
   // marcada en la hoja (no tiene por qué ser la última jornada con datos:
   // es la fecha en la que se consultó/actualizó la hoja por última vez)
-  const conFecha = radarTemporada.filter(d => d.fecha);
-  const referencia = conFecha.length ? conFecha[conFecha.length - 1] : ultimo;
-  document.getElementById("radarActualizado").textContent =
-    `Información actualizada tras jornada ${referencia.jornada} en fecha ${referencia.fecha}`;
+  const elActualizado = document.getElementById("radarActualizado");
+  if(radarTemporada.length <= 1){
+    // todavía no hay ninguna jornada real cargada desde la hoja: el único
+    // punto que hay es el de ejemplo (jornada 0, fecha ficticia), así que
+    // no mostramos ese cartel en vez de anunciar una fecha inventada
+    elActualizado.style.display = "none";
+  }else{
+    // el cartel de "actualizado el..." usa la última fila que tenga fecha
+    // marcada en la hoja (no tiene por qué ser la última jornada con datos:
+    // es la fecha en la que se consultó/actualizó la hoja por última vez)
+    const conFecha = radarTemporada.filter(d => d.fecha);
+    const referencia = conFecha.length ? conFecha[conFecha.length - 1] : ultimo;
+    elActualizado.style.display = "";
+    elActualizado.textContent =
+      `Información actualizada tras jornada ${referencia.jornada} en fecha ${referencia.fecha}`;
+  }
 }
 
 /* ---------- dibuja una gráfica lineal sencilla en SVG (sin librerías) ----------
