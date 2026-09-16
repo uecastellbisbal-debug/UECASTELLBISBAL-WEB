@@ -110,6 +110,55 @@ img{ max-width:100%; display:block; }
 
 ::selection{ background:var(--lilac); color:var(--white); }
 
+/* ============================================================
+   BANNER PROMOCIONAL A PANTALLA (aviso puntual con imagen)
+   ============================================================ */
+.banner-promo-overlay{
+  position:fixed;
+  inset:0;
+  z-index:600;
+  background:rgba(0,0,0,0.82);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.banner-promo-box{
+  position:relative;
+  max-width:80vw;
+  max-height:80vh;
+}
+.banner-promo-img{
+  display:block;
+  max-width:80vw;
+  max-height:80vh;
+  width:auto;
+  height:auto;
+  border-radius:8px;
+  box-shadow:0 24px 70px rgba(0,0,0,0.65);
+}
+.banner-promo-cerrar{
+  position:absolute;
+  top:-16px; right:-16px;
+  width:36px; height:36px;
+  border-radius:50%;
+  background:var(--lilac);
+  border:2px solid var(--white);
+  color:var(--white);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,0.5);
+  transition:background .2s ease;
+}
+.banner-promo-cerrar:hover{ background:var(--lilac-light); }
+.banner-promo-cerrar svg{ width:18px; height:18px; flex:none; }
+@media (max-width:640px){
+  .banner-promo-cerrar{ top:-14px; right:-14px; width:32px; height:32px; }
+  .banner-promo-cerrar svg{ width:16px; height:16px; }
+}
+
 /* focus visibility (accesibilidad) */
 a:focus-visible, button:focus-visible{
   outline:2px solid var(--lilac-light);
@@ -2392,6 +2441,20 @@ a:focus-visible, button:focus-visible{
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js" defer></script>
 </head>
 <body>
+<!-- ============ BANNER PROMOCIONAL A PANTALLA ============
+     Aviso puntual (partido, evento...) que tapa la pantalla al entrar.
+     Para cambiarlo: sustituye la imagen en assets/banners/ y actualiza
+     BANNER_PROMOCIONAL_IMG más abajo, en el script. Para desactivarlo sin
+     borrar nada, pon MOSTRAR_BANNER_PROMOCIONAL a false (también en el script). -->
+<div class="banner-promo-overlay" id="bannerPromoOverlay" style="display:none;">
+  <div class="banner-promo-box">
+    <button class="banner-promo-cerrar" id="btnCerrarBannerPromo" type="button" aria-label="Cerrar aviso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <img class="banner-promo-img" id="bannerPromoImg" src="" alt="Aviso del club">
+  </div>
+</div>
+
 <div class="top-bar">
   <!-- ENLACE TEMPORAL: solo para las primeras jornadas, luego se quita
        este <a> -- la plantilla ya está siempre disponible en el menú de
@@ -4500,6 +4563,30 @@ if("serviceWorker" in navigator){
     navigator.serviceWorker.register("service-worker.js").catch(() => {});
   });
 }
+
+/* ---------- banner promocional a pantalla ----------
+   Para poner un aviso nuevo: cambia la imagen de BANNER_PROMOCIONAL_IMG
+   (guárdala en assets/banners/). Para quitar el aviso sin borrar nada,
+   pon MOSTRAR_BANNER_PROMOCIONAL a false. */
+const MOSTRAR_BANNER_PROMOCIONAL = true;
+const BANNER_PROMOCIONAL_IMG = "assets/banners/banner-promo-test.jpg";
+
+const bannerPromoOverlay = document.getElementById("bannerPromoOverlay");
+function cerrarBannerPromo(){
+  bannerPromoOverlay.style.display = "none";
+}
+if(MOSTRAR_BANNER_PROMOCIONAL){
+  document.getElementById("bannerPromoImg").src = BANNER_PROMOCIONAL_IMG;
+  bannerPromoOverlay.style.display = "flex";
+}
+document.getElementById("btnCerrarBannerPromo").onclick = cerrarBannerPromo;
+// también se cierra si se hace clic fuera de la imagen (en el fondo oscuro)
+bannerPromoOverlay.addEventListener("click", (e) => {
+  if(e.target === bannerPromoOverlay) cerrarBannerPromo();
+});
+window.addEventListener("keydown", (e) => {
+  if(e.key === "Escape") cerrarBannerPromo();
+});
 
 /* ---------- enlaces "Instalar app" y "Activa los avisos": desactivados
    por ahora a petición del club (todavía no ha empezado la liga) -- toda
