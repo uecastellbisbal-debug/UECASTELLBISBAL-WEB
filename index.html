@@ -4526,8 +4526,8 @@ function pintarCalendario(){
       horaHTML = `<span class="cal-hora cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
-      fechaHTML = `<span class="cal-fecha">${p.fecha}</span>`;
-      horaHTML = `<span class="cal-hora">${formatearHora(p.hora)}</span>`;
+      fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
+      horaHTML = `<span class="cal-hora">${escaparHTML(formatearHora(p.hora))}</span>`;
     }
 
     row.innerHTML = `
