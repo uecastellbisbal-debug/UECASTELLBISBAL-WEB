@@ -3853,6 +3853,24 @@ function parseFecha(fecha){
   return new Date(y, m - 1, d);
 }
 
+/* ---------- decide si un partido ya cuenta como jugado (para mostrar su
+   marcador en el banner, "Último partido" y el calendario) -- no basta con
+   que las celdas de goles no estén vacías: podrían llevar un "0" puesto de
+   antemano para un partido que todavía no se ha jugado. Se usa el mismo
+   criterio en los tres sitios:
+     - aplazado: nunca tiene resultado, aunque su fecha original ya pasara
+     - final / en directo / suspendido: se fía de lo marcado a mano en la hoja
+     - próximo (o sin marcar): solo si la fecha ya pasó, por si se olvidó
+       marcarlo como "final" ---------- */
+function partidoTieneResultado(p){
+  if(p.golesLocal === null || p.golesVisitante === null) return false;
+  if(p.estado === "aplazado") return false;
+  if(p.estado === "final" || p.estado === "en_directo" || p.estado === "suspendido") return true;
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return parseFecha(p.fecha) < hoy;
+}
+
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
    la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda
    (un partido ya "final" es historial, no debe volver a salir como
@@ -3929,7 +3947,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   banner.classList.remove("is-directo", "is-final", "is-aplazado", "is-suspendido");
 
   const estado = partidoActual.estado || "proximo";
-  const tieneResultado = partidoActual.golesLocal !== null && partidoActual.golesVisitante !== null;
+  const tieneResultado = partidoTieneResultado(partidoActual);
   // crest1/name1 siempre es el equipo que juega en casa, así que sus goles
   // son siempre "golesLocal", sin importar si ese equipo es la UE Castellbisbal o no
   const golesCastellbisbal = tieneResultado ? (esLocal ? partidoActual.golesLocal : partidoActual.golesVisitante) : 0;
@@ -4304,7 +4322,7 @@ function pintarUltimoPartido(partidoAnterior){
   document.getElementById("ultimoName1").textContent = esLocal ? "UE Castellbisbal" : partidoAnterior.rival;
   document.getElementById("ultimoName2").textContent = esLocal ? partidoAnterior.rival : "UE Castellbisbal";
 
-  const tieneResultado = partidoAnterior.golesLocal !== null && partidoAnterior.golesVisitante !== null;
+  const tieneResultado = partidoTieneResultado(partidoAnterior);
   const score = document.getElementById("ultimoScore");
   let textoResultado = "";
   if(tieneResultado){
@@ -4418,7 +4436,7 @@ function pintarCalendario(){
   }
 
   partidosAMostrar.forEach(p => {
-    const tieneResultado = p.golesLocal !== null && p.golesVisitante !== null;
+    const tieneResultado = partidoTieneResultado(p);
     const esLocal = p.tipo === "LOCAL";
     const escudoRival = p.escudoRival || ESCUDO_GENERICO;
     const row = document.createElement("div");
