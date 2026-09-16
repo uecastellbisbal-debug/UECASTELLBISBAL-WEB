@@ -8,14 +8,17 @@
 
 <!-- Open Graph: la miniatura que se ve al compartir el enlace en WhatsApp, Instagram, Facebook, etc.
      Ya apunta al dominio definitivo, uecastellbisbal.cat (antes apuntaba
-     al dominio de pruebas de GitHub Pages). Pendiente: subir un
-     assets/og-image.png de 1200x630 dedicado -- de momento se reutiliza
-     el logo, que tiene otra proporción (1217x380). -->
+     al dominio de pruebas de GitHub Pages). Usa logo-uecastellbisbal-compartir.png
+     (fondo negro pintado de verdad) en vez del logo normal de la web, que
+     tiene el fondo transparente y se veía "invertido" (blanco) al
+     compartirlo en apps que rellenan la transparencia con blanco.
+     Pendiente: subir un assets/og-image.png de 1200x630 dedicado -- de
+     momento se reutiliza el logo, que tiene otra proporción (1217x380). -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://uecastellbisbal.cat/">
 <meta property="og:title" content="UE Castellbisbal">
 <meta property="og:description" content="Próximo partido, calendario, resultados y clasificación del primer equipo, Grupo 12 de Tercera Catalana.">
-<meta property="og:image" content="https://uecastellbisbal.cat/assets/logo-uecastellbisbal.png">
+<meta property="og:image" content="https://uecastellbisbal.cat/assets/logo-uecastellbisbal-compartir.png">
 <meta property="og:image:width" content="1217">
 <meta property="og:image:height" content="380">
 <meta property="og:locale" content="es_ES">
@@ -23,7 +26,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="UE Castellbisbal">
 <meta name="twitter:description" content="Próximo partido, calendario, resultados y clasificación del primer equipo, Grupo 12 de Tercera Catalana.">
-<meta name="twitter:image" content="https://uecastellbisbal.cat/assets/logo-uecastellbisbal.png">
+<meta name="twitter:image" content="https://uecastellbisbal.cat/assets/logo-uecastellbisbal-compartir.png">
 
 <link rel="icon" type="image/png" id="favicon" href="">
 
@@ -4425,7 +4428,7 @@ function pintarUltimoPartido(partidoAnterior){
 /* ---------- comparte por WhatsApp, con la imagen de marca adjunta cuando es posible ---------- */
 async function compartirPorWhatsapp(texto){
   try{
-    const respuesta = await fetch("assets/logo-uecastellbisbal.png");
+    const respuesta = await fetch("assets/logo-uecastellbisbal-compartir.png");
     const blob = await respuesta.blob();
     const archivo = new File([blob], "uecastellbisbal-cat.png", { type: blob.type });
 
