@@ -960,6 +960,10 @@ a:focus-visible, button:focus-visible{
   font-weight:600;
   color:var(--white-dim);
 }
+/* dentro del cuerpo técnico, cada nombre debe quedar en su propia línea
+   (el recuadro de Fisio tiene dos) -- roster-name-wrap es inline-block por
+   defecto, pensado para la lista de jugadores, donde sí puede convenir */
+.staff-name.roster-name-wrap{ display:block; }
 .roster-box{
   margin-top:16px;
   padding:28px 32px;
@@ -2806,11 +2810,11 @@ a:focus-visible, button:focus-visible{
       </div>
       <div class="staff-box">
         <p class="staff-label">Segundo entrenador</p>
-        <p class="staff-name">Juanan Fernández</p>
+        <p class="staff-name roster-name-wrap" tabindex="0">Juanan Fernández<span class="roster-photo-popup" style="background-image:url('assets/jugadores/juanan-fernandez.jpg'); background-size:cover;"></span></p>
       </div>
       <div class="staff-box">
         <p class="staff-label">Delegado</p>
-        <p class="staff-name">Marc Jiménez</p>
+        <p class="staff-name roster-name-wrap" tabindex="0">Marc Jiménez<span class="roster-photo-popup" style="background-image:url('assets/jugadores/marc-jimenez.jpg'); background-size:cover;"></span></p>
       </div>
       <div class="staff-box">
         <p class="staff-label">Delegado de campo</p>
@@ -2818,12 +2822,12 @@ a:focus-visible, button:focus-visible{
       </div>
       <div class="staff-box">
         <p class="staff-label">Entrenador de porteros</p>
-        <p class="staff-name">Aleix Ruiz</p>
+        <p class="staff-name roster-name-wrap" tabindex="0">Aleix Ruiz<span class="roster-photo-popup" style="background-image:url('assets/jugadores/aleix-ruiz.jpg'); background-size:cover;"></span></p>
       </div>
       <div class="staff-box staff-box-fisio">
         <p class="staff-label">Fisio</p>
-        <p class="staff-name">Oscar Maza</p>
-        <p class="staff-name">Juan Bonache</p>
+        <p class="staff-name roster-name-wrap" tabindex="0">Oscar Maza<span class="roster-photo-popup" style="background-image:url('assets/jugadores/oscar-maza.jpg'); background-size:cover;"></span></p>
+        <p class="staff-name roster-name-wrap" tabindex="0">Juan Bonache<span class="roster-photo-popup" style="background-image:url('assets/jugadores/juan-bonache.jpg'); background-size:cover;"></span></p>
       </div>
     </div>
 
@@ -4775,13 +4779,19 @@ document.getElementById("btnVerMasCalendario").onclick = () => {
    adelante lo lleva sin tener que tocar esto ---------- */
 document.querySelectorAll(".roster-photo-popup").forEach(popup => {
   if(!popup.style.backgroundImage) return;
-  const nombre = popup.previousElementSibling;
-  if(!nombre || !nombre.classList.contains("roster-name")) return;
+  // en la lista de jugadores el nombre va en su propio <span class="roster-name">
+  // justo antes de la foto; en el cuerpo técnico (Dirección deportiva) el
+  // texto va suelto dentro del propio roster-name-wrap, sin ese span aparte
+  const anterior = popup.previousElementSibling;
   const icono = document.createElement("span");
   icono.className = "roster-photo-icon";
   icono.setAttribute("aria-hidden", "true");
   icono.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
-  nombre.appendChild(icono);
+  if(anterior && anterior.classList.contains("roster-name")){
+    anterior.appendChild(icono);
+  }else{
+    popup.parentElement.insertBefore(icono, popup);
+  }
 });
 /* la carga real (calendario, clasificación, radar) se dispara junto al
    resto del arranque, al final de este script -- así el radar puede
