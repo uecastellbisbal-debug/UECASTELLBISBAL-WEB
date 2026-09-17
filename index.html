@@ -925,6 +925,15 @@ a:focus-visible, button:focus-visible{
   border:1px solid var(--line);
   border-radius:4px;
 }
+@media (min-width:901px){
+  /* con el recuadro de Fisio ya son 6 -- no caben en 5 columnas iguales,
+     así que este pasa a ocupar su propia fila entera debajo */
+  .staff-box-fisio{
+    grid-column:1 / -1;
+    border-top:1px solid var(--line);
+  }
+  .staff-grid > .staff-box:nth-child(5){ border-right:none; }
+}
 @media (max-width:900px){
   .staff-grid{ grid-template-columns:repeat(3, 1fr); }
   .staff-box{ border-bottom:1px solid var(--line); }
@@ -2810,6 +2819,11 @@ a:focus-visible, button:focus-visible{
       <div class="staff-box">
         <p class="staff-label">Entrenador de porteros</p>
         <p class="staff-name">Aleix Ruiz</p>
+      </div>
+      <div class="staff-box staff-box-fisio">
+        <p class="staff-label">Fisio</p>
+        <p class="staff-name">Oscar Maza</p>
+        <p class="staff-name">Juan Bonache</p>
       </div>
     </div>
 
