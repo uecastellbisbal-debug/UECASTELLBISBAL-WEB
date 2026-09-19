@@ -2494,8 +2494,8 @@ a:focus-visible, button:focus-visible{
 <body>
 <!-- ============ BANNER PROMOCIONAL A PANTALLA ============
      Aviso puntual (partido, evento...) que tapa la pantalla al entrar.
-     Para cambiarlo: sustituye la imagen en assets/banners/ y actualiza
-     BANNER_PROMOCIONAL_IMG más abajo, en el script. Para desactivarlo sin
+     Cambia de imagen solo a una hora programada (ver BANNER_PROMOCIONAL_CAMBIO
+     más abajo, en el script) sin desaparecer. Para desactivarlo del todo sin
      borrar nada, pon MOSTRAR_BANNER_PROMOCIONAL a false (también en el script). -->
 <div class="banner-promo-overlay" id="bannerPromoOverlay" style="display:none;">
   <div class="banner-promo-box">
@@ -4606,23 +4606,26 @@ if("serviceWorker" in navigator){
 }
 
 /* ---------- banner promocional a pantalla ----------
-   Para poner un aviso nuevo: cambia la imagen de BANNER_PROMOCIONAL_IMG
-   (guárdala en assets/banners/). Para quitar el aviso sin borrar nada,
-   pon MOSTRAR_BANNER_PROMOCIONAL a false. */
+   Para desactivarlo del todo sin borrar nada, pon MOSTRAR_BANNER_PROMOCIONAL
+   a false. Mientras esté activo, cambia de imagen solo (sin desaparecer) en
+   cuanto se cumpla la fecha/hora de BANNER_PROMOCIONAL_CAMBIO (la del propio
+   dispositivo de quien visita la web): antes de esa hora muestra el aviso
+   del partido, a partir de esa hora pasa a mostrar el agradecimiento a los
+   colaboradores. Mes en 0: Ene=0, Feb=1 ... Sep=8, Oct=9... */
 const MOSTRAR_BANNER_PROMOCIONAL = true;
-const BANNER_PROMOCIONAL_IMG = "assets/banners/banner-promo-test.jpg";
-// se apaga solo a partir de esta fecha y hora (la del propio dispositivo
-// de quien visita la web), sin tener que venir a tocar nada -- pensado
-// para que el aviso del partido deje de salir una vez ya ha empezado.
-// Mes en 0: Ene=0, Feb=1 ... Sep=8, Oct=9...
-const BANNER_PROMOCIONAL_HASTA = new Date(2026, 8, 19, 16, 0);
+const BANNER_PROMOCIONAL_IMG_ANTES = "assets/banners/banner-promo-test.jpg";
+const BANNER_PROMOCIONAL_IMG_DESPUES = "assets/colaboradores-agraiments.jpg";
+const BANNER_PROMOCIONAL_CAMBIO = new Date(2026, 8, 19, 16, 0);
 
 const bannerPromoOverlay = document.getElementById("bannerPromoOverlay");
 function cerrarBannerPromo(){
   bannerPromoOverlay.style.display = "none";
 }
-if(MOSTRAR_BANNER_PROMOCIONAL && new Date() < BANNER_PROMOCIONAL_HASTA){
-  document.getElementById("bannerPromoImg").src = BANNER_PROMOCIONAL_IMG;
+if(MOSTRAR_BANNER_PROMOCIONAL){
+  const imagenBannerPromo = new Date() < BANNER_PROMOCIONAL_CAMBIO
+    ? BANNER_PROMOCIONAL_IMG_ANTES
+    : BANNER_PROMOCIONAL_IMG_DESPUES;
+  document.getElementById("bannerPromoImg").src = imagenBannerPromo;
   bannerPromoOverlay.style.display = "flex";
 }
 document.getElementById("btnCerrarBannerPromo").onclick = cerrarBannerPromo;
