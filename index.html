@@ -3987,36 +3987,42 @@ function partidoTieneResultado(p){
 }
 
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
-   la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda
-   (un partido ya "final" es historial, no debe volver a salir como
-   destacado aunque sea el más reciente). Si ninguna fila tiene "proximo"
-   ni "en_directo" (por ejemplo, con los datos de ejemplo, o si aún no se
-   ha marcado nada), se usa la fecha de hoy como respaldo. ---------- */
+   la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda.
+   Si ninguna fila tiene "proximo" ni "en_directo" -- por ejemplo, justo
+   después de marcar un partido como "final" y antes de marcar el
+   siguiente -- el destacado se queda en ese último "final" en vez de
+   saltar solo al próximo partido de la hoja sin marcar: así el resultado
+   se queda un tiempo arriba, a la vista, hasta que marquéis a mano cuál
+   es el próximo partido. Solo si todavía no hay NINGÚN partido "final"
+   (inicio de temporada) se usa como respaldo el primero que no sea
+   "final". ---------- */
 function seleccionarPartidos(){
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
-  let indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
-
-  if(indiceActual === -1){
-    // si ninguna fila está marcada como "proximo"/"en_directo", el
-    // siguiente partido de verdad es el primero que todavía no esté
-    // "final" (no se puede usar solo la fecha: si la temporada tiene
-    // partidos con fecha muy adelantada ya jugados -- por ejemplo de
-    // prueba --, comparar contra la fecha de hoy elegiría ese partido
-    // viejo en vez del próximo real)
-    indiceActual = ordenados.findIndex(p => p.estado !== "final");
-    if(indiceActual === -1) indiceActual = ordenados.length - 1; // temporada acabada: se queda en el último
-  }
 
   // "partido anterior" (tarjeta de "Último partido"): el último marcado
   // "final" en la hoja, por fecha -- no la fila justo antes en la lista,
   // porque puede haber más de un "final" (o huecos) y no tiene por qué
   // coincidir con la fila anterior a la destacada
   const finales = ordenados.filter(p => p.estado === "final");
+  const partidoAnterior = finales.length ? finales[finales.length - 1] : null;
 
-  return {
-    partidoActual: ordenados[indiceActual],
-    partidoAnterior: finales.length ? finales[finales.length - 1] : null
-  };
+  const indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
+
+  let partidoActual;
+  if(indiceActual !== -1){
+    partidoActual = ordenados[indiceActual];
+  }else if(partidoAnterior){
+    // nada marcado "proximo"/"en_directo" todavía: seguimos mostrando el
+    // último resultado como destacado hasta que se marque el siguiente
+    partidoActual = partidoAnterior;
+  }else{
+    // inicio de temporada: todavía no hay ningún "final" ni nada marcado
+    // -- de respaldo, el primero que no sea "final"
+    const indiceNoFinal = ordenados.findIndex(p => p.estado !== "final");
+    partidoActual = ordenados[indiceNoFinal !== -1 ? indiceNoFinal : ordenados.length - 1];
+  }
+
+  return { partidoActual, partidoAnterior };
 }
 
 /* ---------- pinta el banner de arriba (próximo / en directo / final) ---------- */
