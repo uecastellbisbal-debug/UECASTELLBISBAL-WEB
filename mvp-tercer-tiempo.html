@@ -279,7 +279,7 @@ ul{ list-style:none; }
 .mvp-fecha{ font-size:12.5px; color:var(--white-faint); margin-left:auto; }
 .mvp-carousel{
   position:relative;
-  aspect-ratio:4/3;
+  aspect-ratio:4/5;
   overflow:hidden;
   background:#000;
   touch-action:pan-y;
@@ -291,7 +291,7 @@ ul{ list-style:none; }
 }
 .mvp-carousel-track img{
   height:100%;
-  object-fit:cover;
+  object-fit:contain;
   flex:none;
 }
 .mvp-carousel-arrow{
@@ -521,7 +521,7 @@ ul{ list-style:none; }
    a este array (el más reciente sale siempre arriba, se ordena solo).
    ============================================================ */
 let jornadasMVP = [
-  // { jornada: 1, rival: "Vallirana C.F.", fecha: "19/09/2026", fotos: ["assets/mvp-tercer-tiempo/j1-1.jpg", "assets/mvp-tercer-tiempo/j1-2.jpg", "assets/mvp-tercer-tiempo/j1-3.jpg"] },
+  { jornada: 1, rival: "Vallirana C.F.", fecha: "19/09/2026", fotos: ["assets/mvp-tercer-tiempo/j1-1.jpg", "assets/mvp-tercer-tiempo/j1-2.jpg", "assets/mvp-tercer-tiempo/j1-3.jpg"] },
 ];
 
 function escaparHTML(texto){
