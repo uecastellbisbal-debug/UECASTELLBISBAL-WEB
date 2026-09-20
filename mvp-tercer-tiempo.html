@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP y Tercer Tiempo — UE Castellbisbal</title>
+<meta name="description" content="Galería de fotos del MVP y el tercer tiempo de cada jornada como local de la UE Castellbisbal.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="MVP y Tercer Tiempo — UE Castellbisbal">
+<meta property="og:description" content="Galería de fotos del MVP y el tercer tiempo de cada jornada como local de la UE Castellbisbal.">
+<meta property="og:image" content="https://uecastellbisbal.cat/assets/logo-uecastellbisbal-compartir.png">
+
+<link rel="icon" type="image/png" id="favicon" href="">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+/* ============================================================
+   Esta página reutiliza las mismas variables, tipografías, cabecera
+   y pie de página que index.html, para que se vea exactamente igual
+   -- si algún día cambian los colores o el estilo de la cabecera en
+   la web principal, hay que replicar el cambio aquí también.
+   ============================================================ */
+
+:root{
+  --black:        #050505;
+  --black-soft:   #0e0e10;
+  --black-card:   #131315;
+  --line:         rgba(245,245,243,0.10);
+  --white:        #f5f5f3;
+  --white-dim:    rgba(245,245,243,0.62);
+  --white-faint:  rgba(245,245,243,0.38);
+  --lilac:        #7b35c8;
+  --lilac-light:  #a868e8;
+  --lilac-dark:   #2e1150;
+  --crest-blue:   #1e64aa;
+
+  --display: "Archivo Black", "Arial Black", sans-serif;
+  --body: "Inter", -apple-system, sans-serif;
+
+  --wrap: 1180px;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; overscroll-behavior-y:none; }
+
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--body);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+.page-body{ position:relative; background:var(--black); }
+
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+
+.wrap{
+  max-width:var(--wrap);
+  margin:0 auto;
+  padding:0 32px;
+}
+@media (max-width:640px){
+  .wrap{ padding:0 22px; }
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .8s ease, transform .8s ease;
+}
+.reveal.is-visible{ opacity:1; transform:translateY(0); }
+
+/* ============================================================
+   CABECERA (idéntica a index.html, pero sin la barra lila de
+   arriba de todo, así que empieza pegada al top:0)
+   ============================================================ */
+.site-header{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:100;
+  padding:22px 0;
+  transition:background .4s ease, padding .4s ease, border-color .4s ease;
+  border-bottom:1px solid transparent;
+  transform:translateZ(0);
+  -webkit-transform:translateZ(0);
+}
+.site-header.is-scrolled{
+  background:rgba(5,5,5,0.86);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  padding:14px 0;
+  border-bottom:1px solid var(--line);
+}
+.site-header .wrap{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:24px;
+  max-width:1500px;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(15px, 2.4vw, 22px);
+  line-height:1;
+  letter-spacing:0.01em;
+  white-space:nowrap;
+  background:linear-gradient(180deg, #f7e9ab 0%, #d4af37 42%, #a8791f 58%, #f0d878 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+}
+@media (max-width:480px){ .brand-title{ font-size:14px; } }
+.crest{ width:52px; height:52px; object-fit:contain; flex:none; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.6)); }
+.header-nav{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:center;
+  gap:9px 18px;
+  font-size:10.5px;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--white-dim);
+  white-space:nowrap;
+}
+.header-nav a{ transition:color .25s ease; }
+.header-nav a:hover{ color:var(--white); }
+.nav-activa{ color:var(--white); font-weight:800; }
+.nav-instagram{
+  display:none;
+  align-items:center;
+  gap:8px;
+  font-family:var(--display);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:0.01em;
+  color:var(--white);
+  text-decoration:none;
+  transition:color .2s ease;
+}
+.nav-instagram:hover{ color:var(--lilac-light); }
+.nav-instagram svg{ width:20px; height:20px; flex:none; color:var(--lilac-light); }
+
+.menu-toggle{
+  display:none;
+  grid-column:3;
+  flex-direction:column;
+  gap:5px;
+  background:none;
+  border:none;
+  padding:6px;
+}
+.menu-toggle span{
+  width:22px; height:2px;
+  background:var(--white);
+  display:block;
+  transition:transform .25s ease, opacity .25s ease;
+}
+.menu-toggle.is-open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.menu-toggle.is-open span:nth-child(2){ opacity:0; }
+.menu-toggle.is-open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+@media (max-width:1320px){
+  .header-nav{
+    display:flex;
+    position:fixed;
+    top:0; right:0;
+    height:100svh;
+    width:min(78vw, 320px);
+    flex-direction:column;
+    justify-content:center;
+    gap:32px;
+    background:rgba(5,5,5,0.98);
+    border-left:1px solid var(--line);
+    padding:32px;
+    transform:translateX(100%);
+    transition:transform .35s ease;
+    font-size:15px;
+    letter-spacing:0.02em;
+    z-index:99;
+  }
+  .header-nav.is-open{ transform:translateX(0); }
+  .menu-toggle{ display:flex; z-index:101; }
+  .nav-instagram{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-left:14px;
+    padding-bottom:24px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+    text-transform:none;
+    letter-spacing:normal;
+    font-weight:700;
+    color:var(--lilac-light);
+  }
+  .nav-instagram svg{ width:18px; height:18px; flex:none; color:var(--lilac-light); }
+  .nav-instagram:hover{ color:var(--white); }
+}
+
+/* ============================================================
+   SECCIÓN — genérico
+   ============================================================ */
+.section{ padding:120px 0; }
+@media (max-width:640px){ .section{ padding:80px 0; } }
+.mvp-hero{ padding-top:150px; padding-bottom:0; }
+@media (max-width:640px){ .mvp-hero{ padding-top:110px; } }
+.mvp-lista{ padding-top:48px; }
+
+.section-eyebrow{
+  font-size:12px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+}
+.section-title{
+  font-family:var(--display);
+  text-transform:uppercase;
+  font-size:clamp(28px, 4vw, 42px);
+  margin-top:10px;
+}
+.mvp-intro{
+  max-width:640px;
+  margin-top:16px;
+  color:var(--white-dim);
+  font-size:15px;
+  line-height:1.7;
+}
+
+/* ============================================================
+   MVP Y TERCER TIEMPO — tarjetas con carrusel de 3 fotos
+   ============================================================ */
+.mvp-vacio{
+  padding:48px 24px;
+  text-align:center;
+  border:1px dashed var(--line);
+  border-radius:8px;
+  color:var(--white-faint);
+  font-size:14px;
+}
+.mvp-card{
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--black-soft);
+  overflow:hidden;
+  margin-bottom:28px;
+}
+.mvp-card-header{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px 16px;
+  padding:18px 20px;
+  border-bottom:1px solid var(--line);
+}
+.mvp-jornada{
+  font-family:var(--display);
+  font-size:13px;
+  color:var(--lilac-light);
+  background:rgba(123,53,200,0.18);
+  padding:4px 10px;
+  border-radius:4px;
+}
+.mvp-rival{ font-weight:700; color:var(--white); font-size:14.5px; }
+.mvp-fecha{ font-size:12.5px; color:var(--white-faint); margin-left:auto; }
+.mvp-carousel{
+  position:relative;
+  aspect-ratio:4/3;
+  overflow:hidden;
+  background:#000;
+  touch-action:pan-y;
+}
+.mvp-carousel-track{
+  display:flex;
+  height:100%;
+  transition:transform .35s ease;
+}
+.mvp-carousel-track img{
+  height:100%;
+  object-fit:cover;
+  flex:none;
+}
+.mvp-carousel-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:36px; height:36px;
+  border-radius:50%;
+  background:rgba(5,5,5,0.55);
+  border:1px solid rgba(245,245,243,0.25);
+  color:var(--white);
+  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .2s ease, border-color .2s ease;
+}
+.mvp-carousel-arrow:hover{ background:var(--lilac); border-color:var(--lilac-light); }
+.mvp-carousel-prev{ left:10px; }
+.mvp-carousel-next{ right:10px; }
+.mvp-carousel-dots{
+  position:absolute;
+  left:0; right:0; bottom:12px;
+  display:flex;
+  justify-content:center;
+  gap:6px;
+}
+.mvp-dot{
+  width:7px; height:7px;
+  border-radius:50%;
+  background:rgba(245,245,243,0.35);
+  cursor:pointer;
+  transition:background .2s ease, transform .2s ease;
+}
+.mvp-dot.is-active{ background:var(--lilac-light); transform:scale(1.25); }
+@media (max-width:640px){
+  .mvp-card-header{ padding:14px 16px; }
+  .mvp-carousel-arrow{ width:32px; height:32px; font-size:16px; }
+}
+
+/* ============================================================
+   VOLVER ARRIBA
+   ============================================================ */
+.back-to-top{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:90;
+  width:44px; height:44px;
+  border-radius:50%;
+  background:rgba(5,5,5,0.75);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  border:1px solid rgba(123,53,200,0.5);
+  color:var(--white);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease, background .25s ease, border-color .25s ease;
+}
+.back-to-top.is-visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.back-to-top:hover{ background:var(--lilac); border-color:var(--lilac-light); }
+@media (max-width:640px){ .back-to-top{ right:16px; bottom:16px; width:40px; height:40px; } }
+.back-to-top-crest{
+  position:fixed;
+  right:26px;
+  bottom:76px;
+  z-index:90;
+  width:34px;
+  height:auto;
+  filter:grayscale(1) contrast(0.95);
+  opacity:0;
+  transform:translateY(10px);
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.back-to-top-crest.is-visible{ opacity:0.85; transform:translateY(0); }
+@media (max-width:640px){ .back-to-top-crest{ right:18px; bottom:64px; width:28px; } }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{ padding:56px 0 40px; border-top:1px solid var(--line); }
+.sitemap-footer{
+  max-width:640px;
+  margin:0 auto 28px;
+  padding-bottom:28px;
+  border-bottom:1px solid var(--line);
+  text-align:center;
+}
+.sitemap-title{
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--lilac-light);
+  font-weight:700;
+  margin-bottom:14px;
+}
+.sitemap-links{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px 24px;
+  font-size:12.5px;
+  color:var(--white-dim);
+}
+.sitemap-links a{ transition:color .2s ease; }
+.sitemap-links a:hover{ color:var(--white); }
+.footer-disclaimer{
+  max-width:560px;
+  margin:0 auto 24px;
+  text-align:center;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--white-faint);
+}
+.footer-bottom{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  font-size:12px;
+  color:var(--white-faint);
+}
+.footer-bottom a:hover{ color:var(--white); }
+.footer-credit{ margin-top:16px; text-align:center; font-size:11px; color:var(--white-faint); }
+.footer-credit a{ color:var(--white-faint); text-decoration:none; font-weight:700; transition:color .2s ease; }
+.footer-credit a:hover{ color:var(--lilac-light); }
+
+</style>
+</head>
+<body>
+
+<div class="page-body">
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <div class="brand">
+      <img class="crest" style="display:none" src="assets/escudo-castellbisbal.png" alt="" aria-hidden="true">
+      <a href="index.html"><p class="brand-title">Uecastellbisbal.cat</p></a>
+    </div>
+    <nav class="header-nav" id="headerNav">
+      <a class="nav-instagram" href="https://www.instagram.com/uecastellbisbal?igsh=MTdzeDJhbTNnbmprcg==" target="_blank" rel="noopener" aria-label="Sigue a la UE Castellbisbal en Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span>Sigue a la UE en Instagram</span>
+      </a>
+      <a href="index.html#ultimo-partido">Último partido</a>
+      <a href="index.html#radar-resumen">Radar de temporada</a>
+      <a href="index.html#calendario">Calendario y resultados</a>
+      <a href="index.html#clasificacion">Clasificación</a>
+      <a href="index.html#plantilla">Plantilla</a>
+      <a href="mvp-tercer-tiempo.html" class="nav-activa">MVP y Tercer Tiempo</a>
+      <a href="index.html#colaboradores">Colaboradores</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<section class="section mvp-hero reveal">
+  <div class="wrap">
+    <p class="section-eyebrow">Temporada 2026/27</p>
+    <h1 class="section-title">MVP y Tercer Tiempo</h1>
+    <p class="mvp-intro">Cada jornada que jugamos como locales: el mejor jugador del partido y los momentos del tercer tiempo, en fotos.</p>
+  </div>
+</section>
+
+<section class="section mvp-lista reveal">
+  <div class="wrap">
+    <div id="mvpLista"></div>
+  </div>
+</section>
+
+</main>
+
+<img class="back-to-top-crest" id="backToTopCrest" src="" alt="">
+<button class="back-to-top" id="btnBackToTop" aria-label="Volver arriba">
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="sitemap-footer">
+      <p class="sitemap-title">Mapa web</p>
+      <nav class="sitemap-links">
+        <a href="index.html#ultimo-partido">Último partido</a>
+        <a href="index.html#radar-resumen">Radar de temporada</a>
+        <a href="index.html#calendario">Calendario y resultados</a>
+        <a href="index.html#clasificacion">Clasificación</a>
+        <a href="index.html#plantilla">Plantilla</a>
+        <a href="mvp-tercer-tiempo.html">MVP y Tercer Tiempo</a>
+        <a href="index.html#colaboradores">Colaboradores</a>
+      </nav>
+    </div>
+    <p class="footer-disclaimer">Página web comunitaria no oficial — Sin afiliación con UE Castellbisbal. Creada por aficionados para los aficionados. Todos los derechos de marca y contenido pertenecen a sus respectivos propietarios.</p>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> UE Castellbisbal</span>
+    </div>
+    <p class="footer-credit">Página hecha íntegramente con IA — <a href="https://claude.com" target="_blank" rel="noopener">Claude</a>, de Anthropic</p>
+  </div>
+</footer>
+
+</div><!-- /.page-body -->
+
+<script>
+
+/* ============================================================
+   MVP Y TERCER TIEMPO
+   ------------------------------------------------------------
+   3 fotos por cada jornada jugada como LOCAL: el MVP del partido
+   y el tercer tiempo. Se añaden a mano, jornada a jornada (el club
+   manda las fotos y se suben aquí junto con el resto de cambios de
+   la web) -- a diferencia del resto de la web, esta sección NO se
+   lee de ningún Google Sheet.
+
+   Fotos guardadas en assets/mvp-tercer-tiempo/jXX-1.jpg, jXX-2.jpg,
+   jXX-3.jpg. Para añadir una jornada nueva, se añade un objeto más
+   a este array (el más reciente sale siempre arriba, se ordena solo).
+   ============================================================ */
+let jornadasMVP = [
+  // { jornada: 1, rival: "Vallirana C.F.", fecha: "19/09/2026", fotos: ["assets/mvp-tercer-tiempo/j1-1.jpg", "assets/mvp-tercer-tiempo/j1-2.jpg", "assets/mvp-tercer-tiempo/j1-3.jpg"] },
+];
+
+function escaparHTML(texto){
+  const div = document.createElement("div");
+  div.textContent = texto ?? "";
+  return div.innerHTML;
+}
+
+function pintarMVP(){
+  const cont = document.getElementById("mvpLista");
+
+  if(!jornadasMVP.length){
+    cont.innerHTML = `<p class="mvp-vacio">Todavía no hay fotos publicadas. En cuanto juguemos en casa, aquí aparecerán el MVP y el tercer tiempo de cada jornada.</p>`;
+    return;
+  }
+
+  const ordenadas = [...jornadasMVP].sort((a, b) => b.jornada - a.jornada);
+
+  cont.innerHTML = ordenadas.map(j => {
+    const total = j.fotos.length;
+    const anchoImg = (100 / total).toFixed(4);
+    const anchoTrack = (total * 100);
+    const fotosHTML = j.fotos.map(f =>
+      `<img src="${f}" alt="MVP y tercer tiempo, jornada ${j.jornada}" style="width:${anchoImg}%" loading="lazy">`
+    ).join("");
+    const dotsHTML = j.fotos.map((_, i) =>
+      `<span class="mvp-dot${i === 0 ? " is-active" : ""}"></span>`
+    ).join("");
+    return `
+      <div class="mvp-card">
+        <div class="mvp-card-header">
+          <span class="mvp-jornada">J${j.jornada}</span>
+          <span class="mvp-rival">UE Castellbisbal vs ${escaparHTML(j.rival)}</span>
+          <span class="mvp-fecha">${escaparHTML(j.fecha)}</span>
+        </div>
+        <div class="mvp-carousel">
+          <div class="mvp-carousel-track" style="width:${anchoTrack}%">${fotosHTML}</div>
+          <button class="mvp-carousel-arrow mvp-carousel-prev" type="button" aria-label="Foto anterior">‹</button>
+          <button class="mvp-carousel-arrow mvp-carousel-next" type="button" aria-label="Foto siguiente">›</button>
+          <div class="mvp-carousel-dots">${dotsHTML}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  document.querySelectorAll(".mvp-carousel").forEach(car => {
+    const track = car.querySelector(".mvp-carousel-track");
+    const dots = [...car.querySelectorAll(".mvp-dot")];
+    const total = dots.length;
+    let indice = 0;
+
+    function ir(nuevo){
+      indice = (nuevo + total) % total;
+      track.style.transform = `translateX(-${indice * (100 / total)}%)`;
+      dots.forEach((d, i) => d.classList.toggle("is-active", i === indice));
+    }
+
+    car.querySelector(".mvp-carousel-prev").addEventListener("click", () => ir(indice - 1));
+    car.querySelector(".mvp-carousel-next").addEventListener("click", () => ir(indice + 1));
+    dots.forEach((d, i) => d.addEventListener("click", () => ir(i)));
+
+    let inicioX = null;
+    car.addEventListener("touchstart", e => { inicioX = e.touches[0].clientX; }, { passive:true });
+    car.addEventListener("touchend", e => {
+      if(inicioX === null) return;
+      const delta = e.changedTouches[0].clientX - inicioX;
+      if(Math.abs(delta) > 40) ir(indice + (delta < 0 ? 1 : -1));
+      inicioX = null;
+    });
+  });
+}
+pintarMVP();
+
+/* ---------- favicon dinámico (usa el mismo escudo ya incrustado) ---------- */
+document.getElementById("favicon").href = document.querySelector(".crest").src;
+
+/* ---------- año automático en el footer ---------- */
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* ---------- menú móvil ---------- */
+const menuToggle = document.getElementById("menuToggle");
+const headerNav = document.getElementById("headerNav");
+menuToggle.addEventListener("click", () => {
+  const abierto = headerNav.classList.toggle("is-open");
+  menuToggle.classList.toggle("is-open", abierto);
+  menuToggle.setAttribute("aria-expanded", abierto ? "true" : "false");
+});
+headerNav.querySelectorAll("a").forEach(a => {
+  a.addEventListener("click", () => {
+    headerNav.classList.remove("is-open");
+    menuToggle.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  });
+});
+
+/* ---------- cabecera: fondo sólido al hacer scroll ---------- */
+const header = document.getElementById("siteHeader");
+window.addEventListener("scroll", () => {
+  header.classList.toggle("is-scrolled", window.scrollY > 40);
+});
+
+/* ---------- botón "volver arriba", con el escudo encima ---------- */
+const btnBackToTop = document.getElementById("btnBackToTop");
+const backToTopCrest = document.getElementById("backToTopCrest");
+backToTopCrest.src = document.querySelector(".crest").src;
+window.addEventListener("scroll", () => {
+  const visible = window.scrollY > 700;
+  btnBackToTop.classList.toggle("is-visible", visible);
+  backToTopCrest.classList.toggle("is-visible", visible);
+});
+btnBackToTop.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ---------- animación de aparición al hacer scroll ---------- */
+const revealEls = document.querySelectorAll(".reveal");
+if("IntersectionObserver" in window){
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add("is-visible");
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:0.1 });
+  revealEls.forEach(el => io.observe(el));
+}else{
+  revealEls.forEach(el => el.classList.add("is-visible"));
+}
+
+</script>
+</body>
+</html>
