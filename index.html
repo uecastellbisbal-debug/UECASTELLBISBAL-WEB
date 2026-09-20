@@ -1301,6 +1301,65 @@ a:focus-visible, button:focus-visible{
   .radar-charts{ grid-template-columns:1fr; }
 }
 
+.radar-goleadores{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  margin-top:24px;
+}
+@media (max-width:768px){
+  .radar-goleadores{ grid-template-columns:1fr; }
+}
+.goleadores-list{ display:flex; flex-direction:column; }
+.gol-row{
+  display:grid;
+  grid-template-columns:20px 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  color:var(--white-dim);
+}
+.gol-row:last-child{ border-bottom:none; }
+.gol-pos{
+  font-family:var(--display);
+  font-size:13px;
+  color:var(--white-faint);
+}
+.gol-nombre{
+  font-weight:600;
+  color:var(--white);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.gol-equipo{
+  display:block;
+  font-size:10.5px;
+  font-weight:400;
+  color:var(--white-faint);
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.gol-goles{
+  font-family:var(--display);
+  font-size:14px;
+  color:var(--lilac-light);
+  font-weight:700;
+  white-space:nowrap;
+}
+.gol-row.es-nuestro .gol-pos,
+.gol-row.es-nuestro .gol-nombre{ color:var(--lilac-light); }
+.goleadores-vacio{
+  font-size:12.5px;
+  color:var(--white-faint);
+  padding:6px 0;
+}
+
 /* ============================================================
    SECCIÓN — genérico
    ============================================================ */
@@ -2798,6 +2857,20 @@ a:focus-visible, button:focus-visible{
         </div>
       </div>
     </div>
+    <div class="radar-goleadores">
+      <div class="radar-chart-box">
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Top 5 goleadores de la liga</p>
+        </div>
+        <div class="goleadores-list" id="golLigaList"></div>
+      </div>
+      <div class="radar-chart-box">
+        <div class="radar-chart-header">
+          <p class="radar-chart-title">Goleadores UE Castellbisbal</p>
+        </div>
+        <div class="goleadores-list" id="golCastellbisbalList"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -3624,6 +3697,94 @@ function pintarClasificacion(){
     `;
     cont.appendChild(row);
   });
+}
+
+/* ============================================================
+   GOLEADORES — se lee de su propia pestaña en Google Sheets
+   ------------------------------------------------------------
+   Esta pestaña la rellena sola un Apps Script (actualizarGoleadoresFCF,
+   igual que actualizarActasFCF para las actas) consultando la API de
+   goleadores de la federación, así que normalmente no hay que tocarla
+   a mano. Si algún día hiciera falta rellenarla a mano, basta con una
+   fila por jugador con estas 3 columnas, en cualquier orden de goles
+   (la web ya los ordena solos):
+
+   nombre, equipo, goles
+
+     nombre -> nombre y apellidos tal como los da la federación
+     equipo -> nombre EXACTO del club tal como lo da la federación
+               (para que la web detecte los nuestros, debe contener
+               la palabra "CASTELLBISBAL")
+     goles  -> goles totales en la temporada (número)
+
+   Mientras URL_GOLEADORES esté vacío, se usa este dato de ejemplo.
+   ============================================================ */
+let goleadores = [
+  { nombre: "Jordan Méndez", equipo: "CASTELLBISBAL, U.E.", goles: 0 }
+];
+
+const URL_GOLEADORES = "";
+
+function filaAGoleador(fila){
+  return {
+    nombre: fila.nombre || "",
+    equipo: fila.equipo || "",
+    goles: Number(fila.goles) || 0
+  };
+}
+
+/* ---------- carga los goleadores de la hoja (si hay URL y hay conexión) y,
+   tanto si vienen de la hoja como si se queda con el dato de ejemplo, pinta las dos listas ---------- */
+async function cargarGoleadoresYPintar(){
+  if(URL_GOLEADORES){
+    try{
+      const resp = await fetchCSVSinCache(URL_GOLEADORES);
+      if(resp.ok){
+        const filas = parsearCSV(await resp.text()).filter(f => f.nombre && f.goles);
+        if(filas.length) goleadores = filas.map(filaAGoleador);
+      }
+    }catch(err){
+      // sin conexión o falla la hoja: seguimos con el dato de ejemplo, la web no se rompe
+    }
+  }
+  pintarGoleadores();
+}
+
+/* ---------- pinta el top 5 de la liga y el listado completo de goleadores del Castellbisbal ---------- */
+function pintarGoleadores(){
+  const esNuestro = eq => eq.toUpperCase().includes("CASTELLBISBAL");
+  const ordenados = [...goleadores].sort((a, b) => b.goles - a.goles);
+
+  const contLiga = document.getElementById("golLigaList");
+  contLiga.innerHTML = "";
+  ordenados.slice(0, 5).forEach((j, i) => {
+    const row = document.createElement("div");
+    row.className = "gol-row" + (esNuestro(j.equipo) ? " es-nuestro" : "");
+    row.innerHTML = `
+      <span class="gol-pos">${i + 1}</span>
+      <span class="gol-nombre">${escaparHTML(j.nombre)}<span class="gol-equipo">${escaparHTML(j.equipo)}</span></span>
+      <span class="gol-goles">${j.goles}</span>
+    `;
+    contLiga.appendChild(row);
+  });
+
+  const contPropios = document.getElementById("golCastellbisbalList");
+  contPropios.innerHTML = "";
+  const propios = ordenados.filter(j => esNuestro(j.equipo));
+  if(!propios.length){
+    contPropios.innerHTML = `<p class="goleadores-vacio">Todavía no hay goles registrados.</p>`;
+  }else{
+    propios.forEach((j, i) => {
+      const row = document.createElement("div");
+      row.className = "gol-row es-nuestro";
+      row.innerHTML = `
+        <span class="gol-pos">${i + 1}</span>
+        <span class="gol-nombre">${escaparHTML(j.nombre)}</span>
+        <span class="gol-goles">${j.goles}</span>
+      `;
+      contPropios.appendChild(row);
+    });
+  }
 }
 
 /* ---------- cuenta los partidos ganados sobre los ya jugados (marcados
@@ -5052,6 +5213,7 @@ async function cargarCalendarioYArrancar(){
 const calendarioListo = cargarCalendarioYArrancar();
 cargarClasificacionYPintar();
 cargarRadarYPintar(calendarioListo);
+cargarGoleadoresYPintar();
 
 /* ---------- escudos por defecto, para que nunca se vean "rotos" mientras
    carga la hoja (o si falla la conexión, por ejemplo probando en local) ---------- */
