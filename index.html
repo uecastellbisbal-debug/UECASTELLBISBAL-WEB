@@ -1617,6 +1617,23 @@ a:focus-visible, button:focus-visible{
   font-family:var(--display);
   letter-spacing:0.04em;
 }
+.cal-resultado-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+}
+.cal-acta{
+  font-size:10px;
+  line-height:1;
+  text-decoration:none;
+  opacity:0.75;
+  filter:grayscale(1);
+}
+.cal-acta:hover{ opacity:1; }
+@media (max-width:640px){
+  .cal-acta{ font-size:9px; }
+}
 .calendar-row.gano .cal-fecha,
 .calendar-row.gano .cal-hora{ color:#4ade80; }
 .calendar-row.perdio .cal-fecha,
@@ -2584,6 +2601,7 @@ a:focus-visible, button:focus-visible{
       </div>
     </div>
     <a class="live-venue" id="liveVenue" href="https://maps.app.goo.gl/7GEpgcETFou2osYU9" target="_blank" rel="noopener">📍 Campo Municipal</a>
+    <a class="live-venue live-acta" id="liveActa" href="#" target="_blank" rel="noopener" style="display:none;">📋 Ver acta oficial</a>
     <div class="live-badge-wrap" id="liveBadgeWrap" style="display:none;"></div>
     <p class="live-clima" id="liveClima" style="display:none;"></p>
     <p class="live-cuenta-atras" id="liveCuentaAtras" style="display:none;"></p>
@@ -2662,6 +2680,7 @@ a:focus-visible, button:focus-visible{
       <p class="live-venue" id="ultimoInfo">Aún no se ha jugado ningún partido esta temporada</p>
       <div class="match-actions" id="ultimoActions" style="display:none;">
         <a class="match-action match-action-primary" id="btnWhatsapp" href="#" target="_blank" rel="noopener">Compartir resultado</a>
+        <a class="match-action" id="btnActaUltimo" href="#" target="_blank" rel="noopener" style="display:none;">📋 Ver acta oficial</a>
       </div>
     </div>
   </div>
@@ -4025,6 +4044,14 @@ function seleccionarPartidos(){
   return { partidoActual, partidoAnterior };
 }
 
+/* ---------- enlace al acta oficial de la FCF ----------
+   ENLACE_ACTA_FCF + el número de acta = la URL del acta en fcf.cat. Ese
+   número lo rellena solo un Apps Script en la columna "acta" de la hoja
+   de calendario (consulta periódicamente la API de partidos de la FCF y
+   busca la fila de la UE Castellbisbal en cada jornada) -- aquí solo se
+   usa si ya ha llegado un valor. */
+const ENLACE_ACTA_FCF = "https://www.fcf.cat/ca/competicio/acta/";
+
 /* ---------- pinta el banner de arriba (próximo / en directo / final) ---------- */
 /* dirección fija del campo propio, se usa solo si la hoja no trae nada para esa fila */
 const CAMPO_PROPIO_NOMBRE = "Campo Municipal";
@@ -4078,6 +4105,10 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
 
   const venueEl = document.getElementById("liveVenue");
   const badgeWrap = document.getElementById("liveBadgeWrap");
+  const actaEl = document.getElementById("liveActa");
+  // el enlace al acta solo tiene sentido con el partido ya acabado y su
+  // acta cerrada -- se vuelve a mostrar más abajo si toca
+  actaEl.style.display = "none";
 
   if(estado === "en_directo" || estado === "final" || estado === "aplazado" || estado === "suspendido"){
     banner.classList.add(
@@ -4106,6 +4137,13 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       badgeWrap.style.display = "";
       badgeWrap.innerHTML = badgePuntosHTML(golesCastellbisbal, golesRival);
       detenerRelojPartido();
+      // enlace al acta oficial, solo si ya ha llegado el número (lo rellena
+      // el Apps Script en cuanto la FCF cierra el acta -- puede tardar un
+      // poco desde que el partido pasa a "final")
+      if(partidoActual.acta){
+        actaEl.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoActual.acta);
+        actaEl.style.display = "";
+      }
       // y el mismo resultado se refleja también en la tarjeta de "Último
       // partido", sin tener que escribirlo dos veces
       pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
@@ -4409,6 +4447,15 @@ function pintarUltimoPartidoDesdeSheet(partido, golesCastellbisbal, golesRival){
     e.preventDefault();
     compartirPorWhatsapp(texto);
   };
+
+  const btnActaUltimo = document.getElementById("btnActaUltimo");
+  if(partido.acta){
+    btnActaUltimo.href = ENLACE_ACTA_FCF + encodeURIComponent(partido.acta);
+    btnActaUltimo.style.display = "";
+  }else{
+    btnActaUltimo.style.display = "none";
+  }
+
   acciones.style.display = "";
 }
 
@@ -4471,6 +4518,15 @@ function pintarUltimoPartido(partidoAnterior){
     e.preventDefault();
     compartirPorWhatsapp(texto);
   };
+
+  const btnActaUltimo = document.getElementById("btnActaUltimo");
+  if(partidoAnterior.acta){
+    btnActaUltimo.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoAnterior.acta);
+    btnActaUltimo.style.display = "";
+  }else{
+    btnActaUltimo.style.display = "none";
+  }
+
   acciones.style.display = "";
 }
 
@@ -4574,7 +4630,12 @@ function pintarCalendario(){
       // el resultado se muestra siempre "local-visitante" (como marca el
       // marcador de verdad), no "nosotros-rival": si jugamos fuera, nuestro
       // gol va segundo, igual que ya se hace en el banner y en "Último partido"
-      horaHTML = `<span class="cal-hora cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>`;
+      // si ya ha llegado el número de acta (lo rellena el Apps Script), se
+      // añade un enlace pequeño al lado del marcador
+      const enlaceActaCalendario = p.acta
+        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        : "";
+      horaHTML = `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${enlaceActaCalendario}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
@@ -4943,7 +5004,11 @@ function filaAPartido(fila){
     golesVisitante: numeroOVacio(fila.goles_visitante),
     escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
     campo: fila.campo ? capitalizar(fila.campo) : fila.campo,
-    direccion: fila["dirección"] || fila.direccion || ""
+    direccion: fila["dirección"] || fila.direccion || "",
+    // identificador del acta oficial de la FCF (solo el número, lo rellena
+    // solo un Apps Script que consulta la FCF -- ver comentario junto a
+    // ENLACE_ACTA_FCF más abajo). Vacío hasta que el acta esté cerrada.
+    acta: fila.acta || ""
   };
 }
 
