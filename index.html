@@ -416,11 +416,13 @@ a:focus-visible, button:focus-visible{
 .live-acta{
   display:inline-flex;
   align-items:center;
-  gap:6px;
-  padding:6px 16px;
-  border-radius:20px;
-  background:rgba(123,53,200,0.18);
-  border:1px solid rgba(123,53,200,0.5);
+  justify-content:center;
+  align-self:center;
+  gap:4px;
+  margin-top:10px;
+  padding:2px 6px;
+  border-radius:4px;
+  background:rgba(123,53,200,0.28);
   color:var(--lilac-light);
   font-weight:700;
   animation:live-blink 1.3s infinite;
@@ -2691,9 +2693,9 @@ a:focus-visible, button:focus-visible{
         </div>
       </div>
       <p class="live-venue" id="ultimoInfo">Aún no se ha jugado ningún partido esta temporada</p>
+      <a class="live-acta" id="btnActaUltimo" href="#" target="_blank" rel="noopener" style="display:none;">📋 Ver acta oficial</a>
       <div class="match-actions" id="ultimoActions" style="display:none;">
         <a class="match-action match-action-primary" id="btnWhatsapp" href="#" target="_blank" rel="noopener">Compartir resultado</a>
-        <a class="match-action" id="btnActaUltimo" href="#" target="_blank" rel="noopener" style="display:none;">📋 Ver acta oficial</a>
       </div>
     </div>
   </div>
