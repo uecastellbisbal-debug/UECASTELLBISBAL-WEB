@@ -4874,11 +4874,12 @@ if("serviceWorker" in navigator){
    a false. Mientras esté activo, cambia de imagen solo (sin desaparecer) en
    cuanto se cumpla la fecha/hora de BANNER_PROMOCIONAL_CAMBIO (la del propio
    dispositivo de quien visita la web): antes de esa hora muestra el aviso
-   del partido, a partir de esa hora pasa a mostrar la foto del MVP de la
-   última jornada. Mes en 0: Ene=0, Feb=1 ... Sep=8, Oct=9... */
+   del partido, a partir de esa hora pasa a mostrar el agradecimiento a
+   patrocinadores y colaboradores (se queda así hasta nueva indicación).
+   Mes en 0: Ene=0, Feb=1 ... Sep=8, Oct=9... */
 const MOSTRAR_BANNER_PROMOCIONAL = true;
 const BANNER_PROMOCIONAL_IMG_ANTES = "assets/banners/banner-promo-abrera.jpg";
-const BANNER_PROMOCIONAL_IMG_DESPUES = "assets/mvp-tercer-tiempo/j1-1.jpg";
+const BANNER_PROMOCIONAL_IMG_DESPUES = "assets/colaboradores-agraiments.jpg";
 const BANNER_PROMOCIONAL_CAMBIO = new Date(2026, 8, 26, 16, 0);
 
 const bannerPromoOverlay = document.getElementById("bannerPromoOverlay");
