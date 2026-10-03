@@ -4206,11 +4206,12 @@ function partidoTieneResultado(p){
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
    la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda.
    Si ninguna fila tiene "proximo" ni "en_directo" -- por ejemplo, justo
-   después de marcar un partido como "final" y antes de marcar el
-   siguiente -- el destacado se queda en ese último "final" en vez de
-   saltar solo al próximo partido de la hoja sin marcar: así el resultado
-   se queda un tiempo arriba, a la vista, hasta que marquéis a mano cuál
-   es el próximo partido. Solo si todavía no hay NINGÚN partido "final"
+   después de marcar un partido como "final", "aplazado" o "suspendido" y
+   antes de marcar el siguiente -- el destacado se queda en el más
+   reciente (por fecha) de esos marcados a mano en vez de saltar solo al
+   próximo partido de la hoja sin marcar: así el resultado (o el aviso de
+   aplazado/suspendido) se queda arriba, a la vista, hasta que marquéis a
+   mano cuál es el próximo partido. Solo si todavía no hay NINGUNO
    (inicio de temporada) se usa como respaldo el primero que no sea
    "final". ---------- */
 function seleccionarPartidos(){
@@ -4225,13 +4226,19 @@ function seleccionarPartidos(){
 
   const indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
 
+  // último partido "cerrado" a mano: final, aplazado o suspendido -- el
+  // que tenga la fecha más reciente de los tres
+  const cerrados = ordenados.filter(p => p.estado === "final" || p.estado === "aplazado" || p.estado === "suspendido");
+  const ultimoCerrado = cerrados.length ? cerrados[cerrados.length - 1] : null;
+
   let partidoActual;
   if(indiceActual !== -1){
     partidoActual = ordenados[indiceActual];
-  }else if(partidoAnterior){
+  }else if(ultimoCerrado){
     // nada marcado "proximo"/"en_directo" todavía: seguimos mostrando el
-    // último resultado como destacado hasta que se marque el siguiente
-    partidoActual = partidoAnterior;
+    // último resultado (o el aplazado/suspendido) como destacado hasta que
+    // se marque el siguiente
+    partidoActual = ultimoCerrado;
   }else{
     // inicio de temporada: todavía no hay ningún "final" ni nada marcado
     // -- de respaldo, el primero que no sea "final"
