@@ -1719,6 +1719,7 @@ a:focus-visible, button:focus-visible{
 .calendar-row.perdio .cal-hora{ color:#f87171; }
 .calendar-row.empato .cal-fecha,
 .calendar-row.empato .cal-hora{ color:#eab308; }
+.calendar-row.aplazado .cal-fecha{ color:#f87171; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
 .cal-bola{
   width:10px; height:10px;
   border-radius:50%;
@@ -1729,6 +1730,7 @@ a:focus-visible, button:focus-visible{
 .calendar-row.gano .cal-bola{ background:#4ade80; }
 .calendar-row.perdio .cal-bola{ background:#f87171; }
 .calendar-row.empato .cal-bola{ background:#eab308; }
+.calendar-row.aplazado .cal-bola{ background:#dc2626; }
 
 @media (max-width:640px){
   .calendar-header{ grid-template-columns:18px 16px 1fr 78px 44px 8px; gap:5px; }
@@ -4842,6 +4844,13 @@ function pintarCalendario(){
         ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
         : "";
       horaHTML = `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${enlaceActaCalendario}</span>`;
+    }else if(p.estado === "aplazado"){
+      // aplazado: en vez de la fecha y la hora, la etiqueta "Aplazado" en
+      // rojo (como en el banner) y la fecha original al lado, sin atenuar
+      // la fila aunque esa fecha ya haya pasado
+      row.classList.add("aplazado");
+      fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
+      horaHTML = `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
