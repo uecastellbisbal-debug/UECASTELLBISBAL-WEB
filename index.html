@@ -4210,7 +4210,8 @@ function partidoTieneResultado(p){
    siguiente -- el destacado se queda en ese último "final" en vez de
    saltar solo al próximo partido de la hoja sin marcar: así el resultado
    se queda un tiempo arriba, a la vista, hasta que marquéis a mano cuál
-   es el próximo partido. Solo si todavía no hay NINGÚN partido "final"
+   es el próximo partido. Lo mismo con un partido marcado "aplazado" o
+   "suspendido": si es el más reciente, sale en el banner con su etiqueta. Solo si todavía no hay NINGÚN partido "final"
    (inicio de temporada) se usa como respaldo el primero que no sea
    "final". ---------- */
 function seleccionarPartidos(){
@@ -4225,13 +4226,20 @@ function seleccionarPartidos(){
 
   const indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
 
+  // último partido (por fecha) marcado "final", "aplazado" o "suspendido":
+  // si el más reciente es un aplazado/suspendido, es ese el que tiene que
+  // salir en el banner, no el "final" de la jornada anterior
+  const cerrados = ordenados.filter(p => p.estado === "final" || p.estado === "aplazado" || p.estado === "suspendido");
+  const ultimoCerrado = cerrados.length ? cerrados[cerrados.length - 1] : null;
+
   let partidoActual;
   if(indiceActual !== -1){
     partidoActual = ordenados[indiceActual];
-  }else if(partidoAnterior){
+  }else if(ultimoCerrado){
     // nada marcado "proximo"/"en_directo" todavía: seguimos mostrando el
-    // último resultado como destacado hasta que se marque el siguiente
-    partidoActual = partidoAnterior;
+    // último resultado (o el último aplazado/suspendido) como destacado
+    // hasta que se marque el siguiente
+    partidoActual = ultimoCerrado;
   }else{
     // inicio de temporada: todavía no hay ningún "final" ni nada marcado
     // -- de respaldo, el primero que no sea "final"
@@ -5185,6 +5193,16 @@ function capitalizar(texto){
   return texto.replace(/\S+/g, p => p.charAt(0).toUpperCase() + p.slice(1));
 }
 
+/* ---------- el estado escrito en la hoja ("Aplazado", "APLAZADO", "Próximo",
+   "en directo"...) pasa al valor interno ("aplazado", "proximo",
+   "en_directo"...), sin importar mayúsculas, tildes ni espacios ---------- */
+function normalizarEstado(valor){
+  const limpio = (valor || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().trim().replace(/[\s-]+/g, "_");
+  return ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(limpio) ? limpio : "";
+}
+
 /* ---------- convierte una fila de la hoja en un partido tal como lo espera el resto del código ---------- */
 function filaAPartido(fila){
   const numeroOVacio = v => (v === undefined || v === "" || v === "-") ? null : Number(v);
@@ -5198,7 +5216,7 @@ function filaAPartido(fila){
     // cosa (celda vacía, "-", o texto suelto tipo "na" que a veces deja una
     // fórmula o un autorelleno de la hoja) se trata como "sin marcar", para
     // que seleccionarPartidos() no la confunda con la fila destacada
-    estado: ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(fila.estado) ? fila.estado : "",
+    estado: normalizarEstado(fila.estado),
     golesLocal: numeroOVacio(fila.goles_local),
     golesVisitante: numeroOVacio(fila.goles_visitante),
     escudoRival: ESCUDOS_RIVALES[fila.rival] || ESCUDO_GENERICO,
