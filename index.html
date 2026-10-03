@@ -1729,6 +1729,13 @@ a:focus-visible, button:focus-visible{
 .calendar-row.gano .cal-bola{ background:#4ade80; }
 .calendar-row.perdio .cal-bola{ background:#f87171; }
 .calendar-row.empato .cal-bola{ background:#eab308; }
+.calendar-row.aplazado .cal-fecha{
+  color:#f87171;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+}
+.calendar-row.aplazado .cal-bola{ background:transparent; border:2px solid #f87171; box-sizing:border-box; }
 
 @media (max-width:640px){
   .calendar-header{ grid-template-columns:18px 16px 1fr 78px 44px 8px; gap:5px; }
@@ -3393,7 +3400,8 @@ a:focus-visible, button:focus-visible{
      jornada          -> número de jornada
      estado           -> "proximo" / "en_directo" / "final" (solo importa en
                           la jornada que toca jugar; el resto se puede dejar
-                          en blanco)
+                          en blanco). "aplazado" se puede poner en cualquier
+                          jornada y en el calendario sale como APLAZADO
      rival            -> nombre del equipo contrario
      fecha            -> formato DD/MM/AAAA
      hora             -> formato HH:MM (o "Por confirmar")
@@ -4842,6 +4850,12 @@ function pintarCalendario(){
         ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
         : "";
       horaHTML = `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${enlaceActaCalendario}</span>`;
+    }else if(p.estado === "aplazado"){
+      // aplazado: en vez de la fecha original (que ya no vale) se indica
+      // claramente que el partido no se ha jugado y queda pendiente
+      row.classList.add("aplazado");
+      fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
+      horaHTML = `<span class="cal-hora">—</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
@@ -5104,7 +5118,7 @@ document.querySelectorAll(".roster-photo-popup").forEach(popup => {
 let partidos = [
   { jornada: 1, rival: "Vallirana C.F.", fecha: "20/09/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_VALLIRANA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
   { jornada: 2, rival: "Abrera A.E.", fecha: "27/09/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_ABRERA, campo: "Camp De Futbol Mpal. D'abrera", direccion: "https://maps.app.goo.gl/qNxLGLpzEe45WVJ29" },
-  { jornada: 3, rival: "Sant Andreu de la Barca", fecha: "04/10/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_ANDREU, campo: "Camp De Futbol Iem Can Salvi", direccion: "https://maps.app.goo.gl/f51P6wY4EKV8zLHy8" },
+  { jornada: 3, rival: "Sant Andreu de la Barca", fecha: "04/10/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "aplazado", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_SANT_ANDREU, campo: "Camp De Futbol Iem Can Salvi", direccion: "https://maps.app.goo.gl/f51P6wY4EKV8zLHy8" },
   { jornada: 4, rival: "Juan XXIII C.S.", fecha: "11/10/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUAN_XXIII, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
   { jornada: 5, rival: "Juventud 25 de Septiembre B", fecha: "18/10/2026", hora: "Por confirmar", tipo: "VISITANTE", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_JUVENTUD_25, campo: "Camp De Futbol Mpal. Del 25 De Setembre", direccion: "https://maps.app.goo.gl/G1w7yeN7GkcRvt2K9" },
   { jornada: 6, rival: "Penya Barcelonista Sant Vicenç", fecha: "25/10/2026", hora: "Por confirmar", tipo: "LOCAL", estado: "proximo", golesLocal: null, golesVisitante: null, escudoRival: ESCUDO_PENYA_BARCELONISTA, campo: "Camp Municipal", direccion: CAMPO_PROPIO_MAPA },
