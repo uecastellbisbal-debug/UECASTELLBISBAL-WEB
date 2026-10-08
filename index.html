@@ -3546,7 +3546,11 @@ async function cargarRadarYPintar(calendarioListo){
         const filas = parsearCSV(await resp.text());
         const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-");
         if(filasConDatos.length){
-          radarTemporada = [radarTemporada[0]].concat(filasConDatos.map(filaARadar));
+          // se ordenan por número de jornada: si una jornada aplazada se juega
+          // más tarde y su fila se añade al final de la hoja, las gráficas y
+          // los acumulados siguen yendo en orden de jornada
+          const filasRadar = filasConDatos.map(filaARadar).sort((a, b) => a.jornada - b.jornada);
+          radarTemporada = [radarTemporada[0]].concat(filasRadar);
         }
       }
     }catch(err){
@@ -3825,13 +3829,26 @@ function calcularPartidosGanados(){
 }
 
 /* ---------- pinta el resumen de 9 datos con el último dato disponible ---------- */
+/* ---------- fila del radar actualizada más recientemente (por la fecha que
+   lleva marcada en la hoja), que no tiene por qué ser la de la jornada más
+   alta: si una jornada aplazada se juega tarde, su fila es la última en
+   actualizarse aunque su número sea menor ---------- */
+function filaRadarMasReciente(){
+  const conFecha = radarTemporada.filter(d => d.jornada > 0 && d.fecha);
+  if(!conFecha.length) return radarTemporada[radarTemporada.length - 1];
+  return conFecha.reduce((a, b) => parseFecha(b.fecha) >= parseFecha(a.fecha) ? b : a);
+}
+
 function pintarRadarResumen(){
   const cont = document.getElementById("radarGrid");
   if(!radarTemporada.length){
     cont.innerHTML = '<div class="radar-item" style="grid-column:1/-1">Aún no hay datos de la temporada</div>';
     return;
   }
+  // jornada más avanzada: sus goles acumulados incluyen todos los partidos
+  // ya jugados (también un aplazado que se jugó tarde)
   const ultimo = radarTemporada[radarTemporada.length - 1];
+  const reciente = filaRadarMasReciente();
   // puntos/amarillas/rojas de toda la temporada: se suman las de cada jornada
   const totalPuntos = radarTemporada.reduce((suma, d) => suma + d.puntosJornada, 0);
   const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
@@ -3843,7 +3860,7 @@ function pintarRadarResumen(){
   const porcentajePuntos = puntosMax > 0 ? Math.round((totalPuntos / puntosMax) * 100) : 0;
   const items = [
     { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
-    { label: "Posición",         valor: ultimo.posicion + "º", clase: "es-posicion" },
+    { label: "Posición",         valor: reciente.posicion + "º", clase: "es-posicion" },
     { label: "Puntos",           valor: totalPuntos, clase: "es-puntos" },
     { label: "Puntos ganados",   valor: `${totalPuntos}/${puntosMax} (${porcentajePuntos}%)`, clase: "es-ganados" },
     { label: "Partidos ganados", valor: `${ganados}/${jugados} (${porcentajeGanados}%)`, clase: "es-ganados" },
@@ -3869,14 +3886,12 @@ function pintarRadarResumen(){
     // no mostramos ese cartel en vez de anunciar una fecha inventada
     elActualizado.style.display = "none";
   }else{
-    // el cartel de "actualizado el..." usa la última fila que tenga fecha
+    // el cartel de "actualizado el..." usa la fila con la fecha más reciente
     // marcada en la hoja (no tiene por qué ser la última jornada con datos:
     // es la fecha en la que se consultó/actualizó la hoja por última vez)
-    const conFecha = radarTemporada.filter(d => d.fecha);
-    const referencia = conFecha.length ? conFecha[conFecha.length - 1] : ultimo;
-    elActualizado.style.display = "";
+    elActualizado.style.display = reciente.fecha ? "" : "none";
     elActualizado.textContent =
-      `Información actualizada tras jornada ${referencia.jornada} en fecha ${referencia.fecha}`;
+      `Información actualizada tras jornada ${reciente.jornada} en fecha ${reciente.fecha}`;
   }
 }
 
