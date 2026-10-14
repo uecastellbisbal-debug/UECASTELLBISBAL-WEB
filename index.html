@@ -5227,6 +5227,14 @@ function normalizarEstado(valor){
   return ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(limpio) ? limpio : "";
 }
 
+/* ---------- actas puestas a mano (jornada -> número de acta de la FCF) para
+   cuando el Apps Script todavía no las ha escrito en la hoja. Si la hoja ya
+   trae acta para esa jornada, manda la de la hoja; esto es solo un respaldo,
+   se puede borrar cuando el activador del Apps Script las rellene solo ---------- */
+const ACTAS_MANUALES = {
+  4: "4118866"
+};
+
 /* ---------- convierte una fila de la hoja en un partido tal como lo espera el resto del código ---------- */
 function filaAPartido(fila){
   const numeroOVacio = v => (v === undefined || v === "" || v === "-") ? null : Number(v);
@@ -5249,7 +5257,7 @@ function filaAPartido(fila){
     // identificador del acta oficial de la FCF (solo el número, lo rellena
     // solo un Apps Script que consulta la FCF -- ver comentario junto a
     // ENLACE_ACTA_FCF más abajo). Vacío hasta que el acta esté cerrada.
-    acta: fila.acta || ""
+    acta: fila.acta || ACTAS_MANUALES[Number(fila.jornada)] || ""
   };
 }
 
