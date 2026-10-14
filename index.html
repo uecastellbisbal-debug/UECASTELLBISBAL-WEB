@@ -3964,11 +3964,22 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
     });
   }
 
+  // si faltan jornadas entre dos datos (por ejemplo una aplazada que todavía
+  // no se ha jugado), ese tramo no se pinta como una línea normal: va en gris
+  // fino de puntitos, y sin marcador en la jornada que falta
+  const hayHueco = (a, b) => b.jornada - a.jornada > 1;
+  const lineaHueco = (a, b, key) =>
+    `<line x1="${pixelX(a.jornada).toFixed(1)}" y1="${pixelY(a[key]).toFixed(1)}" x2="${pixelX(b.jornada).toFixed(1)}" y2="${pixelY(b[key]).toFixed(1)}" stroke="rgba(245,245,243,0.45)" stroke-width="1.2" stroke-dasharray="0.1,3.2" stroke-linecap="round"/>`;
+
   series.forEach(s => {
     if(s.colorFn){
       // color por punto/segmento (por ejemplo: verde/amarillo/rojo según
       // suba, se mantenga o baje) en vez de un color fijo para toda la línea
       for(let i = 1; i < datos.length; i++){
+        if(hayHueco(datos[i - 1], datos[i])){
+          svg += lineaHueco(datos[i - 1], datos[i], s.key);
+          continue;
+        }
         const color = s.colorFn(datos, i);
         const x1 = pixelX(datos[i - 1].jornada).toFixed(1), y1 = pixelY(datos[i - 1][s.key]).toFixed(1);
         const x2 = pixelX(datos[i].jornada).toFixed(1), y2 = pixelY(datos[i][s.key]).toFixed(1);
@@ -3981,7 +3992,23 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
       });
     }else{
       const puntos = datos.map(d => pixelX(d.jornada).toFixed(1) + "," + pixelY(d[s.key]).toFixed(1));
-      svg += `<polyline points="${puntos.join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      // un tramo de línea continua por cada bloque de jornadas seguidas; los
+      // huecos entre bloques se unen con la línea gris de puntitos
+      let tramo = [];
+      const cerrarTramo = () => {
+        if(tramo.length > 1){
+          svg += `<polyline points="${tramo.join(" ")}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+        }
+        tramo = [];
+      };
+      datos.forEach((d, i) => {
+        if(i > 0 && hayHueco(datos[i - 1], d)){
+          cerrarTramo();
+          svg += lineaHueco(datos[i - 1], d, s.key);
+        }
+        tramo.push(puntos[i]);
+      });
+      cerrarTramo();
       puntos.forEach(p => {
         const [px, py] = p.split(",");
         svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
