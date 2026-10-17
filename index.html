@@ -4290,10 +4290,11 @@ function seleccionarPartidos(){
   const cerrados = ordenados.filter(p => p.estado === "final" || p.estado === "aplazado" || p.estado === "suspendido");
   const ultimoCerrado = cerrados.length ? cerrados[cerrados.length - 1] : null;
 
-  // un partido suspendido sigue pendiente de jugarse: se queda en el banner
-  // como "Próximo partido" aunque después haya otro "final" con fecha más
-  // reciente -- solo le quita el sitio una fila marcada "proximo" o "en_directo"
-  const suspendidos = ordenados.filter(p => p.estado === "suspendido");
+  // un partido suspendido o aplazado sigue pendiente de jugarse: se queda en
+  // el banner como "Próximo partido" aunque después haya otro "final" con
+  // fecha más reciente -- solo le quita el sitio una fila marcada "proximo"
+  // o "en_directo"
+  const suspendidos = ordenados.filter(p => p.estado === "suspendido" || p.estado === "aplazado");
   const ultimoSuspendido = suspendidos.length ? suspendidos[suspendidos.length - 1] : null;
 
   let partidoActual;
@@ -4384,14 +4385,9 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   // acta cerrada -- se vuelve a mostrar más abajo si toca
   actaEl.style.display = "none";
 
-  if(estado === "en_directo" || estado === "final" || estado === "aplazado"){
-    banner.classList.add(
-      estado === "en_directo" ? "is-directo" :
-      estado === "final" ? "is-final" : "is-aplazado"
-    );
-    label.textContent =
-      estado === "en_directo" ? "En directo" :
-      estado === "final" ? "Final" : "Aplazado";
+  if(estado === "en_directo" || estado === "final"){
+    banner.classList.add(estado === "en_directo" ? "is-directo" : "is-final");
+    label.textContent = estado === "en_directo" ? "En directo" : "Final";
     fecha.style.display = "none";
     hora.style.display = "none";
 
@@ -4419,18 +4415,11 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       // y el mismo resultado se refleja también en la tarjeta de "Último
       // partido", sin tener que escribirlo dos veces
       pintarUltimoPartidoDesdeSheet(partidoActual, golesCastellbisbal, golesRival);
-    }else if(estado === "en_directo"){
+    }else{
       badgeWrap.style.display = "none";
       iniciarRelojPartido(partidoActual);
       // mientras el partido destacado está en directo, "Último partido"
       // sigue mostrando el resultado anterior (el suyo propio aún no existe)
-      pintarUltimoPartido(partidoAnterior);
-    }else{
-      // aplazado: mismo formato que en directo (misma tarjeta
-      // roja, sin fecha/hora/campo), pero sin el reloj en marcha porque el
-      // partido no está avanzando en este momento
-      badgeWrap.style.display = "none";
-      detenerRelojPartido();
       pintarUltimoPartido(partidoAnterior);
     }
   }else{
@@ -4443,16 +4432,16 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
     hora.textContent = formatearHora(partidoActual.hora);
     fecha.style.display = "";
     hora.style.display = "";
-    if(estado === "suspendido"){
-      // suspendido: el partido se queda en "Próximo partido" (con su fecha,
-      // hora y campo), pero en vez del "VS" se ve el resultado al que se
-      // suspendió y, debajo, la etiqueta "Suspendido"
+    if(estado === "suspendido" || estado === "aplazado"){
+      // suspendido / aplazado: el partido se queda en "Próximo partido" (con
+      // su fecha, hora y campo), pero en vez del "VS" se ve el resultado que
+      // lleva y, debajo, la etiqueta "Suspendido" o "Aplazado"
       score.innerHTML =
         `<span class="live-score-num">${partidoActual.golesLocal ?? 0}</span>` +
         `<span class="live-score-sep">–</span>` +
         `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
       badgeWrap.style.display = "";
-      badgeWrap.innerHTML = `<span class="live-suspendido">Suspendido</span>`;
+      badgeWrap.innerHTML = `<span class="live-suspendido">${estado === "aplazado" ? "Aplazado" : "Suspendido"}</span>`;
     }else{
       score.innerHTML = `<span class="live-vs">VS</span>`;
     }
@@ -4849,13 +4838,12 @@ function compartirBanner(){
   const bloqueUbicacion = venueUrl ? `${venueTexto}\n${venueUrl}` : venueTexto;
   let texto;
 
-  if(["en_directo", "final", "aplazado"].includes(bannerInfo.estado)){
+  if(["en_directo", "final"].includes(bannerInfo.estado)){
     const golesIzquierda = esLocalDestacado ? bannerInfo.golesCastellbisbal : bannerInfo.golesRival;
     const golesDerecha = esLocalDestacado ? bannerInfo.golesRival : bannerInfo.golesCastellbisbal;
     const etiqueta =
       bannerInfo.estado === "en_directo" ? "🔴 EN DIRECTO" :
-      bannerInfo.estado === "final" ? "⚪ FINAL" :
-      "🟡 APLAZADO";
+      "⚪ FINAL";
     texto =
       `${etiqueta}\n` +
       `${nombreIzquierda} ${golesIzquierda} – ${golesDerecha} ${nombreDerecha}\n` +
@@ -4866,7 +4854,8 @@ function compartirBanner(){
     texto =
       `🟢 PRÓXIMO PARTIDO\n` +
       `⚽ ${nombreIzquierda} vs ${nombreDerecha}\n` +
-      (bannerInfo.estado === "suspendido" ? `🟡 SUSPENDIDO (${golesSuspendido})\n` : "") +
+      (bannerInfo.estado === "suspendido" ? `🟡 SUSPENDIDO (${golesSuspendido})\n` :
+       bannerInfo.estado === "aplazado" ? `🟡 APLAZADO (${golesSuspendido})\n` : "") +
       `📅 ${bannerInfo.fecha} · 🕐 ${horaTexto}\n` +
       `${bloqueUbicacion}`;
   }
@@ -4926,9 +4915,12 @@ function pintarCalendario(){
       // aplazado: en vez de la fecha y la hora, la etiqueta "Aplazado" en
       // rojo (como en el banner) y la fecha original al lado, sin atenuar
       // la fila aunque esa fecha ya haya pasado
+      // (si la hoja trae resultado, se ve el resultado en vez de la fecha)
       row.classList.add("aplazado");
       fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
-      horaHTML = `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
+      horaHTML = (p.golesLocal !== null && p.golesVisitante !== null)
+        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span></span>`
+        : `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
     }else if(p.estado === "suspendido"){
       // suspendido: "Suspendido" en rojo en vez de la fecha y, al lado, el
       // resultado al que se suspendió (si la hoja lo trae; si no, la fecha)
@@ -5299,6 +5291,7 @@ function normalizarEstado(valor){
   // para que una forma distinta de escribirlo no haga que el partido se
   // ignore y el banner se quede en el último "final"
   if(/^susp/.test(limpio)) return "suspendido";
+  if(/^(aplaz|apalz)/.test(limpio)) return "aplazado";
   return ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(limpio) ? limpio : "";
 }
 
