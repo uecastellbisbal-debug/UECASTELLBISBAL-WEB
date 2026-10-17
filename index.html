@@ -4262,7 +4262,9 @@ function partidoTieneResultado(p){
 }
 
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
-   la hoja tenga marcado a mano "proximo" o "en_directo" es la que manda.
+   la hoja tenga marcado a mano "en_directo" es la que manda; si no hay
+   ninguna, el último partido "suspendido" o "aplazado" (aunque haya una
+   fila marcada "proximo"); y si tampoco, la fila marcada "proximo".
    Si ninguna fila tiene "proximo" ni "en_directo" -- por ejemplo, justo
    después de marcar un partido como "final" y antes de marcar el
    siguiente -- el destacado se queda en ese último "final" en vez de
@@ -4282,7 +4284,8 @@ function seleccionarPartidos(){
   const finales = ordenados.filter(p => p.estado === "final");
   const partidoAnterior = finales.length ? finales[finales.length - 1] : null;
 
-  const indiceActual = ordenados.findIndex(p => p.estado === "proximo" || p.estado === "en_directo");
+  const indiceDirecto = ordenados.findIndex(p => p.estado === "en_directo");
+  const indiceProximo = ordenados.findIndex(p => p.estado === "proximo");
 
   // último partido (por fecha) marcado "final", "aplazado" o "suspendido":
   // si el más reciente es un aplazado/suspendido, es ese el que tiene que
@@ -4290,18 +4293,20 @@ function seleccionarPartidos(){
   const cerrados = ordenados.filter(p => p.estado === "final" || p.estado === "aplazado" || p.estado === "suspendido");
   const ultimoCerrado = cerrados.length ? cerrados[cerrados.length - 1] : null;
 
-  // un partido suspendido o aplazado sigue pendiente de jugarse: se queda en
-  // el banner como "Próximo partido" aunque después haya otro "final" con
-  // fecha más reciente -- solo le quita el sitio una fila marcada "proximo"
-  // o "en_directo"
+  // un partido suspendido o aplazado sigue pendiente de jugarse: el último
+  // de ellos se queda en el banner como "Próximo partido" aunque después
+  // haya otro "final" con fecha más reciente o una fila marcada "proximo"
+  // -- solo le quita el sitio un partido "en_directo"
   const suspendidos = ordenados.filter(p => p.estado === "suspendido" || p.estado === "aplazado");
   const ultimoSuspendido = suspendidos.length ? suspendidos[suspendidos.length - 1] : null;
 
   let partidoActual;
-  if(indiceActual !== -1){
-    partidoActual = ordenados[indiceActual];
+  if(indiceDirecto !== -1){
+    partidoActual = ordenados[indiceDirecto];
   }else if(ultimoSuspendido){
     partidoActual = ultimoSuspendido;
+  }else if(indiceProximo !== -1){
+    partidoActual = ordenados[indiceProximo];
   }else if(ultimoCerrado){
     // nada marcado "proximo"/"en_directo" todavía: seguimos mostrando el
     // último resultado (o el último aplazado/suspendido) como destacado
