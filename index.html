@@ -4290,9 +4290,17 @@ function seleccionarPartidos(){
   const cerrados = ordenados.filter(p => p.estado === "final" || p.estado === "aplazado" || p.estado === "suspendido");
   const ultimoCerrado = cerrados.length ? cerrados[cerrados.length - 1] : null;
 
+  // un partido suspendido sigue pendiente de jugarse: se queda en el banner
+  // como "Próximo partido" aunque después haya otro "final" con fecha más
+  // reciente -- solo le quita el sitio una fila marcada "proximo" o "en_directo"
+  const suspendidos = ordenados.filter(p => p.estado === "suspendido");
+  const ultimoSuspendido = suspendidos.length ? suspendidos[suspendidos.length - 1] : null;
+
   let partidoActual;
   if(indiceActual !== -1){
     partidoActual = ordenados[indiceActual];
+  }else if(ultimoSuspendido){
+    partidoActual = ultimoSuspendido;
   }else if(ultimoCerrado){
     // nada marcado "proximo"/"en_directo" todavía: seguimos mostrando el
     // último resultado (o el último aplazado/suspendido) como destacado
