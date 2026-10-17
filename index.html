@@ -5280,13 +5280,17 @@ function capitalizar(texto){
   return texto.replace(/\S+/g, p => p.charAt(0).toUpperCase() + p.slice(1));
 }
 
-/* ---------- el estado escrito en la hoja ("Aplazado", "APLAZADO", "Próximo",
+/* ---------- el estado escrito en la hoja ("Aplazado", "APLAZADO", "Próximo", "Suspendida",
    "en directo"...) pasa al valor interno ("aplazado", "proximo",
    "en_directo"...), sin importar mayúsculas, tildes ni espacios ---------- */
 function normalizarEstado(valor){
   const limpio = (valor || "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().trim().replace(/[\s-]+/g, "_");
+    .toLowerCase().trim().replace(/[.!]+$/, "").replace(/[\s-]+/g, "_");
+  // suspendido: femenino y catalán también valen ("suspendida", "suspès"...),
+  // para que una forma distinta de escribirlo no haga que el partido se
+  // ignore y el banner se quede en el último "final"
+  if(/^susp/.test(limpio)) return "suspendido";
   return ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(limpio) ? limpio : "";
 }
 
