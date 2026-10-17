@@ -434,6 +434,18 @@ a:focus-visible, button:focus-visible{
   margin:16px auto 0;
 }
 .live-badge-wrap{ margin-top:16px; display:flex; justify-content:center; }
+.live-suspendido{
+  display:inline-block;
+  padding:5px 12px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:#f87171;
+  border:1px solid rgba(220,38,38,0.6);
+  background:rgba(220,38,38,0.1);
+}
 .puntos-badge{
   display:inline-flex;
   align-items:center;
@@ -1720,6 +1732,7 @@ a:focus-visible, button:focus-visible{
 .calendar-row.empato .cal-fecha,
 .calendar-row.empato .cal-hora{ color:#eab308; }
 .calendar-row.aplazado .cal-fecha{ color:#f87171; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
+.calendar-row.suspendido .cal-fecha{ color:#f87171; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; }
 .cal-bola{
   width:10px; height:10px;
   border-radius:50%;
@@ -1730,7 +1743,8 @@ a:focus-visible, button:focus-visible{
 .calendar-row.gano .cal-bola{ background:#4ade80; }
 .calendar-row.perdio .cal-bola{ background:#f87171; }
 .calendar-row.empato .cal-bola{ background:#eab308; }
-.calendar-row.aplazado .cal-bola{ background:#dc2626; }
+.calendar-row.aplazado .cal-bola,
+.calendar-row.suspendido .cal-bola{ background:#dc2626; }
 
 @media (max-width:640px){
   .calendar-header{ grid-template-columns:18px 16px 1fr 78px 44px 8px; gap:5px; }
@@ -4234,14 +4248,14 @@ function parseFecha(fecha){
    que las celdas de goles no estén vacías: podrían llevar un "0" puesto de
    antemano para un partido que todavía no se ha jugado. Se usa el mismo
    criterio en los tres sitios:
-     - aplazado: nunca tiene resultado, aunque su fecha original ya pasara
-     - final / en directo / suspendido: se fía de lo marcado a mano en la hoja
+     - aplazado / suspendido: nunca tiene resultado, aunque su fecha ya pasara
+     - final / en directo: se fía de lo marcado a mano en la hoja
      - próximo (o sin marcar): solo si la fecha ya pasó, por si se olvidó
        marcarlo como "final" ---------- */
 function partidoTieneResultado(p){
   if(p.golesLocal === null || p.golesVisitante === null) return false;
-  if(p.estado === "aplazado") return false;
-  if(p.estado === "final" || p.estado === "en_directo" || p.estado === "suspendido") return true;
+  if(p.estado === "aplazado" || p.estado === "suspendido") return false;
+  if(p.estado === "final" || p.estado === "en_directo") return true;
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
   return parseFecha(p.fecha) < hoy;
@@ -4329,6 +4343,8 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   bannerInfo.rival = partidoActual.rival;
   bannerInfo.fecha = partidoActual.fecha;
   bannerInfo.hora = partidoActual.hora;
+  bannerInfo.golesLocal = partidoActual.golesLocal;
+  bannerInfo.golesVisitante = partidoActual.golesVisitante;
   bannerInfo.estado = partidoActual.estado || "proximo";
 
   document.getElementById("liveJornada").textContent = "J" + partidoActual.jornada;
@@ -4360,16 +4376,14 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
   // acta cerrada -- se vuelve a mostrar más abajo si toca
   actaEl.style.display = "none";
 
-  if(estado === "en_directo" || estado === "final" || estado === "aplazado" || estado === "suspendido"){
+  if(estado === "en_directo" || estado === "final" || estado === "aplazado"){
     banner.classList.add(
       estado === "en_directo" ? "is-directo" :
-      estado === "final" ? "is-final" :
-      estado === "aplazado" ? "is-aplazado" : "is-suspendido"
+      estado === "final" ? "is-final" : "is-aplazado"
     );
     label.textContent =
       estado === "en_directo" ? "En directo" :
-      estado === "final" ? "Final" :
-      estado === "aplazado" ? "Aplazado" : "Suspendido";
+      estado === "final" ? "Final" : "Aplazado";
     fecha.style.display = "none";
     hora.style.display = "none";
 
@@ -4378,7 +4392,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       `<span class="live-score-sep">–</span>` +
       `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
 
-    // ni en directo, ni en final, ni aplazado, ni suspendido hace falta ya
+    // ni en directo, ni en final, ni aplazado hace falta ya
     // la ubicación del campo
     venueEl.style.display = "none";
 
@@ -4404,7 +4418,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       // sigue mostrando el resultado anterior (el suyo propio aún no existe)
       pintarUltimoPartido(partidoAnterior);
     }else{
-      // aplazado / suspendido: mismo formato que en directo (misma tarjeta
+      // aplazado: mismo formato que en directo (misma tarjeta
       // roja, sin fecha/hora/campo), pero sin el reloj en marcha porque el
       // partido no está avanzando en este momento
       badgeWrap.style.display = "none";
@@ -4421,7 +4435,19 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
     hora.textContent = formatearHora(partidoActual.hora);
     fecha.style.display = "";
     hora.style.display = "";
-    score.innerHTML = `<span class="live-vs">VS</span>`;
+    if(estado === "suspendido"){
+      // suspendido: el partido se queda en "Próximo partido" (con su fecha,
+      // hora y campo), pero en vez del "VS" se ve el resultado al que se
+      // suspendió y, debajo, la etiqueta "Suspendido"
+      score.innerHTML =
+        `<span class="live-score-num">${partidoActual.golesLocal ?? 0}</span>` +
+        `<span class="live-score-sep">–</span>` +
+        `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
+      badgeWrap.style.display = "";
+      badgeWrap.innerHTML = `<span class="live-suspendido">Suspendido</span>`;
+    }else{
+      score.innerHTML = `<span class="live-vs">VS</span>`;
+    }
 
     // si la hoja está en "próximo" (nueva semana), la tarjeta de abajo
     // muestra el resultado de la jornada anterior, tal como está en la hoja
@@ -4815,22 +4841,24 @@ function compartirBanner(){
   const bloqueUbicacion = venueUrl ? `${venueTexto}\n${venueUrl}` : venueTexto;
   let texto;
 
-  if(["en_directo", "final", "aplazado", "suspendido"].includes(bannerInfo.estado)){
+  if(["en_directo", "final", "aplazado"].includes(bannerInfo.estado)){
     const golesIzquierda = esLocalDestacado ? bannerInfo.golesCastellbisbal : bannerInfo.golesRival;
     const golesDerecha = esLocalDestacado ? bannerInfo.golesRival : bannerInfo.golesCastellbisbal;
     const etiqueta =
       bannerInfo.estado === "en_directo" ? "🔴 EN DIRECTO" :
       bannerInfo.estado === "final" ? "⚪ FINAL" :
-      bannerInfo.estado === "aplazado" ? "🟡 APLAZADO" : "🟡 SUSPENDIDO";
+      "🟡 APLAZADO";
     texto =
       `${etiqueta}\n` +
       `${nombreIzquierda} ${golesIzquierda} – ${golesDerecha} ${nombreDerecha}\n` +
       `${bloqueUbicacion}`;
   }else{
     const horaTexto = formatearHora(bannerInfo.hora);
+    const golesSuspendido = `${bannerInfo.golesLocal ?? 0}–${bannerInfo.golesVisitante ?? 0}`;
     texto =
       `🟢 PRÓXIMO PARTIDO\n` +
       `⚽ ${nombreIzquierda} vs ${nombreDerecha}\n` +
+      (bannerInfo.estado === "suspendido" ? `🟡 SUSPENDIDO (${golesSuspendido})\n` : "") +
       `📅 ${bannerInfo.fecha} · 🕐 ${horaTexto}\n` +
       `${bloqueUbicacion}`;
   }
@@ -4893,6 +4921,14 @@ function pintarCalendario(){
       row.classList.add("aplazado");
       fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
       horaHTML = `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
+    }else if(p.estado === "suspendido"){
+      // suspendido: "Suspendido" en rojo en vez de la fecha y, al lado, el
+      // resultado al que se suspendió (si la hoja lo trae; si no, la fecha)
+      row.classList.add("suspendido");
+      fechaHTML = `<span class="cal-fecha">Suspendido</span>`;
+      horaHTML = (p.golesLocal !== null && p.golesVisitante !== null)
+        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span></span>`
+        : `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
