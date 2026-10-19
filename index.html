@@ -3517,12 +3517,22 @@ let radarTemporada = [
    antes de pintar -- se conectan más abajo, al arrancar la web. */
 const URL_RADAR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vReBRASG82d__O1Pj4WbSjIuVlSk4oViN0mYSoZ-wjQmubwFjLBlqb17GyLoGyHx9NeqTNKEm6ugbyj/pub?gid=961026861&single=true&output=csv";
 
+/* ---------- una jornada "sin jugar" es la que en el calendario está marcada
+   como aplazada o suspendida: no cuenta para el radar ni para las gráficas
+   (ni sus puntos, ni sus goles, ni sus tarjetas) hasta que se juegue y se
+   marque como final ---------- */
+function jornadaSinJugar(jornada){
+  return partidos.some(p => p.jornada === jornada && (p.estado === "aplazado" || p.estado === "suspendido"));
+}
+
 /* ---------- suma los goles de UE Castellbisbal en todos los partidos ya
    jugados hasta (e incluyendo) una jornada, a partir del calendario ---------- */
 function golesAcumuladosHastaJornada(jornada){
   let favor = 0, contra = 0;
   partidos.forEach(p => {
     if(p.jornada > jornada || p.golesLocal === null || p.golesVisitante === null) return;
+    // un aplazado o suspendido no cuenta aunque lleve un marcador parcial
+    if(jornadaSinJugar(p.jornada)) return;
     const esLocal = p.tipo === "LOCAL";
     favor  += esLocal ? p.golesLocal : p.golesVisitante;
     contra += esLocal ? p.golesVisitante : p.golesLocal;
@@ -3558,7 +3568,9 @@ async function cargarRadarYPintar(calendarioListo){
       const resp = await fetchCSVSinCache(URL_RADAR);
       if(resp.ok){
         const filas = parsearCSV(await resp.text());
-        const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-");
+        // además de las filas sin datos, se descartan las de jornadas
+        // aplazadas/suspendidas aunque lleven algún dato escrito: no cuentan
+        const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-" && !jornadaSinJugar(Number(f.Jornada)));
         if(filasConDatos.length){
           // se ordenan por número de jornada: si una jornada aplazada se juega
           // más tarde y su fila se añade al final de la hoja, las gráficas y
@@ -4028,6 +4040,21 @@ function pintarGraficoLineal(contenedorId, datos, series, opciones){
         svg += `<circle cx="${px}" cy="${py}" r="2.5" fill="${s.color}"/>`;
       });
     }
+
+    // jornadas pendientes (aplazadas/suspendidas) por delante del último dato:
+    // solo una línea de puntitos que sigue desde el último valor hasta esa
+    // jornada, sin marcador, a la espera de ver cómo queda
+    if(opciones.pendientes){
+      let previo = datos[datos.length - 1];
+      opciones.pendientes
+        .filter(j => j > previo.jornada && j <= maxX)
+        .sort((a, b) => a - b)
+        .forEach(j => {
+          const destino = { jornada: j, [s.key]: previo[s.key] };
+          svg += lineaHueco(previo, destino, s.key);
+          previo = destino;
+        });
+    }
   });
 
   // etiquetas del eje horizontal: todas las jornadas, sin girar, solo el número
@@ -4147,6 +4174,11 @@ function colorPuntosJornada(datos, i){
 /* ---------- pinta las gráficas del desglose, siempre de la J0 a la J30 ---------- */
 function pintarRadarDesglose(){
   const medias = calcularMediasDesglose();
+  // jornadas aplazadas/suspendidas: no se cuentan, pero las gráficas dibujan
+  // una línea de puntitos hacia ellas si van por delante del último dato
+  const pendientes = partidos
+    .filter(p => p.estado === "aplazado" || p.estado === "suspendido")
+    .map(p => p.jornada);
 
   // en la gráfica, un 0 significa "todavía sin clasificar": se trata como si
   // fuera el último puesto, para que la línea arranque abajo del todo en vez
@@ -4157,14 +4189,14 @@ function pintarRadarDesglose(){
   }));
   pintarGraficoLineal("chartPosicion", datosPosicion,
     [{ key: "posicion", colorFn: colorEvolucionPosicion }],
-    { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16,
+    { invertirY: true, minX: 0, maxX: 30, minY: 1, maxY: 16, pendientes,
       etiquetasY: Array.from({ length: 16 }, (_, i) => i + 1),
       medias: [{ valor: medias.posicionMedia, color: "#a868e8" }] }
   );
 
   pintarGraficoLineal("chartPuntosJornada", radarTemporada,
     [{ key: "puntosJornada", colorFn: colorPuntosJornada }],
-    { minX: 0, maxX: 30, minY: 0, maxY: 3,
+    { minX: 0, maxX: 30, minY: 0, maxY: 3, pendientes,
       medias: [{ valor: medias.puntosMedia, color: "#a868e8" }] }
   );
 
@@ -4181,7 +4213,7 @@ function pintarRadarDesglose(){
   });
   pintarGraficoLineal("chartEvolucionPuntos", datosEvolucionPuntos,
     [{ key: "puntosAcumulados", color: "#a868e8", colorFn: colorPuntosJornada }],
-    { minX: 0, maxX: 30, minY: 0 }
+    { minX: 0, maxX: 30, minY: 0, pendientes }
   );
 
   // "goles por jornada" tampoco viene directo de la hoja: se calcula
@@ -4195,7 +4227,7 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartGolesJornada", datosGolesJornada, [
     { key: "golesFavorJornada", color: "#22c55e" },
     { key: "golesContraJornada", color: "#dc2626" }
-  ], { minX: 0, maxX: 30,
+  ], { minX: 0, maxX: 30, pendientes,
     medias: [
       { valor: medias.golesFavorMedia, color: "#22c55e" },
       { valor: medias.golesContraMedia, color: "#dc2626" }
@@ -4206,11 +4238,11 @@ function pintarRadarDesglose(){
   pintarGraficoLineal("chartEvolucionGoles", radarTemporada, [
     { key: "golesFavor", color: "#22c55e" },
     { key: "golesContra", color: "#dc2626" }
-  ], { minX: 0, maxX: 30 });
+  ], { minX: 0, maxX: 30, pendientes });
   pintarGraficoLineal("chartTarjetas", radarTemporada, [
     { key: "amarillasJornada", color: "#eab308" },
     { key: "rojasJornada", color: "#dc2626" }
-  ], { minX: 0, maxX: 30,
+  ], { minX: 0, maxX: 30, pendientes,
     medias: [
       { valor: medias.amarillasMedia, color: "#eab308" },
       { valor: medias.rojasMedia, color: "#dc2626" }
@@ -4240,7 +4272,9 @@ function badgePuntosHTML(golesCastellbisbal, golesRival, claseExtra){
 /* ---------- convierte "DD/MM/AAAA" en objeto Date ---------- */
 function parseFecha(fecha){
   const [d, m, y] = fecha.split("/").map(Number);
-  return new Date(y, m - 1, d);
+  // la hoja del radar escribe el año con dos cifras (20/09/26): sin esto
+  // se leería como 1926 y se descuadraría al compararla con otras fechas
+  return new Date(y < 100 ? 2000 + y : y, m - 1, d);
 }
 
 /* ---------- decide si un partido ya cuenta como jugado (para mostrar su
@@ -4447,6 +4481,11 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
         `<span class="live-score-num">${partidoActual.golesVisitante ?? 0}</span>`;
       badgeWrap.style.display = "";
       badgeWrap.innerHTML = `<span class="live-suspendido">${estado === "aplazado" ? "Aplazado" : "Suspendido"}</span>`;
+      // si ya hay acta (aunque sea la provisional del partido parado), se enlaza
+      if(partidoActual.acta){
+        actaEl.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoActual.acta);
+        actaEl.style.display = "";
+      }
     }else{
       score.innerHTML = `<span class="live-vs">VS</span>`;
     }
@@ -4922,18 +4961,28 @@ function pintarCalendario(){
       // la fila aunque esa fecha ya haya pasado
       // (si la hoja trae resultado, se ve el resultado en vez de la fecha)
       row.classList.add("aplazado");
+      // si ya hay acta (por ejemplo la provisional de un partido suspendido),
+      // se enlaza con el mismo icono pequeño que en los partidos jugados
+      const iconoActa = p.acta
+        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        : "";
       fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
+      // fecha original solo con día/mes: con el año no cabe en la columna
+      // estrecha del móvil y se cortaba por la derecha
       horaHTML = (p.golesLocal !== null && p.golesVisitante !== null)
-        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span></span>`
-        : `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
+        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${iconoActa}</span>`
+        : `<span class="cal-hora">${escaparHTML(p.fecha.slice(0, 5))}</span>`;
     }else if(p.estado === "suspendido"){
       // suspendido: "Suspendido" en rojo en vez de la fecha y, al lado, el
       // resultado al que se suspendió (si la hoja lo trae; si no, la fecha)
       row.classList.add("suspendido");
+      const iconoActa = p.acta
+        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        : "";
       fechaHTML = `<span class="cal-fecha">Suspendido</span>`;
       horaHTML = (p.golesLocal !== null && p.golesVisitante !== null)
-        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span></span>`
-        : `<span class="cal-hora">${escaparHTML(p.fecha)}</span>`;
+        ? `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${iconoActa}</span>`
+        : `<span class="cal-hora">${escaparHTML(p.fecha.slice(0, 5))}</span>`;
     }else{
       if(parseFecha(p.fecha) < hoy) row.classList.add("jugado"); // fecha pasada pero aún sin resultado cargado
       fechaHTML = `<span class="cal-fecha">${escaparHTML(p.fecha)}</span>`;
@@ -5305,7 +5354,8 @@ function normalizarEstado(valor){
    trae acta para esa jornada, manda la de la hoja; esto es solo un respaldo,
    se puede borrar cuando el activador del Apps Script las rellene solo ---------- */
 const ACTAS_MANUALES = {
-  4: "4118866"
+  4: "4118866",
+  5: "4118873" // acta provisional del partido suspendido
 };
 
 /* ---------- convierte una fila de la hoja en un partido tal como lo espera el resto del código ---------- */
