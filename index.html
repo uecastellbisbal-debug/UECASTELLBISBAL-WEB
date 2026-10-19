@@ -3507,6 +3507,11 @@ const ESCUDOS_RIVALES = {
 
    Mientras URL_RADAR esté vacío, se usan estos datos de ejemplo.
    ============================================================ */
+/* filas del radar de jornadas aplazadas/suspendidas que ya traen posición:
+   solo se usan para el "Jornada" y la "Posición" del resumen, nunca para
+   totales ni gráficas */
+let radarSinJugar = [];
+
 let radarTemporada = [
   { jornada: 0, posicion: 0, puntosJornada: 0, golesFavor: 0, golesContra: 0, amarillasJornada: 0, rojasJornada: 0, fecha: "06/08/2026" }
 ];
@@ -3570,7 +3575,11 @@ async function cargarRadarYPintar(calendarioListo){
         const filas = parsearCSV(await resp.text());
         // además de las filas sin datos, se descartan las de jornadas
         // aplazadas/suspendidas aunque lleven algún dato escrito: no cuentan
-        const filasConDatos = filas.filter(f => f.Posicion && f.Posicion !== "-" && !jornadaSinJugar(Number(f.Jornada)));
+        // (ni en las gráficas ni en los totales). De ellas solo se guarda,
+        // aparte, la jornada y la posición, que el resumen sí enseña
+        const filasConPosicion = filas.filter(f => f.Posicion && f.Posicion !== "-");
+        const filasConDatos = filasConPosicion.filter(f => !jornadaSinJugar(Number(f.Jornada)));
+        radarSinJugar = filasConPosicion.filter(f => jornadaSinJugar(Number(f.Jornada))).map(filaARadar);
         if(filasConDatos.length){
           // se ordenan por número de jornada: si una jornada aplazada se juega
           // más tarde y su fila se añade al final de la hoja, las gráficas y
@@ -3860,7 +3869,10 @@ function calcularPartidosGanados(){
    alta: si una jornada aplazada se juega tarde, su fila es la última en
    actualizarse aunque su número sea menor ---------- */
 function filaRadarMasReciente(){
-  const conFecha = radarTemporada.filter(d => d.jornada > 0 && d.fecha);
+  // se tienen en cuenta también las filas de jornadas aplazadas/suspendidas
+  // (solo para la jornada y la posición del resumen)
+  const candidatas = radarTemporada.concat(radarSinJugar);
+  const conFecha = candidatas.filter(d => d.jornada > 0 && d.fecha);
   if(!conFecha.length) return radarTemporada[radarTemporada.length - 1];
   return conFecha.reduce((a, b) => parseFecha(b.fecha) >= parseFecha(a.fecha) ? b : a);
 }
@@ -3875,6 +3887,9 @@ function pintarRadarResumen(){
   // ya jugados (también un aplazado que se jugó tarde)
   const ultimo = radarTemporada[radarTemporada.length - 1];
   const reciente = filaRadarMasReciente();
+  // la jornada que se muestra sí cuenta una aplazada/suspendida con posición
+  // (por ejemplo "J5"), aunque el resto de sus datos no se sumen
+  const jornadaMostrada = Math.max(ultimo.jornada, ...radarSinJugar.map(d => d.jornada));
   // puntos/amarillas/rojas de toda la temporada: se suman las de cada jornada
   const totalPuntos = radarTemporada.reduce((suma, d) => suma + d.puntosJornada, 0);
   const totalAmarillas = radarTemporada.reduce((suma, d) => suma + d.amarillasJornada, 0);
@@ -3885,7 +3900,7 @@ function pintarRadarResumen(){
   const puntosMax = jugados * 3;
   const porcentajePuntos = puntosMax > 0 ? Math.round((totalPuntos / puntosMax) * 100) : 0;
   const items = [
-    { label: "Jornada",          valor: "J" + ultimo.jornada, clase: "es-jornada" },
+    { label: "Jornada",          valor: "J" + jornadaMostrada, clase: "es-jornada" },
     { label: "Posición",         valor: reciente.posicion + "º", clase: "es-posicion" },
     { label: "Puntos",           valor: totalPuntos, clase: "es-puntos" },
     { label: "Puntos ganados",   valor: `${totalPuntos}/${puntosMax} (${porcentajePuntos}%)`, clase: "es-ganados" },
