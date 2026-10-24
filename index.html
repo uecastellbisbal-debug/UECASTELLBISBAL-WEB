@@ -4311,8 +4311,9 @@ function partidoTieneResultado(p){
 }
 
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
-   la hoja tenga marcado a mano "en_directo" es la que manda; si no hay
-   ninguna, la fila marcada "proximo" (siempre, aunque haya partidos
+   la hoja tenga marcado a mano "en_directo" es la que manda; si no, el
+   último "final" durante DIAS_FINAL_EN_BANNER días tras su fecha; si no,
+   la fila marcada "proximo" (siempre, aunque haya partidos
    "suspendido" o "aplazado"); y si tampoco, el último "suspendido" o
    "aplazado".
    Si ninguna fila tiene "proximo" ni "en_directo" -- por ejemplo, justo
@@ -4324,6 +4325,11 @@ function partidoTieneResultado(p){
    "suspendido": si es el más reciente, sale en el banner con su etiqueta. Solo si todavía no hay NINGÚN partido "final"
    (inicio de temporada) se usa como respaldo el primero que no sea
    "final". ---------- */
+// días que el último "final" sigue en el banner tras la fecha del partido
+// (un partido del domingo se ve hasta el miércoles) antes de dar paso al
+// siguiente marcado "proximo"
+const DIAS_FINAL_EN_BANNER = 3;
+
 function seleccionarPartidos(){
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
 
@@ -4350,9 +4356,20 @@ function seleccionarPartidos(){
   const suspendidos = ordenados.filter(p => p.estado === "suspendido" || p.estado === "aplazado");
   const ultimoSuspendido = suspendidos.length ? suspendidos[suspendidos.length - 1] : null;
 
+  // el último "final" de la hoja se queda en el banner (con su resultado)
+  // durante unos días después del partido, aunque las filas siguientes ya
+  // estén marcadas "proximo" -- siempre que sea el partido cerrado más
+  // reciente (si después hay un aplazado/suspendido, manda ese)
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const finalReciente = partidoAnterior && partidoAnterior === ultimoCerrado &&
+    hoy - parseFecha(partidoAnterior.fecha) <= DIAS_FINAL_EN_BANNER * 86400000;
+
   let partidoActual;
   if(indiceDirecto !== -1){
     partidoActual = ordenados[indiceDirecto];
+  }else if(finalReciente){
+    partidoActual = partidoAnterior;
   }else if(indiceProximo !== -1){
     partidoActual = ordenados[indiceProximo];
   }else if(ultimoSuspendido){
