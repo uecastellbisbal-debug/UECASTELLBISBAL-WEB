@@ -4325,8 +4325,19 @@ function partidoTieneResultado(p){
    "suspendido": si es el más reciente, sale en el banner con su etiqueta. Solo si todavía no hay NINGÚN partido "final"
    (inicio de temporada) se usa como respaldo el primero que no sea
    "final". ---------- */
+/* ---------- partido fijado a mano en el banner: mientras esta jornada
+   esté marcada "final" en la hoja, sale ella en el banner (y en "Último
+   partido") pase lo que pase en el resto de filas -- aunque haya otro
+   "final" con fecha más reciente o un partido "en_directo". Poned null
+   para volver a la selección automática de siempre. ---------- */
+const JORNADA_FIJADA_BANNER = 3; // Sant Andreu de la Barca (jugado el 29/10/2026)
+
 function seleccionarPartidos(){
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
+
+  const fijado = JORNADA_FIJADA_BANNER === null ? null
+    : ordenados.find(p => p.jornada === JORNADA_FIJADA_BANNER && p.estado === "final");
+  if(fijado) return { partidoActual: fijado, partidoAnterior: fijado };
 
   // "partido anterior" (tarjeta de "Último partido"): el último marcado
   // "final" en la hoja, por fecha -- no la fila justo antes en la lista,
