@@ -4311,11 +4311,10 @@ function partidoTieneResultado(p){
 }
 
 /* ---------- elige cuál es el partido destacado del banner: la fila que en
-   la hoja tenga marcado a mano "en_directo" es la que manda; si no, el
-   último "final" de la hoja, siempre; si no hay ningún "final",
-   la fila marcada "proximo" (siempre, aunque haya partidos
-   "suspendido" o "aplazado"); y si tampoco, el último "suspendido" o
-   "aplazado".
+   la hoja tenga marcado a mano "en_directo" es la que manda; si no, la
+   fila marcada "proximo" (siempre, aunque haya partidos "final",
+   "suspendido" o "aplazado"); si no hay ninguna, el último "final" de la
+   hoja; y si tampoco, el último "suspendido" o "aplazado".
    Si ninguna fila tiene "proximo" ni "en_directo" -- por ejemplo, justo
    después de marcar un partido como "final" y antes de marcar el
    siguiente -- el destacado se queda en ese último "final" en vez de
@@ -4330,7 +4329,7 @@ function partidoTieneResultado(p){
    partido") pase lo que pase en el resto de filas -- aunque haya otro
    "final" con fecha más reciente o un partido "en_directo". Poned null
    para volver a la selección automática de siempre. ---------- */
-const JORNADA_FIJADA_BANNER = 3; // Sant Andreu de la Barca (jugado el 29/10/2026)
+const JORNADA_FIJADA_BANNER = null;
 
 function seleccionarPartidos(){
   const ordenados = [...partidos].sort((a, b) => parseFecha(a.fecha) - parseFecha(b.fecha));
@@ -4365,13 +4364,14 @@ function seleccionarPartidos(){
   let partidoActual;
   if(indiceDirecto !== -1){
     partidoActual = ordenados[indiceDirecto];
-  }else if(partidoAnterior){
-    // el último "final" de la hoja sale siempre en el banner con su
-    // resultado, aunque haya filas marcadas "proximo", "aplazado" o
-    // "suspendido" -- solo le gana un partido en directo
-    partidoActual = partidoAnterior;
   }else if(indiceProximo !== -1){
+    // la fila marcada "proximo" en la hoja es la que sale en el banner de
+    // "Próximo partido" -- solo le gana un partido en directo
     partidoActual = ordenados[indiceProximo];
+  }else if(partidoAnterior){
+    // sin nada marcado "proximo": el último "final" de la hoja sigue en el
+    // banner con su resultado
+    partidoActual = partidoAnterior;
   }else if(ultimoSuspendido){
     partidoActual = ultimoSuspendido;
   }else if(ultimoCerrado){
