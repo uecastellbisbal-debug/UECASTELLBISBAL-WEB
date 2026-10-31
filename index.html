@@ -3573,12 +3573,19 @@ async function cargarRadarYPintar(calendarioListo){
       const resp = await fetchCSVSinCache(URL_RADAR);
       if(resp.ok){
         const filas = parsearCSV(await resp.text());
+        const tieneValor = v => v !== undefined && String(v).trim() !== "" && String(v).trim() !== "-";
         // además de las filas sin datos, se descartan las de jornadas
         // aplazadas/suspendidas aunque lleven algún dato escrito: no cuentan
         // (ni en las gráficas ni en los totales). De ellas solo se guarda,
-        // aparte, la jornada y la posición, que el resumen sí enseña
-        const filasConPosicion = filas.filter(f => f.Posicion && f.Posicion !== "-");
-        const filasConDatos = filasConPosicion.filter(f => !jornadaSinJugar(Number(f.Jornada)));
+        // aparte, la jornada y la posición, que el resumen sí enseña.
+        // Una jornada atrasada que se juega tarde puede traer puntos y
+        // tarjetas pero la posición en "-" (la clasificación ya va por otra
+        // jornada): esa fila sí cuenta, solo se queda fuera de la gráfica de
+        // posición
+        const filasConPosicion = filas.filter(f => tieneValor(f.Posicion));
+        const filasConDatos = filas
+          .filter(f => tieneValor(f.Posicion) || tieneValor(f.Puntos))
+          .filter(f => !jornadaSinJugar(Number(f.Jornada)));
         radarSinJugar = filasConPosicion.filter(f => jornadaSinJugar(Number(f.Jornada))).map(filaARadar);
         if(filasConDatos.length){
           // se ordenan por número de jornada: si una jornada aplazada se juega
@@ -3871,8 +3878,10 @@ function calcularPartidosGanados(){
 function filaRadarMasReciente(){
   // se tienen en cuenta también las filas de jornadas aplazadas/suspendidas
   // (solo para la jornada y la posición del resumen)
+  // (solo filas con posición: una jornada atrasada con la posición en "-"
+  // no puede dar la "Posición" del resumen)
   const candidatas = radarTemporada.concat(radarSinJugar);
-  const conFecha = candidatas.filter(d => d.jornada > 0 && d.fecha);
+  const conFecha = candidatas.filter(d => d.jornada > 0 && d.fecha && d.posicion > 0);
   if(!conFecha.length) return radarTemporada[radarTemporada.length - 1];
   return conFecha.reduce((a, b) => parseFecha(b.fecha) >= parseFecha(a.fecha) ? b : a);
 }
@@ -4197,8 +4206,10 @@ function pintarRadarDesglose(){
 
   // en la gráfica, un 0 significa "todavía sin clasificar": se trata como si
   // fuera el último puesto, para que la línea arranque abajo del todo en vez
-  // de arriba (que sería visualmente engañoso, como si fuera el 1er puesto)
-  const datosPosicion = radarTemporada.map(d => ({
+  // de arriba (que sería visualmente engañoso, como si fuera el 1er puesto).
+  // Eso solo vale para la jornada 0: una jornada jugada sin posición (una
+  // atrasada con "-" en la hoja) se quita de esta gráfica y queda como hueco
+  const datosPosicion = radarTemporada.filter(d => d.jornada === 0 || d.posicion > 0).map(d => ({
     jornada: d.jornada,
     posicion: d.posicion === 0 ? 16 : d.posicion
   }));
