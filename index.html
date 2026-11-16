@@ -4408,6 +4408,13 @@ function seleccionarPartidos(){
    usa si ya ha llegado un valor. */
 const ENLACE_ACTA_FCF = "https://www.fcf.cat/ca/competicio/acta/";
 
+/* si en vez del número viene una dirección completa (por ejemplo la página
+   del partido en fcf.cat, cuando el acta todavía no tiene número), se
+   enlaza tal cual */
+function enlaceActa(acta){
+  return /^https?:\/\//i.test(acta) ? acta : ENLACE_ACTA_FCF + encodeURIComponent(acta);
+}
+
 /* ---------- pinta el banner de arriba (próximo / en directo / final) ---------- */
 /* dirección fija del campo propio, se usa solo si la hoja no trae nada para esa fila */
 const CAMPO_PROPIO_NOMBRE = "Campo Municipal";
@@ -4492,7 +4499,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       // el Apps Script en cuanto la FCF cierra el acta -- puede tardar un
       // poco desde que el partido pasa a "final")
       if(partidoActual.acta){
-        actaEl.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoActual.acta);
+        actaEl.href = enlaceActa(partidoActual.acta);
         actaEl.style.display = "";
       }
       // y el mismo resultado se refleja también en la tarjeta de "Último
@@ -4527,7 +4534,7 @@ function pintarBannerPartido(partidoActual, partidoAnterior){
       badgeWrap.innerHTML = `<span class="live-suspendido">${estado === "aplazado" ? "Aplazado" : "Suspendido"}</span>`;
       // si ya hay acta (aunque sea la provisional del partido parado), se enlaza
       if(partidoActual.acta){
-        actaEl.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoActual.acta);
+        actaEl.href = enlaceActa(partidoActual.acta);
         actaEl.style.display = "";
       }
     }else{
@@ -4811,7 +4818,7 @@ function pintarUltimoPartidoDesdeSheet(partido, golesCastellbisbal, golesRival){
 
   const btnActaUltimo = document.getElementById("btnActaUltimo");
   if(partido.acta){
-    btnActaUltimo.href = ENLACE_ACTA_FCF + encodeURIComponent(partido.acta);
+    btnActaUltimo.href = enlaceActa(partido.acta);
     btnActaUltimo.style.display = "";
   }else{
     btnActaUltimo.style.display = "none";
@@ -4882,7 +4889,7 @@ function pintarUltimoPartido(partidoAnterior){
 
   const btnActaUltimo = document.getElementById("btnActaUltimo");
   if(partidoAnterior.acta){
-    btnActaUltimo.href = ENLACE_ACTA_FCF + encodeURIComponent(partidoAnterior.acta);
+    btnActaUltimo.href = enlaceActa(partidoAnterior.acta);
     btnActaUltimo.style.display = "";
   }else{
     btnActaUltimo.style.display = "none";
@@ -4996,7 +5003,7 @@ function pintarCalendario(){
       // si ya ha llegado el número de acta (lo rellena el Apps Script), se
       // añade un enlace pequeño al lado del marcador
       const enlaceActaCalendario = p.acta
-        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        ? `<a class="cal-acta" href="${enlaceActa(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
         : "";
       horaHTML = `<span class="cal-hora cal-resultado-wrap"><span class="cal-resultado">${p.golesLocal}-${p.golesVisitante}</span>${enlaceActaCalendario}</span>`;
     }else if(p.estado === "aplazado"){
@@ -5008,7 +5015,7 @@ function pintarCalendario(){
       // si ya hay acta (por ejemplo la provisional de un partido suspendido),
       // se enlaza con el mismo icono pequeño que en los partidos jugados
       const iconoActa = p.acta
-        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        ? `<a class="cal-acta" href="${enlaceActa(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
         : "";
       fechaHTML = `<span class="cal-fecha">Aplazado</span>`;
       // fecha original solo con día/mes: con el año no cabe en la columna
@@ -5021,7 +5028,7 @@ function pintarCalendario(){
       // resultado al que se suspendió (si la hoja lo trae; si no, la fecha)
       row.classList.add("suspendido");
       const iconoActa = p.acta
-        ? `<a class="cal-acta" href="${ENLACE_ACTA_FCF}${encodeURIComponent(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
+        ? `<a class="cal-acta" href="${enlaceActa(p.acta)}" target="_blank" rel="noopener" title="Ver acta oficial" aria-label="Ver acta oficial">📋</a>`
         : "";
       fechaHTML = `<span class="cal-fecha">Suspendido</span>`;
       horaHTML = (p.golesLocal !== null && p.golesVisitante !== null)
@@ -5393,7 +5400,8 @@ function normalizarEstado(valor){
   return ["proximo", "en_directo", "final", "aplazado", "suspendido"].includes(limpio) ? limpio : "";
 }
 
-/* ---------- actas puestas a mano (jornada -> número de acta de la FCF) para
+/* ---------- actas puestas a mano (jornada -> número de acta de la FCF, o
+   la dirección completa de la página del partido si aún no hay número) para
    cuando el Apps Script todavía no las ha escrito en la hoja. Si la hoja ya
    trae acta para esa jornada, manda la de la hoja; esto es solo un respaldo,
    se puede borrar cuando el activador del Apps Script las rellene solo ---------- */
@@ -5403,7 +5411,9 @@ const ACTAS_MANUALES = {
   5: "4118873", // acta provisional del partido suspendido
   6: "4118881",
   7: "4118888",
-  8: "4118896"
+  8: "4118896",
+  // sin número de acta todavía: se enlaza la página del partido en fcf.cat
+  9: "https://www.fcf.cat/ca/partit/2026-2027/tercera-catalana/grup-12/jornada-9/pa-union-d-malaga-club-a-3cat-vs-castellbisbal-ue-a-3cat"
 };
 
 /* ---------- convierte una fila de la hoja en un partido tal como lo espera el resto del código ---------- */
