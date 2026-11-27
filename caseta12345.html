@@ -493,30 +493,40 @@ ul{ list-style:none; }
 .caseta-fase.is-final .caseta-fase-num{ color:#f0d878; background:rgba(212,175,55,0.18); }
 
 /* financiación */
-.caseta-meta{
+.caseta-necesitamos{
   margin-top:40px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:860px){ .caseta-necesitamos{ grid-template-columns:1fr; } }
+.caseta-meta{
   border:1px solid rgba(123,53,200,0.45);
   border-radius:8px;
   background:linear-gradient(135deg, rgba(123,53,200,0.16), var(--black-soft) 60%);
-  padding:28px;
+  padding:26px;
 }
+.caseta-meta h3{ font-family:var(--display); text-transform:uppercase; font-size:20px; margin-top:8px; }
 .caseta-meta-cifras{
+  margin-top:16px;
   display:flex;
   flex-wrap:wrap;
   align-items:baseline;
   justify-content:space-between;
-  gap:8px 24px;
+  gap:4px 16px;
 }
 .caseta-meta-recaudado{
   font-family:var(--display);
-  font-size:clamp(30px, 5vw, 44px);
+  font-size:clamp(30px, 5vw, 42px);
   font-variant-numeric:tabular-nums;
 }
-.caseta-meta-objetivo{ color:var(--white-dim); font-size:14px; }
+.caseta-meta-objetivo{ color:var(--white-dim); font-size:14px; font-variant-numeric:tabular-nums; }
+.caseta-meta-objetivo strong{ color:var(--lilac-light); }
 .caseta-barra{
-  margin-top:18px;
-  height:10px;
-  border-radius:5px;
+  margin-top:14px;
+  height:12px;
+  border-radius:6px;
   background:rgba(245,245,243,0.08);
   overflow:hidden;
 }
@@ -524,11 +534,51 @@ ul{ list-style:none; }
   display:block;
   height:100%;
   width:0;
-  border-radius:5px;
+  border-radius:6px;
   background:linear-gradient(90deg, var(--lilac), var(--lilac-light));
   transition:width 1.2s ease;
 }
-.caseta-meta-nota{ margin-top:14px; color:var(--white-faint); font-size:12.5px; line-height:1.6; }
+.caseta-barra.is-material i{ background:linear-gradient(90deg, #16a34a, #4ade80); }
+.caseta-meta-nota{ margin-top:12px; color:var(--white-faint); font-size:12.5px; line-height:1.6; }
+
+/* lista de necesidades */
+.caseta-necesidades{ margin-top:18px; display:grid; }
+.caseta-necesidad{
+  display:grid;
+  grid-template-columns:24px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:10px 0;
+  border-top:1px solid var(--line);
+  font-size:14px;
+}
+.caseta-necesidad-check{
+  width:22px; height:22px;
+  border-radius:50%;
+  border:1.5px solid rgba(245,245,243,0.3);
+  display:flex; align-items:center; justify-content:center;
+}
+.caseta-necesidad-check svg{ width:13px; height:13px; }
+.caseta-necesidad.is-conseguido .caseta-necesidad-check{ background:#16a34a; border-color:#16a34a; color:#fff; }
+.caseta-necesidad.is-conseguido .caseta-necesidad-texto{ color:var(--white-faint); text-decoration:line-through; }
+.caseta-necesidad-texto{ color:var(--white); min-width:0; }
+.caseta-necesidad-texto span{ display:block; color:var(--white-faint); font-size:12px; margin-top:2px; }
+.caseta-necesidad-btn{
+  border:1px solid rgba(74,222,128,0.45);
+  background:transparent;
+  color:#4ade80;
+  border-radius:999px;
+  padding:5px 11px;
+  font-family:var(--body);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background .2s ease, color .2s ease;
+}
+.caseta-necesidad-btn:hover{ background:#16a34a; color:#fff; border-color:#16a34a; }
+.caseta-necesidad-ok{ font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#4ade80; }
 
 .caseta-formas{
   margin-top:24px;
@@ -864,13 +914,28 @@ ul{ list-style:none; }
     <h2 class="section-title">Súmate al proyecto</h2>
     <p class="caseta-texto">Cada aportación cuenta: en dinero, en material, en servicios o en horas de trabajo. Buscamos colaboradores y donaciones de <strong>empresas, entidades, personas y familias</strong>.</p>
 
-    <div class="caseta-meta" id="casetaMeta">
-      <div class="caseta-meta-cifras">
-        <span class="caseta-meta-recaudado" id="metaRecaudado">Presupuesto en elaboración</span>
-        <span class="caseta-meta-objetivo" id="metaObjetivo"></span>
+    <div class="caseta-necesitamos" id="necesitamos">
+      <div class="caseta-meta">
+        <p class="caseta-forma-quien">Necesidades económicas</p>
+        <h3>Lo que llevamos</h3>
+        <div class="caseta-meta-cifras">
+          <span class="caseta-meta-recaudado" id="metaRecaudado">0 €</span>
+          <span class="caseta-meta-objetivo" id="metaObjetivo"></span>
+        </div>
+        <div class="caseta-barra" role="img" id="metaBarraWrap" aria-label="Recaudación"><i id="metaBarra"></i></div>
+        <p class="caseta-meta-nota">Aportaciones económicas de empresas, entidades, personas y familias, sobre un objetivo de <span id="metaObjetivoTexto"></span>. Puedes aportar por Bizum.</p>
       </div>
-      <div class="caseta-barra" role="img" id="metaBarraWrap" aria-label="Progreso de la recaudación"><i id="metaBarra"></i></div>
-      <p class="caseta-meta-nota" id="metaNota">En cuanto tengamos el presupuesto cerrado, aquí verás el objetivo y lo que llevamos conseguido entre todos.</p>
+      <div class="caseta-meta">
+        <p class="caseta-forma-quien" style="color:#4ade80">Colaboraciones</p>
+        <h3>Lo que necesitamos</h3>
+        <div class="caseta-meta-cifras">
+          <span class="caseta-meta-recaudado" id="materialPct">0%</span>
+          <span class="caseta-meta-objetivo" id="materialCuenta"></span>
+        </div>
+        <div class="caseta-barra is-material" role="img" id="materialBarraWrap" aria-label="Necesidades cubiertas"><i id="materialBarra"></i></div>
+        <div class="caseta-necesidades" id="necesidadesLista"></div>
+        <p class="caseta-meta-nota">¿Puedes conseguir, prestar o donar alguna de estas cosas? Pulsa «Lo aporto» y nos ponemos en contacto.</p>
+      </div>
     </div>
 
     <div class="caseta-formas">
@@ -984,15 +1049,33 @@ ul{ list-style:none; }
    PROYECTO CASETA
    ------------------------------------------------------------
    Datos que se editan a mano a medida que avance el proyecto:
-   - OBJETIVO_EUROS: presupuesto total (null = todavía sin cerrar,
-     se muestra "Presupuesto en elaboración").
-   - RECAUDADO_EUROS: lo conseguido hasta ahora.
+   - OBJETIVO_EUROS / RECAUDADO_EUROS: barra de necesidades económicas
+     (lo recaudado sobre el objetivo).
+   - necesidadesCaseta: lista de cosas que hacen falta. Cuando alguien
+     aporta una, se cambia conseguido:false por conseguido:true (y si se
+     quiere, quien:"Nombre" para darle las gracias). El porcentaje de la
+     barra de colaboraciones se calcula solo.
    - BIZUM_NUMERO: número (o código) de Bizum del club. Vacío = se
      muestra "Número de Bizum pendiente".
    ============================================================ */
-const OBJETIVO_EUROS = null;
+const OBJETIVO_EUROS = 2000;
 const RECAUDADO_EUROS = 0;
 const BIZUM_NUMERO = "";
+
+const necesidadesCaseta = [
+  { cosa: "Pintura interior y exterior",        detalle: "Blanca y lila, unos 60 litros",           conseguido: false },
+  { cosa: "Rodillos, brochas y cinta de pintor", detalle: "Para las jornadas de pintura",           conseguido: false },
+  { cosa: "Electricista",                        detalle: "Revisar y renovar la instalación",       conseguido: false },
+  { cosa: "Fontanero",                           detalle: "Agua y baño",                             conseguido: false },
+  { cosa: "Furgoneta y contenedor",              detalle: "Para vaciar y llevar escombros",          conseguido: false },
+  { cosa: "Puerta de entrada",                   detalle: "Nueva o en buen estado",                  conseguido: false },
+  { cosa: "Iluminación LED",                     detalle: "Pantallas y focos interiores",            conseguido: false },
+  { cosa: "Mesas y sillas",                      detalle: "Para unas 30 personas",                   conseguido: false },
+  { cosa: "Nevera",                              detalle: "Para el tercer tiempo",                   conseguido: false },
+  { cosa: "Televisión o pantalla",               detalle: "Para ver partidos y vídeos",              conseguido: false },
+  { cosa: "Vitrina para trofeos",                detalle: "Para la historia del club",               conseguido: false },
+  { cosa: "Material de limpieza",                detalle: "Para dejarla a punto",                     conseguido: false },
+];
 
 /* Fotos de "Cómo está" y "Cómo quedará": 4 por apartado, 2 exteriores
    y 2 interiores. Se guardan en assets/caseta/ con estos nombres y se
@@ -1017,19 +1100,49 @@ function escaparHTML(texto){
   return div.innerHTML;
 }
 
-const fmtEuros = n => n.toLocaleString("es-ES", { maximumFractionDigits:0 }) + " €";
+// punto de miles siempre ("2.000 €"; toLocaleString en español no lo pone con 4 cifras)
+const fmtEuros = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " €";
+
+const ICONO_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
 function pintarMeta(){
-  if(!OBJETIVO_EUROS){
-    document.getElementById("metaBarraWrap").style.display = "none";
-    return;
-  }
-  const pct = Math.min(100, Math.round(RECAUDADO_EUROS / OBJETIVO_EUROS * 100));
+  // barra económica: lo recaudado sobre el objetivo
+  const pctEuros = Math.min(100, Math.round(RECAUDADO_EUROS / OBJETIVO_EUROS * 100));
   document.getElementById("metaRecaudado").textContent = fmtEuros(RECAUDADO_EUROS);
-  document.getElementById("metaObjetivo").textContent = `de ${fmtEuros(OBJETIVO_EUROS)} · ${pct}%`;
-  document.getElementById("metaBarraWrap").setAttribute("aria-label", `Recaudado ${pct}% del objetivo`);
-  document.getElementById("metaNota").textContent = "Cifras actualizadas a mano por el club a medida que llegan las aportaciones.";
-  requestAnimationFrame(() => { document.getElementById("metaBarra").style.width = pct + "%"; });
+  document.getElementById("metaObjetivo").innerHTML = `de ${fmtEuros(OBJETIVO_EUROS)} · <strong>${pctEuros}%</strong>`;
+  document.getElementById("metaObjetivoTexto").textContent = fmtEuros(OBJETIVO_EUROS);
+  document.getElementById("metaBarraWrap").setAttribute("aria-label", `Recaudado ${fmtEuros(RECAUDADO_EUROS)} de ${fmtEuros(OBJETIVO_EUROS)} (${pctEuros}%)`);
+
+  // barra de colaboraciones: % de la lista de necesidades ya cubierta
+  const total = necesidadesCaseta.length;
+  const hechas = necesidadesCaseta.filter(n => n.conseguido).length;
+  const pctMaterial = total ? Math.round(hechas / total * 100) : 0;
+  document.getElementById("materialPct").textContent = pctMaterial + "%";
+  document.getElementById("materialCuenta").innerHTML = `<strong style="color:#4ade80">${hechas}</strong> de ${total} cubiertas`;
+  document.getElementById("materialBarraWrap").setAttribute("aria-label", `${hechas} de ${total} necesidades cubiertas (${pctMaterial}%)`);
+  document.getElementById("necesidadesLista").innerHTML = necesidadesCaseta.map((n, i) => `
+    <div class="caseta-necesidad${n.conseguido ? " is-conseguido" : ""}">
+      <span class="caseta-necesidad-check">${n.conseguido ? ICONO_CHECK : ""}</span>
+      <span class="caseta-necesidad-texto">${escaparHTML(n.cosa)}${n.detalle ? `<span>${escaparHTML(n.detalle)}${n.conseguido && n.quien ? " · Gracias, " + escaparHTML(n.quien) : ""}</span>` : ""}</span>
+      ${n.conseguido
+        ? `<span class="caseta-necesidad-ok">Conseguido</span>`
+        : `<button class="caseta-necesidad-btn" type="button" data-necesidad="${i}">Lo aporto</button>`}
+    </div>`).join("");
+
+  // las barras se rellenan con animación cuando la sección entra en pantalla
+  const llenar = () => {
+    document.getElementById("metaBarra").style.width = pctEuros + "%";
+    document.getElementById("materialBarra").style.width = pctMaterial + "%";
+  };
+  const zona = document.getElementById("necesitamos");
+  if("IntersectionObserver" in window){
+    const io = new IntersectionObserver(es => {
+      if(es.some(e => e.isIntersecting)){ llenar(); io.disconnect(); }
+    }, { threshold:0.3 });
+    io.observe(zona);
+  }else{
+    llenar();
+  }
 }
 pintarMeta();
 
@@ -1088,6 +1201,15 @@ document.querySelectorAll("[data-colaborar]").forEach(btn => {
     const tipo = btn.dataset.colaborar;
     const asunto = `Proyecto Caseta UEC — ${tipo}`;
     const cuerpo = `Hola,\n\nMe gustaría colaborar con el proyecto de rehabilitación de la caseta de la UE Castellbisbal.\n\nSoy: ${tipo}\nNombre:\nTeléfono:\nCómo me gustaría ayudar:\n\nGracias.`;
+    window.location.href = `mailto:${EMAIL_CASETA}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  });
+});
+
+document.querySelectorAll("[data-necesidad]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const n = necesidadesCaseta[Number(btn.dataset.necesidad)];
+    const asunto = `Proyecto Caseta UEC — Puedo aportar: ${n.cosa}`;
+    const cuerpo = `Hola,\n\nPuedo aportar para la caseta: ${n.cosa}.\n\nNombre:\nTeléfono:\nDetalles (si lo dono, lo presto, cuándo podría ser...):\n\nGracias.`;
     window.location.href = `mailto:${EMAIL_CASETA}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
   });
 });
