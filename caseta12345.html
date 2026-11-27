@@ -578,6 +578,10 @@ ul{ list-style:none; }
   transition:background .2s ease, color .2s ease;
 }
 .caseta-necesidad-btn:hover{ background:#16a34a; color:#fff; border-color:#16a34a; }
+.caseta-donacion{ grid-template-columns:24px 1fr auto; }
+.caseta-donacion .caseta-necesidad-check{ background:rgba(123,53,200,0.25); border-color:rgba(168,104,232,0.6); color:var(--lilac-light); }
+.caseta-donacion-euros{ font-family:var(--display); font-size:15px; font-variant-numeric:tabular-nums; color:var(--white); }
+.caseta-donaciones-vacio{ padding:12px 0 2px; border-top:1px solid var(--line); color:var(--white-faint); font-size:13.5px; }
 .caseta-necesidad-ok{ font-size:11px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#4ade80; }
 
 .caseta-formas{
@@ -923,6 +927,7 @@ ul{ list-style:none; }
           <span class="caseta-meta-objetivo" id="metaObjetivo"></span>
         </div>
         <div class="caseta-barra" role="img" id="metaBarraWrap" aria-label="Recaudación"><i id="metaBarra"></i></div>
+        <div class="caseta-necesidades" id="donacionesLista"></div>
         <p class="caseta-meta-nota">Aportaciones económicas de empresas, entidades, personas y familias, sobre un objetivo de <span id="metaObjetivoTexto"></span>. Puedes aportar por Bizum.</p>
       </div>
       <div class="caseta-meta">
@@ -1049,8 +1054,11 @@ ul{ list-style:none; }
    PROYECTO CASETA
    ------------------------------------------------------------
    Datos que se editan a mano a medida que avance el proyecto:
-   - OBJETIVO_EUROS / RECAUDADO_EUROS: barra de necesidades económicas
-     (lo recaudado sobre el objetivo).
+   - OBJETIVO_EUROS: objetivo de la barra de necesidades económicas.
+   - donacionesCaseta: cada donación que llega, en orden. Lo recaudado
+     se calcula solo sumando la lista. Se pone { euros: 20 } y, si el
+     donante quiere salir con nombre, { euros: 20, nombre: "Familia X" };
+     sin nombre se muestra "Donación 1", "Donación 2"...
    - necesidadesCaseta: lista de cosas que hacen falta. Cuando alguien
      aporta una, se cambia conseguido:false por conseguido:true (y si se
      quiere, quien:"Nombre" para darle las gracias). El porcentaje de la
@@ -1059,7 +1067,13 @@ ul{ list-style:none; }
      muestra "Número de Bizum pendiente".
    ============================================================ */
 const OBJETIVO_EUROS = 2000;
-const RECAUDADO_EUROS = 0;
+// EJEMPLO: estas tres donaciones son de prueba; borrarlas al empezar de verdad.
+const donacionesCaseta = [
+  { euros: 50 },
+  { euros: 20 },
+  { euros: 5 },
+];
+const RECAUDADO_EUROS = donacionesCaseta.reduce((s, d) => s + (Number(d.euros) || 0), 0);
 const BIZUM_NUMERO = "";
 
 const necesidadesCaseta = [
@@ -1112,6 +1126,16 @@ function pintarMeta(){
   document.getElementById("metaObjetivo").innerHTML = `de ${fmtEuros(OBJETIVO_EUROS)} · <strong>${pctEuros}%</strong>`;
   document.getElementById("metaObjetivoTexto").textContent = fmtEuros(OBJETIVO_EUROS);
   document.getElementById("metaBarraWrap").setAttribute("aria-label", `Recaudado ${fmtEuros(RECAUDADO_EUROS)} de ${fmtEuros(OBJETIVO_EUROS)} (${pctEuros}%)`);
+  // lista de donaciones, en el orden en que han llegado
+  const listaDon = document.getElementById("donacionesLista");
+  listaDon.innerHTML = donacionesCaseta.length
+    ? donacionesCaseta.map((d, i) => `
+      <div class="caseta-necesidad caseta-donacion">
+        <span class="caseta-necesidad-check">${ICONO_CHECK}</span>
+        <span class="caseta-necesidad-texto">${d.nombre ? escaparHTML(d.nombre) : `Donación ${i + 1}`}</span>
+        <span class="caseta-donacion-euros">${fmtEuros(Number(d.euros) || 0)}</span>
+      </div>`).join("")
+    : `<p class="caseta-donaciones-vacio">Todavía no hay donaciones. ¿Quieres ser la primera?</p>`;
 
   // barra de colaboraciones: % de la lista de necesidades ya cubierta
   const total = necesidadesCaseta.length;
