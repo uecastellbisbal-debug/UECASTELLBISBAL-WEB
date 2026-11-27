@@ -778,6 +778,22 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
   font-size:13.5px;
 }
 
+/* aviso de nombres válidos */
+.caseta-aviso{
+  grid-column:1 / -1;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  margin-top:4px;
+  padding:14px 16px;
+  border-radius:6px;
+  border:1px solid rgba(234,179,8,0.35);
+  background:rgba(234,179,8,0.07);
+}
+.caseta-aviso svg{ width:20px; height:20px; flex:none; color:#eab308; margin-top:1px; }
+.caseta-aviso p{ color:var(--white-dim); font-size:13.5px; line-height:1.6; }
+.caseta-aviso strong{ color:var(--white); }
+
 /* muro de la sede social */
 .caseta-muro-claves{
   margin-top:32px;
@@ -1126,9 +1142,13 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
       </div>
       <ol class="caseta-pasos">
         <li><span>Haz un Bizum al número del club por la cantidad que quieras. <strong>Con 20 € o más</strong>, tu nombre irá al mural.</span></li>
-        <li><span>Si aportas 20 € o más, escribe en el <strong>concepto</strong> el nombre que quieres que aparezca: el tuyo, el de tu familia, tu empresa, tu entidad… lo que tú quieras.<br><span class="caseta-concepto">Ej.: Familia Garcia Puig</span></span></li>
+        <li><span>Si aportas 20 € o más, escribe en el <strong>concepto</strong> el nombre que quieres que aparezca: el tuyo, el de tu familia, el de tu empresa o el de tu entidad.<br><span class="caseta-concepto">Ej.: Familia Garcia Puig</span></span></li>
         <li><span>Tu nombre aparecerá en el <strong>mural de la pared principal de la caseta</strong>, junto al nombre y el escudo del club. Todos los nombres, del mismo tamaño. Las aportaciones de menos de 20 € también son bienvenidas y suman igual al objetivo, aunque no aparezcan en el mural.</span></li>
       </ol>
+      <div class="caseta-aviso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p><strong>Nombres válidos.</strong> El nombre del mural debe ser real y respetuoso: el de una persona, una familia, una empresa o una entidad (o «Anónimo»). No se aceptan insultos, bromas, apodos ofensivos, mensajes políticos ni publicidad. El club revisará cada nombre y, <strong>si alguno no encaja, se devolverá el Bizum</strong>.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -1143,7 +1163,7 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
 
     <div class="caseta-muro-claves">
       <div class="caseta-compromiso"><h3>Todos iguales</h3><p>Desde 20 €, todos los nombres con el mismo tamaño, aporte lo que aporte cada uno.</p></div>
-      <div class="caseta-compromiso"><h3>Tú eliges el nombre</h3><p>El tuyo, el de tu familia, tu empresa, tu entidad… o anónimo, si lo prefieres.</p></div>
+      <div class="caseta-compromiso"><h3>Tú eliges el nombre</h3><p>El tuyo, el de tu familia, tu empresa, tu entidad… o anónimo, si lo prefieres. Siempre un nombre real y respetuoso: el club los revisa todos.</p></div>
       <div class="caseta-compromiso"><h3>El corazón de la sede social</h3><p>Con una pantalla en el centro para ver los partidos y luces LED lilas, el color del club.</p></div>
     </div>
 
@@ -1191,7 +1211,7 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
       <div class="caseta-campo">
         <label for="formNombre">Nombre para el mural</label>
         <input type="text" id="formNombre" maxlength="60" autocomplete="off" placeholder="Tu nombre, tu familia, tu empresa, tu entidad…">
-        <span class="caseta-campo-ayuda">Así aparecerá en el mural de la caseta, igual que todos los demás.</span>
+        <span class="caseta-campo-ayuda">Así aparecerá en el mural de la caseta, igual que todos los demás. Debe ser un nombre real y respetuoso (persona, familia, empresa o entidad); si no encaja, te pediremos cambiarlo.</span>
       </div>
 
       <div class="caseta-campo">
