@@ -254,14 +254,18 @@ ul{ list-style:none; }
 .caseta-hero::before{
   content:"";
   position:absolute; inset:0;
-  background:url("assets/hero-bg.jpg") center/cover no-repeat;
-  opacity:0.28;
+  background:url("assets/caseta/hero-campo.jpg") center 60%/cover no-repeat;
+  opacity:0.75;
   z-index:0;
 }
 .caseta-hero::after{
   content:"";
   position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(5,5,5,0.55) 0%, rgba(46,17,80,0.55) 55%, var(--black) 100%);
+  /* oscurece la foto lo justo para que el texto se lea: más por la izquierda
+     (donde va el título) y fundido a negro abajo, igual que el resto de la web */
+  background:
+    linear-gradient(90deg, rgba(5,5,5,0.82) 0%, rgba(5,5,5,0.55) 45%, rgba(46,17,80,0.25) 100%),
+    linear-gradient(180deg, rgba(5,5,5,0.35) 0%, rgba(5,5,5,0) 40%, var(--black) 100%);
   z-index:0;
 }
 .caseta-hero .wrap{ position:relative; z-index:1; }
