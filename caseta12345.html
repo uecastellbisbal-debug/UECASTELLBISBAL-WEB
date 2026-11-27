@@ -594,7 +594,15 @@ ul{ list-style:none; }
 .caseta-necesidad-texto{ color:var(--white); min-width:0; }
 .caseta-necesidad-texto span{ display:block; color:var(--white-faint); font-size:12px; margin-top:2px; }
 .caseta-necesidad-pendiente{ font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--white-faint); }
-.caseta-meta .caseta-btn{ margin-top:20px; }
+.caseta-meta-cab{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px 16px;
+  flex-wrap:wrap;
+}
+.caseta-meta-cab > div{ min-width:0; flex:1 1 200px; }
+.caseta-btn-cab{ flex:none; padding:10px 16px; font-size:11.5px; }
 
 /* formulario de colaboración en servicios o especies */
 .caseta-modal{
@@ -1018,8 +1026,13 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
 
     <div class="caseta-necesitamos" id="necesitamos">
       <div class="caseta-meta">
-        <p class="caseta-forma-quien">Necesidades económicas</p>
-        <h3>Lo que llevamos</h3>
+        <div class="caseta-meta-cab">
+          <div>
+            <p class="caseta-forma-quien">Necesidades económicas</p>
+            <h3>Lo que llevamos</h3>
+          </div>
+          <a class="caseta-btn caseta-btn-cab" href="#bizum">Aportar por Bizum</a>
+        </div>
         <div class="caseta-meta-cifras">
           <span class="caseta-meta-recaudado" id="metaRecaudado">0 €</span>
           <span class="caseta-meta-objetivo" id="metaObjetivo"></span>
@@ -1027,11 +1040,15 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
         <div class="caseta-barra" role="img" id="metaBarraWrap" aria-label="Recaudación"><i id="metaBarra"></i></div>
         <div class="caseta-necesidades" id="donacionesLista"></div>
         <p class="caseta-meta-nota">Aportaciones económicas de empresas, entidades, personas y familias, sobre un objetivo de <span id="metaObjetivoTexto"></span>.</p>
-        <a class="caseta-btn" href="#bizum">Aportar por Bizum</a>
       </div>
       <div class="caseta-meta">
-        <p class="caseta-forma-quien" style="color:#4ade80">Colaboraciones en servicios o especies</p>
-        <h3>Lo que necesitamos</h3>
+        <div class="caseta-meta-cab">
+          <div>
+            <p class="caseta-forma-quien" style="color:#4ade80">Colaboraciones en servicios o especies</p>
+            <h3>Lo que necesitamos</h3>
+          </div>
+          <button class="caseta-btn caseta-btn-cab" type="button" id="btnAbrirColabora">Quiero colaborar</button>
+        </div>
         <div class="caseta-meta-cifras">
           <span class="caseta-meta-recaudado" id="materialPct">0%</span>
           <span class="caseta-meta-objetivo" id="materialCuenta"></span>
@@ -1039,7 +1056,6 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
         <div class="caseta-barra is-material" role="img" id="materialBarraWrap" aria-label="Necesidades cubiertas"><i id="materialBarra"></i></div>
         <div class="caseta-necesidades" id="necesidadesLista"></div>
         <p class="caseta-meta-nota">¿Puedes conseguir, prestar o donar alguna de estas cosas, o echar una mano con tu oficio? Elige lo que puedes aportar y tu nombre irá en el mural de la caseta.</p>
-        <button class="caseta-btn" type="button" id="btnAbrirColabora">Quiero colaborar</button>
       </div>
     </div>
 
