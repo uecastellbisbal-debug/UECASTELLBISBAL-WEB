@@ -778,6 +778,28 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
   font-size:13.5px;
 }
 
+/* muro de la sede social */
+.caseta-muro-claves{
+  margin-top:32px;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+}
+@media (max-width:900px){ .caseta-muro-claves{ grid-template-columns:1fr; } }
+.caseta-compromiso{ border-top:2px solid var(--lilac); padding-top:16px; }
+.caseta-compromiso h3{ font-size:15.5px; font-weight:800; }
+.caseta-compromiso p{ margin-top:6px; color:var(--white-dim); font-size:14px; line-height:1.65; }
+.caseta-render{ margin-top:36px; }
+.caseta-render-foto{
+  display:block;
+  width:100%;
+  aspect-ratio:16/9;
+  border:1px solid rgba(123,53,200,0.5);
+  box-shadow:0 0 60px rgba(123,53,200,0.25);
+}
+.caseta-render-foto img{ object-fit:cover; }
+.caseta-render figcaption{ margin-top:12px; color:var(--white-faint); font-size:12.5px; text-align:center; }
+
 /* CTA final */
 .caseta-cta{
   text-align:center;
@@ -1108,6 +1130,29 @@ fieldset.caseta-campo{ border:0; padding:0; margin-inline:0; min-width:0; }
         <li><span>Tu nombre aparecerá en el <strong>mural de la pared principal de la caseta</strong>, junto al nombre y el escudo del club. Todos los nombres, del mismo tamaño.</span></li>
       </ol>
     </div>
+  </div>
+</section>
+
+<!-- ============ EL MURO DE LA SEDE SOCIAL ============ -->
+<section class="section reveal" id="muro">
+  <div class="wrap">
+    <p class="section-eyebrow">El muro de la sede social</p>
+    <h2 class="section-title">Tu nombre en nuestra casa</h2>
+    <p class="caseta-texto">En la pared principal de la sede social haremos un gran mural con el nombre de todos los que hayan hecho posible la caseta. Y lo tenemos claro: <strong>todos los colaboradores, sea quien sea y aporte lo que aporte, tienen derecho a aparecer en el mural</strong>.</p>
+    <p class="caseta-texto">Da igual si ayudas con un Bizum, con material, con tu oficio o con tus horas: tu nombre estará ahí, para siempre, en la casa del club.</p>
+
+    <div class="caseta-muro-claves">
+      <div class="caseta-compromiso"><h3>Todos iguales</h3><p>Todos los nombres con el mismo tamaño, aporte lo que aporte cada uno.</p></div>
+      <div class="caseta-compromiso"><h3>Tú eliges el nombre</h3><p>El tuyo, el de tu familia, tu empresa, tu entidad… o anónimo, si lo prefieres.</p></div>
+      <div class="caseta-compromiso"><h3>El corazón de la sede</h3><p>Con una pantalla en el centro para ver los partidos y luces LED lilas, el color del club.</p></div>
+    </div>
+
+    <figure class="caseta-render">
+      <button class="caseta-foto caseta-render-foto" type="button" data-src="assets/caseta/ejemplo-mural.svg" aria-label="Ampliar el render del mural">
+        <img src="assets/caseta/ejemplo-mural.svg" alt="Render de ejemplo: pared principal de la sede con un mural lila lleno de nombres de colaboradores, una pantalla en el centro y luces LED lilas alrededor" loading="lazy">
+      </button>
+      <figcaption>Render de ejemplo: así podría quedar la pared principal de la sede social. Los nombres son inventados.</figcaption>
+    </figure>
   </div>
 </section>
 
